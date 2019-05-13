@@ -32,7 +32,7 @@ The timeline of the development must comply with the official GSoC [timeline](ht
   * Test the application with real users and adapt to the feedback
   
   ## Contributors
-  * Mentor: Leventis Sotiris ([sleventis](https://github.com/sleventis))
+  * Mentor: Leventis Sotiris ([sotirisleventis](https://github.com/sotirisleventis))
   * Mentor: Mikros George ([gmikros](https://github.com/gmikros))
   * Mentor: Fitsilis Fotis ([fitsilisf](https://github.com/fitsilisf))
   * Google Summer of Code 2019 Participant: Papantonakis Panagiotis ([PanagiotisP](https://github.com/PanagiotisP))
