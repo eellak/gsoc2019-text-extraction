@@ -10,7 +10,7 @@ The tool is going to be modular and open source, in order to be easily accessibl
 The project is going to boost and facilitate scientific research in NLP fields, as it will make text analysis available to people with little to none computer science knowledge (e.g. linguistics students).
 
 ## Project Timeline
-This project is one of the projects that got accepted for [Google Summer of Code](https://summerofcode.withgoogle.com/about/).
+This project is one of the projects that got accepted for the 2019 session of the [Google Summer of Code](https://summerofcode.withgoogle.com/about/).
 The timeline of the development must comply with the official GSoC [timeline](https://summerofcode.withgoogle.com/how-it-works/#timeline) and is the following:
 
 * Community Bonding (May 6 - May 26)
