@@ -6,23 +6,32 @@ class App extends Component {
   constructor() {
     super();
     this.state = {
+      platform: window.process.platform,
       electron: window.require('electron'),
       isDev: window.require('electron-is-dev'),
       selectedFilesPaths: []
     };
   }
-
   addFilesDialog = () => {
     const path = require('path');
     const dialog = this.state.electron.remote.dialog;
-    dialog.showOpenDialog({
+    dialog.showOpenDialog(this.state.electron.remote.getCurrentWindow(), 
+    {
       title: 'Add files to process',
       defaultPath: this.state.isDev ? "/home/panagiotis/Documents/gsoc2019-text-extraction/data" : `${path.join(__dirname, '../data')}`,
       properties: ['openFile', 'multiSelections']
     },
       (filePaths) => {
         this.setState({ selectedFilesPaths: filePaths });
-        const filenames = filePaths.map((path) => path.split('/').slice(-1)[0])
+        const filenames = filePaths.map((path) => {
+          switch (this.state.platform) {
+            case "win32":
+              return path.split('\\').slice(-1)[0];
+            case "linux":
+            default:
+              return path.split('/').slice(-1)[0];
+          }
+        });
         document.querySelector('#selected-files').innerHTML = 'You have selected ' + filenames.join(', ');
       }
     );
@@ -32,7 +41,16 @@ class App extends Component {
     const execButton = document.querySelector('#execute');
     execButton.disabled = true;
     const { spawn } = window.require('child_process');
-    const script = spawn('Rscript', ['./src/tokenize.R'].concat(this.state.selectedFilesPaths));
+    const scriptSrc = () => {
+      switch (this.state.platform) {
+        case "win32":
+          return '.\\src\\tokenize.R';
+        case "linux":
+        default:
+          return './src/tokenize.R';
+      }
+    }
+    const script = spawn('Rscript', [scriptSrc()].concat(this.state.selectedFilesPaths));
 
     // script.stderr.on('data', (data) => {
     //   console.log(`${data}`);
@@ -43,7 +61,7 @@ class App extends Component {
     });
 
 
-    script.on('close', (code) => {
+    script.on('exit', (code) => {
       console.log(`child process exited with code ${code}`);
       execButton.disabled = false;
     });
