@@ -12,31 +12,62 @@ class App extends Component {
       selectedFilesPaths: []
     };
   }
+
+  componentDidMount() {
+    const { spawn } = window.require('child_process');
+    const scriptSrc = () => {
+      switch (this.state.platform) {
+        case "win32":
+          return '.\\src\\initializeR.R';
+        case "linux":
+        default:
+          return './src/initializeR.R';
+      }
+    }
+    const script = spawn('Rscript', [scriptSrc()]);
+
+    // script.stderr.on('data', (data) => {
+    //   console.log(`${data}`);
+    // });
+
+    script.stdout.on('data', (data) => {
+      console.log(`${data}`);
+    });
+
+
+    script.on('exit', (code) => {
+      console.log(`child process exited with code ${code}`);
+    });
+  }
+
   addFilesDialog = () => {
     const path = require('path');
     const dialog = this.state.electron.remote.dialog;
-    dialog.showOpenDialog(this.state.electron.remote.getCurrentWindow(), 
-    {
-      title: 'Add files to process',
-      defaultPath: this.state.isDev ? "/home/panagiotis/Documents/gsoc2019-text-extraction/data" : `${path.join(__dirname, '../data')}`,
-      properties: ['openFile', 'multiSelections']
-    },
+    dialog.showOpenDialog(this.state.electron.remote.getCurrentWindow(),
+      {
+        title: 'Add files to process',
+        defaultPath: this.state.isDev ? "/home/panagiotis/Documents/gsoc2019-text-extraction/data" : `${path.join(__dirname, '../data')}`,
+        properties: ['openFile', 'multiSelections']
+      },
       (filePaths) => {
-        this.setState({ selectedFilesPaths: filePaths });
-        const filenames = filePaths.map((path) => {
-          switch (this.state.platform) {
-            case "win32":
-              return path.split('\\').slice(-1)[0];
-            case "linux":
-            default:
-              return path.split('/').slice(-1)[0];
-          }
-        });
-        document.querySelector('#selected-files').innerHTML = 'You have selected ' + filenames.join(', ');
+        let filenames = []
+        if (filePaths !== undefined) {
+          this.setState({ selectedFilesPaths: filePaths });
+          filenames = filePaths.map((path) => {
+            switch (this.state.platform) {
+              case "win32":
+                return path.split('\\').slice(-1)[0];
+              case "linux":
+              default:
+                return path.split('/').slice(-1)[0];
+            }
+          });
+        }
+        filePaths === undefined ? {} : document.querySelector('#selected-files').innerHTML = 'You have selected ' + filenames.join(', ');
       }
     );
   }
-
+  
   executeScript = () => {
     const execButton = document.querySelector('#execute');
     execButton.disabled = true;
@@ -44,10 +75,10 @@ class App extends Component {
     const scriptSrc = () => {
       switch (this.state.platform) {
         case "win32":
-          return '.\\src\\tokenize.R';
+          return '.\\src\\readability_indices.R';
         case "linux":
         default:
-          return './src/tokenize.R';
+          return './src/readability_indices.R';
       }
     }
     const script = spawn('Rscript', [scriptSrc()].concat(this.state.selectedFilesPaths));
