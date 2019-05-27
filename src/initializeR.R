@@ -12,3 +12,4 @@ if (!require(koRpus)) { install.packages('koRpus', lib=libPath) }
 if(!require(koRpus.lang.en)) { install.koRpus.lang("en", lib=libPath) }
 if(!require("quanteda")) { install.packages("quanteda", lib=libPath) }
 if(!require("readtext")) { install.packages("readtext", lib=libPath) }
+if(!require("R.utils")) { install.packages("R.utils", lib=libPath) }
