@@ -1,11 +1,13 @@
 # Initialize R
+
+# Set mirror to download packages
 r <- getOption("repos")
 r["CRAN"] <- "http://cran.us.r-project.org"
 options(repos = r)
 rm(r)
 
+# Create the environment in which R will run
 if(!dir.exists("Rlibrary")) dir.create("Rlibrary");
-
 .libPaths("Rlibrary")
 libPath <- "Rlibrary"
 if (!require(koRpus)) { install.packages('koRpus', lib=libPath) }

@@ -3,6 +3,16 @@ import logo from './logo.svg';
 import './App.css';
 
 class App extends Component {
+  /* State:
+  * platform: information about the platform (for cross-platform use)
+  * isDev: the mode in which the application runs (production or development)
+  * electron: electron instance, used to reach application's main window
+  * selectedFilePaths: array which stores the paths of input files
+  */
+
+  /* resultList: a global array to store the results of the nlp scripts
+  */
+
   constructor() {
     super();
     this.state = {
@@ -10,9 +20,12 @@ class App extends Component {
       electron: window.require('electron'),
       isDev: window.require('electron-is-dev'),
       selectedFilesPaths: [],
-      resultList: []
     };
+    var resultList = []
   }
+
+  /* R environment is initialized immediately after startup*
+  */
 
   componentDidMount() {
     const { spawn } = window.require('child_process');
@@ -31,15 +44,18 @@ class App extends Component {
     //   console.log(`${data}`);
     // });
 
-    script.stdout.on('data', (data) => {
-      console.log(`${data}`);
-    });
-
+    // script.stdout.on('data', (data) => {
+    //   console.log(`${data}`);
+    // });
 
     script.on('exit', (code) => {
       console.log(`InitializeR process exited with code ${code}`);
     });
   }
+
+  /* addFilesDialog:
+  * an electron dialog opens in order to select input files
+  */
 
   addFilesDialog = () => {
     const path = require('path');
@@ -69,6 +85,10 @@ class App extends Component {
     );
   }
 
+
+  /* executeScript:
+  * call an NLP script using the npm's child_process module
+  */
   executeScript = () => {
     const execButton = document.querySelector('#execute');
     execButton.disabled = true;
@@ -103,13 +123,13 @@ class App extends Component {
       data = String(data);
       if (data.startsWith('{')) {
         try{
-          this.state.resultList.push(JSON.parse(data));
+          this.resultList.push(JSON.parse(data));
         }
         catch(e) {
           if(e === SyntaxError) {
             const multipleDataList = data.split('\n');
             multipleDataList.forEach((json) => {
-              this.state.resultList.push(JSON.parse(json));
+              this.resultList.push(JSON.parse(json));
             });
           }
         }
@@ -118,10 +138,10 @@ class App extends Component {
 
 
     script.on('exit', (code) => {
-      console.log(this.state.resultList);
+      console.log(this.resultList);
       console.log(`child process exited with code ${code}`);
       execButton.disabled = false;
-      this.state.resultList = [];
+      this.resultList = [];
     });
   }
 
