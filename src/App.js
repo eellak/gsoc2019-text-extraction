@@ -92,7 +92,6 @@ class App extends Component {
 
 
     const script = spawn('Rscript', [scriptSrc()].concat("-filePaths=" + this.state.selectedFilesPaths).concat("-index=" + indices.join(',')));
-    console.log("-index=" + indices.join(','));
     // script.stderr.on('data', (data) => {
     //   console.log(`${data}`);
     // });
@@ -124,6 +123,8 @@ class App extends Component {
         <div id="selected-files">
         </div>
         <input type="checkbox" class="read-index" name="readability-index" value="ARI" />ARI
+        <input type="checkbox" class="read-index" name="readability-index" value="ARI.NRI" />(ARI NRI)
+        <input type="checkbox" class="read-index" name="readability-index" value="ARI.simple" />(ARI simplified)
         <input type="checkbox" class="read-index" name="readability-index" value="Bormuth" />Bormuth
         <input type="checkbox" class="read-index" name="readability-index" value="Coleman" />Coleman
         <input type="checkbox" class="read-index" name="readability-index" value="Coleman.Liau" />Coleman.Liau
@@ -133,10 +134,14 @@ class App extends Component {
         <input type="checkbox" class="read-index" name="readability-index" value="DRP" />DRP
         <input type="checkbox" class="read-index" name="readability-index" value="ELF" />ELF
         <input type="checkbox" class="read-index" name="readability-index" value="Farr.Jenkins.Paterson" />Farr.Jenkins.Paterson
+        <input type="checkbox" class="read-index" name="readability-index" value="Farr.Jenkins.Paterson.PSK" />Farr.Jenkins.Paterson PSK
         <input type="checkbox" class="read-index" name="readability-index" value="Flesch" />Flesch
+        <input type="checkbox" class="read-index" name="readability-index" value="Flesch.PSK" />Flesch PSK
         <input type="checkbox" class="read-index" name="readability-index" value="Flesch.Kincaid" />Flesch.Kincaid
         <input type="checkbox" class="read-index" name="readability-index" value="FOG" />FOG
-        <input type="checkbox" class="read-index" name="readability-index" value="FORCAST" />FORCAST
+        <input type="checkbox" class="read-index" name="readability-index" value="FOG.PSK" />FOG PSK
+        <input type="checkbox" class="read-index" name="readability-index" value="FOG.NRI" />FOG NRI
+        <input type="checkbox" class="read-index" name="readability-index" value="FORCAST.RGL" />FORCAST Reading Grade Level
         <input type="checkbox" class="read-index" name="readability-index" value="Fucks" />Fucks
         <input type="checkbox" class="read-index" name="readability-index" value="Harris.Jacobson" />Harris.Jacobson
         <input type="checkbox" class="read-index" name="readability-index" value="Linsear.Write" />Linsear.Write
@@ -144,6 +149,8 @@ class App extends Component {
         <input type="checkbox" class="read-index" name="readability-index" value="nWS" />nWS
         <input type="checkbox" class="read-index" name="readability-index" value="RIX" />RIX
         <input type="checkbox" class="read-index" name="readability-index" value="SMOG" />SMOG
+        <input type="checkbox" class="read-index" name="readability-index" value="SMOG.C" />SMOG C
+        <input type="checkbox" class="read-index" name="readability-index" value="SMOG.simple" />SMOG simplified
         <input type="checkbox" class="read-index" name="readability-index" value="Spache" />Spache
         <input type="checkbox" class="read-index" name="readability-index" value="Strain" />Strain
         <input type="checkbox" class="read-index" name="readability-index" value="Traenkle.Bailer" />Traenkle.Bailer
