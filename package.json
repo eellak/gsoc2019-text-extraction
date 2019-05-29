@@ -3,12 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "electron-is-dev": "^1.1.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-scripts": "0.9.5"
   },
   "devDependencies": {
     "concurrently": "^4.1.0",
+    "cross-env": "^5.2.0",
     "electron": "^5.0.1",
     "wait-on": "^3.2.0"
   },
@@ -19,6 +21,6 @@
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
-    "electron-dev": "concurrently \"BROWSER=none npm start\" \"wait-on http://localhost:3000 && electron .\""
+    "electron-dev": "concurrently \"cross-env BROWSER=none npm start\" \"wait-on http://localhost:3000 && electron .\""
   }
 }
