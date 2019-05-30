@@ -3,68 +3,102 @@ import './ReadabilityOptions.css';
 
 class ReadabilityOptions extends Component {
 
-    constructor() {
-        super();
-        this.state = {
-            platform: window.process.platform,
-            electron: window.require('electron'),
-            isDev: window.require('electron-is-dev'),
-            selectedFilesPaths: [],
-            resultList: []
-        };
+  constructor(props) {
+    super(props);
+    this.state = {
+      readabilityIndices: [
+        //TODO probably will add a "what to return" field. Maybe load from database
+        { indexName: "ARI", displayName: "ARI" },
+        { indexName: "ARI.NRI", displayName: "ARI NRI" },
+        { indexName: "ARI.simple", displayName: "ARI simplified" },
+        { indexName: "Bormuth", displayName: "Bormuth" },
+        { indexName: "Coleman", displayName: "Coleman" },
+        { indexName: "Coleman.Liau", displayName: "Coleman.Liau" },
+        { indexName: "Dale.Chall", displayName: "Dale.Chall" },
+        { indexName: "Danielson.Bryan", displayName: "Danielson.Bryan" },
+        { indexName: "Dickes.Steiwer", displayName: "Dickes.Steiwer" },
+        { indexName: "DRP", displayName: "DRP" },
+        { indexName: "ELF", displayName: "ELF" },
+        { indexName: "Farr.Jenkins.Paterson", displayName: "Farr.Jenkins.Paterson" },
+        { indexName: "Farr.Jenkins.Paterson.PSK", displayName: "Farr.Jenkins.Paterson PSK" },
+        { indexName: "Flesch", displayName: "Flesch" },
+        { indexName: "Flesch.PSK", displayName: "Flesch PSK" },
+        { indexName: "Flesch.Kincaid", displayName: "Flesch.Kincaid" },
+        { indexName: "FOG", displayName: "FOG" },
+        { indexName: "FOG.PSK", displayName: "FOG PSK" },
+        { indexName: "FOG.NRI", displayName: "FOG NRI" },
+        { indexName: "FORCAST", displayName: "FORCAST" },
+        { indexName: "FORCAST.RGL", displayName: "FORCAST Reading Grade Level" },
+        { indexName: "Fucks", displayName: "Fucks" },
+        { indexName: "Harris.Jacobson", displayName: "Harris.Jacobson" },
+        { indexName: "Linsear.Write", displayName: "Linsear.Write" },
+        { indexName: "LIX", displayName: "LIX" },
+        { indexName: "RIX", displayName: "RIX" },
+        { indexName: "SMOG", displayName: "SMOG" },
+        { indexName: "SMOG.C", displayName: "SMOG C" },
+        { indexName: "SMOG.simple", displayName: "SMOG simplified" },
+        { indexName: "Spache", displayName: "Spache" },
+        { indexName: "Strain", displayName: "Strain" },
+        { indexName: "Traenkle.Bailer", displayName: "Traenkle.Bailer" },
+        { indexName: "TRI", displayName: "TRI" },
+        { indexName: "Tuldava", displayName: "Tuldava" },
+        { indexName: "Wheeler.Smith", displayName: "Wheeler.Smith" },
+      ],
+      env: 'Rscript',
+      scriptPath: (() => {
+        switch (props.platform) {
+          case "win32":
+            return "src\\Built-in\\readability\\readability_indices.R";
+          case "linux":
+          default:
+            return "src/Built-in/readability/readability_indices.R";
+        }
+      })(),
     }
+  };
 
-    checkAll = () => {
-        const checkboxes = document.querySelectorAll(".read-index");
-        const isChecked = document.querySelector("#check-all").checked;
-        checkboxes.forEach((checkbox) => {
-          checkbox.checked = isChecked;
-        });
-      }
-      
-    render() {
-        return (
-            <div id="select-read-indices">
-                <input type="checkbox" id="check-all" name="readability-index" value="all" onClick={this.checkAll} />All
-              <input type="checkbox" className="read-index" name="readability-index" value="ARI" />ARI
-              <input type="checkbox" className="read-index" name="readability-index" value="ARI.NRI" />(ARI NRI)
-              <input type="checkbox" className="read-index" name="readability-index" value="ARI.simple" />(ARI simplified)
-              <input type="checkbox" className="read-index" name="readability-index" value="Bormuth" />Bormuth
-              <input type="checkbox" className="read-index" name="readability-index" value="Coleman" />Coleman
-              <input type="checkbox" className="read-index" name="readability-index" value="Coleman.Liau" />Coleman.Liau
-              <input type="checkbox" className="read-index" name="readability-index" value="Dale.Chall" />Dale.Chall
-              <input type="checkbox" className="read-index" name="readability-index" value="Danielson.Bryan" />Danielson.Bryan
-              <input type="checkbox" className="read-index" name="readability-index" value="Dickes.Steiwer" />Dickes.Steiwer
-              <input type="checkbox" className="read-index" name="readability-index" value="DRP" />DRP
-              <input type="checkbox" className="read-index" name="readability-index" value="ELF" />ELF
-              <input type="checkbox" className="read-index" name="readability-index" value="Farr.Jenkins.Paterson" />Farr.Jenkins.Paterson
-              <input type="checkbox" className="read-index" name="readability-index" value="Farr.Jenkins.Paterson.PSK" />Farr.Jenkins.Paterson PSK
-              <input type="checkbox" className="read-index" name="readability-index" value="Flesch" />Flesch
-              <input type="checkbox" className="read-index" name="readability-index" value="Flesch.PSK" />Flesch PSK
-              <input type="checkbox" className="read-index" name="readability-index" value="Flesch.Kincaid" />Flesch.Kincaid
-              <input type="checkbox" className="read-index" name="readability-index" value="FOG" />FOG
-              <input type="checkbox" className="read-index" name="readability-index" value="FOG.PSK" />FOG PSK
-              <input type="checkbox" className="read-index" name="readability-index" value="FOG.NRI" />FOG NRI
-              <input type="checkbox" className="read-index" name="readability-index" value="FORCAST" />FORCAST
-              <input type="checkbox" className="read-index" name="readability-index" value="FORCAST.RGL" />FORCAST Reading Grade Level
-              <input type="checkbox" className="read-index" name="readability-index" value="Fucks" />Fucks
-              <input type="checkbox" className="read-index" name="readability-index" value="Harris.Jacobson" />Harris.Jacobson
-              <input type="checkbox" className="read-index" name="readability-index" value="Linsear.Write" />Linsear.Write
-              <input type="checkbox" className="read-index" name="readability-index" value="LIX" />LIX
-              {/* <input type="checkbox" className="read-index" name="readability-index" value="nWS" />nWS */}
-                <input type="checkbox" className="read-index" name="readability-index" value="RIX" />RIX
-              <input type="checkbox" className="read-index" name="readability-index" value="SMOG" />SMOG
-              <input type="checkbox" className="read-index" name="readability-index" value="SMOG.C" />SMOG C
-              <input type="checkbox" className="read-index" name="readability-index" value="SMOG.simple" />SMOG simplified
-              <input type="checkbox" className="read-index" name="readability-index" value="Spache" />Spache
-              <input type="checkbox" className="read-index" name="readability-index" value="Strain" />Strain
-              <input type="checkbox" className="read-index" name="readability-index" value="Traenkle.Bailer" />Traenkle.Bailer
-              <input type="checkbox" className="read-index" name="readability-index" value="TRI" />TRI
-              <input type="checkbox" className="read-index" name="readability-index" value="Tuldava" />Tuldava
-              <input type="checkbox" className="read-index" name="readability-index" value="Wheeler.Smith" />Wheeler.Smith
-            </div>
-        );
-    }
+  componentDidUpdate(prevProps) {
+    if(prevProps.filePaths !== this.props.filePaths) this.changeArgs();
   }
 
-    export default ReadabilityOptions;
+  checkAll = () => {
+    const checkboxes = document.querySelectorAll(".read-index");
+    const isChecked = document.querySelector("#check-all").checked;
+    checkboxes.forEach((checkbox) => {
+      checkbox.checked = isChecked;
+    });
+  }
+ 
+  changeArgs = () => {
+    const checkboxes = document.querySelectorAll(".read-index");
+    let indexList = [];
+    checkboxes.forEach((checkbox) => {
+      if (checkbox.checked) {
+        indexList.push(checkbox.value);
+      }
+      else {
+        document.querySelector("#check-all").checked = false;
+      }
+    })
+    if(indexList.length === 0 || this.props.filePaths.length === 0) this.props.setScriptParameters(true, this.props.type);
+    else {
+      const args = ["-filePaths=" + this.props.filePaths.join(','), "-index=" + indexList.join(',')];
+      this.props.setScriptParameters(false, this.props.type, this.state.env, this.state.scriptPath, args);
+    }
+}
+
+  render() {
+    return (
+      <div id="select-read-indices">
+        <form onChange={this.changeArgs}>
+          <input type="checkbox" id="check-all" name="readability-index" value="all" onClick={this.checkAll} />All
+        {this.state.readabilityIndices.map((indexObj, i) =>
+            <div key={i}><input type="checkbox" className="read-index" name="readability-index" value={indexObj.indexName} />{indexObj.displayName}</div>
+          )}
+        </form>
+      </div>
+    );
+  }
+}
+
+export default ReadabilityOptions;

@@ -23,7 +23,11 @@ class CustomOptions extends Component {
       }
       
     render() {
-        return (<div></div>);
+        return (
+        <form id="custom-options">
+            <button>Select script</button>
+            <input type="text" placeholder="Insert necessary arguments"/>
+        </form>);
     }
   }
 
