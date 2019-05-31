@@ -65,6 +65,7 @@ class CustomOptions extends Component {
     let [env, , , args] = e.target.parentNode.children;
     const id = e.target.parentNode.getAttribute("id").split('-').slice(-1);
     this.props.setScriptParameters(false, `${this.props.type}${id}`, env.value, this.state.scriptPaths.id, args.value.split(' '));
+    document.querySelector(`#add-script-${id}`).innerText="update";
     document.querySelector(`#remove-script-${id}`).style.display="inline";
     this.spawnCustomOption();
   }
@@ -90,7 +91,7 @@ class CustomOptions extends Component {
         <button onClick={this.addScriptDialog}>Select script</button>
         <div id={`display-script-${String(this.state.id)}`}></div>
         <input type="text" placeholder="Insert necessary arguments" />
-        <button onClick={this.addScript}>add</button>
+        <button id={`add-script-${String(this.state.id)}`} onClick={this.addScript}>add</button>
         <button className="remove-script" id={`remove-script-${String(this.state.id)}`} onClick={this.removeScript}>remove</button>
       </div>);
       let displayData = this.state.displayData;

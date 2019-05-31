@@ -57,10 +57,6 @@ class ReadabilityOptions extends Component {
     }
   };
 
-  componentDidUpdate(prevProps) {
-    if(prevProps.filePaths !== this.props.filePaths) this.changeArgs();
-  }
-
   checkAll = () => {
     const checkboxes = document.querySelectorAll(".read-index");
     const isChecked = document.querySelector("#check-all").checked;
@@ -69,7 +65,7 @@ class ReadabilityOptions extends Component {
     });
   }
  
-  changeArgs = () => {
+  changeArgs = (e) => {
     const checkboxes = document.querySelectorAll(".read-index");
     let indexList = [];
     checkboxes.forEach((checkbox) => {
@@ -80,22 +76,28 @@ class ReadabilityOptions extends Component {
         document.querySelector("#check-all").checked = false;
       }
     })
-    if(indexList.length === 0 || this.props.filePaths.length === 0) this.props.setScriptParameters(true, this.props.type);
+    if(indexList.length === 0 || this.props.filePaths.length === 0) {
+      console.log("Please select at least one file");
+      this.props.setScriptParameters(true, this.props.type);
+      e.target.innerText = "add";
+    }
     else {
       const args = ["-filePaths=" + this.props.filePaths.join(','), "-index=" + indexList.join(',')];
       this.props.setScriptParameters(false, this.props.type, this.state.env, this.state.scriptPath, args);
+      e.target.innerText = "update";
     }
 }
 
   render() {
     return (
       <div id="select-read-indices">
-        <form onChange={this.changeArgs}>
+        <div>
           <input type="checkbox" id="check-all" name="readability-index" value="all" onClick={this.checkAll} />All
         {this.state.readabilityIndices.map((indexObj, i) =>
             <div key={i}><input type="checkbox" className="read-index" name="readability-index" value={indexObj.indexName} />{indexObj.displayName}</div>
           )}
-        </form>
+          <button id={`add-readability-${String(this.state.id)}`} onClick={this.changeArgs}>add</button>
+        </div>
       </div>
     );
   }
