@@ -138,6 +138,7 @@ class App extends Component {
   }
 
   render() {
+    console.log(this.state.toExecute)
     const renderType = (() => {
       switch (this.state.display) {
         case "dummy":
@@ -152,7 +153,7 @@ class App extends Component {
           return (
             <div>
               <p>Select options</p>
-              <CustomOptions setScriptParameters={this.setScriptParameters} />
+              <CustomOptions platform={this.state.platform} electron={this.state.electron} isDev={this.state.isDev} type="custom" setScriptParameters={this.setScriptParameters} />
             </div>);
         default:
           return <div />;
