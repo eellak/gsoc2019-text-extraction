@@ -138,11 +138,15 @@ class App extends Component {
   }
 
   render() {
-    console.log(this.state.toExecute)
+    // console.log(this.state.toExecute)
     const renderType = (() => {
       switch (this.state.display) {
         case "dummy":
-          return <p>Executing dummy copy-paste to data\results</p>;
+          if(this.state.selectedFilesPaths.length !== 0) {
+            const file = new File(["foo"], this.state.selectedFilesPaths[0]);
+            return <p>Dummy method which pastes the path of the first selected file. {file.name}</p>;
+          }
+          else return <p>No file selected.</p>;
         case "readability":
           return (
             <div>
@@ -159,6 +163,7 @@ class App extends Component {
           return <div />;
       }
     })();
+
     return (
       <div className="App">
         <div className="App-header">
