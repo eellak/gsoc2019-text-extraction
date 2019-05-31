@@ -9,7 +9,8 @@ class CustomOptions extends Component {
       resultList: [],
       environments: [
         "Rscript",
-        "python3"],
+        "python3",
+        "python"],
       scriptPaths: {},
       id: 0,
       displayData: {}
@@ -40,9 +41,9 @@ class CustomOptions extends Component {
         properties: ['openFile']
       },
       (scriptPath) => {
-        scriptPath = scriptPath[0];
         let scriptName = ""
         if (scriptPath !== undefined) {
+          scriptPath = scriptPath[0];
           let scriptPaths = this.state.scriptPaths;
           scriptPaths.id = scriptPath;
           this.setState({ scriptPaths: scriptPaths });
@@ -64,10 +65,10 @@ class CustomOptions extends Component {
   addScript = (e) => {
     let [env, , , args] = e.target.parentNode.children;
     const id = e.target.parentNode.getAttribute("id").split('-').slice(-1);
+    if(document.querySelector(`#add-script-${id}`).innerText === "add") this.spawnCustomOption();
     this.props.setScriptParameters(false, `${this.props.type}${id}`, env.value, this.state.scriptPaths.id, args.value.split(' '));
-    document.querySelector(`#add-script-${id}`).innerText="update";
-    document.querySelector(`#remove-script-${id}`).style.display="inline";
-    this.spawnCustomOption();
+    document.querySelector(`#add-script-${id}`).innerText = "update";
+    document.querySelector(`#remove-script-${id}`).style.display = "inline"
   }
 
   removeScript = (e) => {
@@ -75,15 +76,15 @@ class CustomOptions extends Component {
     this.props.setScriptParameters(true, `${this.props.type}${id}`);
     let displayData = this.state.displayData;
     delete displayData[id];
-    this.setState({ displayData: displayData});
+    this.setState({ displayData: displayData });
   }
 
   spawnCustomOption = () => {
     const envSelect =
-    <select defaultValue="Choose environment">
+      <select defaultValue="Choose environment">
         {this.state.environments.map((env, i) =>
           <option key={i} value={env}>{env}</option>
-          )}
+        )}
       </select>
     const child = (
       <div key={this.state.id} id={`custom-options-${String(this.state.id)}`}>
@@ -94,10 +95,10 @@ class CustomOptions extends Component {
         <button id={`add-script-${String(this.state.id)}`} onClick={this.addScript}>add</button>
         <button className="remove-script" id={`remove-script-${String(this.state.id)}`} onClick={this.removeScript}>remove</button>
       </div>);
-      let displayData = this.state.displayData;
-      displayData[String(this.state.id)] = child;
-      this.setState({ id: this.state.id + 1, displayData: displayData});
-    }
+    let displayData = this.state.displayData;
+    displayData[String(this.state.id)] = child;
+    this.setState({ id: this.state.id + 1, displayData: displayData });
+  }
 
   render() {
     return (
