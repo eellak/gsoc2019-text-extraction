@@ -82,6 +82,12 @@ class App extends Component {
   */
 
   executeScript = (env, scriptPath, args = []) => {
+    let replaceIndex = args.indexOf("{filepaths}")
+    if(replaceIndex !== -1) {
+      let firstPart = args.slice(0, replaceIndex);
+      let secondPart = args.slice(replaceIndex + 1);
+      args = firstPart.concat(this.state.selectedFilesPaths).concat(secondPart);
+    }
     const execButton = document.querySelector('#execute');
     execButton.disabled = true;
     const { spawn } = window.require('child_process');
@@ -145,13 +151,11 @@ class App extends Component {
 
     const readabilityTab = (
       <div>
-        <p>Select one or more indices to extract</p>
         <ReadabilityOptions filePaths={this.state.selectedFilesPaths} type="readability" setScriptParameters={this.setScriptParameters} platform={this.state.platform} />
       </div>);
 
     const customScriptTab = (
       <div>
-        <p>Select options</p>
         <CustomOptions platform={this.state.platform} electron={this.state.electron} isDev={this.state.isDev} type="custom" setScriptParameters={this.setScriptParameters} />
       </div>);
 

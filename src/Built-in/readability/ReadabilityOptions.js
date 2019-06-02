@@ -91,6 +91,7 @@ class ReadabilityOptions extends Component {
   render() {
     return (
       <div id="select-read-indices">
+        <p>Select one or more indices to extract</p>
         <div>
           <input type="checkbox" id="check-all" name="readability-index" value="all" onClick={this.checkAll} />All
         {this.state.readabilityIndices.map((indexObj, i) =>
