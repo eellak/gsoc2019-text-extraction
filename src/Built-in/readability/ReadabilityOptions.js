@@ -82,7 +82,7 @@ class ReadabilityOptions extends Component {
       e.target.innerText = "add";
     }
     else {
-      const args = ["-filePaths=" + this.props.filePaths.join(','), "-index=" + indexList.join(',')];
+      const args = ["-filePaths"].concat(this.props.filePaths).concat("-index").concat(indexList);
       this.props.setScriptParameters(false, this.props.type, this.state.env, this.state.scriptPath, args);
       e.target.innerText = "update";
     }

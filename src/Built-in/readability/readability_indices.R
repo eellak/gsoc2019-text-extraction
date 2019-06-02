@@ -6,15 +6,27 @@ library("koRpus.lang.en")
 library("quanteda")
 library("readtext")
 library("jsonlite")
-library("R.utils")
 
 # Set koRpus environment (language)
 set.kRp.env(lang="en")
 
 # Get and split commandArgs (paths of the files to process and readability indices)
-args <- commandArgs(trailingOnly=T, asValues=T)
-filePaths <- unlist(strsplit(args$filePaths, split=','))
-index <- unlist(strsplit(args$index, split=','))
+args <- commandArgs(trailingOnly=T)
+filePaths <- c();
+index <- c();
+temp <- c();
+for(arg in args) {
+    if(arg == "-filePaths") {
+        next;
+    }
+    else if (arg == "-index") {
+       filePaths <- temp;
+        temp <- c();
+        next;
+    }
+    temp <- c(temp, arg);
+}
+index <- temp;
 for (i in 1:length(filePaths)) {
     # book <- readtext(filePaths[i])
     tagged_text <- treetag(filePaths[i], treetagger="manual", lang=get.kRp.env(lang=T), TT.options=list(path="C:\\TreeTagger", preset="en"), doc_id="sample")
