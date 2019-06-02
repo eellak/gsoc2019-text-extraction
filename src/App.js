@@ -3,6 +3,8 @@ import logo from './logo.svg';
 import './App.css';
 import ReadabilityOptions from './Built-in/readability/ReadabilityOptions'
 import CustomOptions from './Built-in/custom/CustomOptions'
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import "react-tabs/style/react-tabs.css";
 
 class App extends Component {
   /* State:
@@ -23,7 +25,6 @@ class App extends Component {
       selectedFilesPaths: [],
       toExecute: {},
       resultList: [],
-      display: "",
     };
   }
 
@@ -85,7 +86,7 @@ class App extends Component {
     execButton.disabled = true;
     const { spawn } = window.require('child_process');
     const process = spawn(env, [scriptPath].concat(args));
-    
+
     // process.stderr.on('data', (data) => {
     //   console.log(`${data}`);
     // });
@@ -125,44 +126,34 @@ class App extends Component {
 
   setScriptParameters = (remove, type, env, scriptPath, args) => {
     let toExecute = this.state.toExecute;
-    if(remove) delete toExecute[type];
+    if (remove) delete toExecute[type];
     else {
       toExecute[type] = { env: env, scriptPath: scriptPath, args: args }
       this.setState({ toExecute: toExecute });
     }
   }
 
-  setDisplay = (e) => {
-    const display = e.target.getAttribute("value");
-    this.setState({ display: display });
-  }
-
   render() {
     // console.log(this.state.toExecute)
-    const renderType = (() => {
-      switch (this.state.display) {
-        case "dummy":
-          if(this.state.selectedFilesPaths.length !== 0) {
-            const file = new File(["foo"], this.state.selectedFilesPaths[0]);
-            return <p>Dummy method which pastes the path of the first selected file. {file.name}</p>;
-          }
-          else return <p>No file selected.</p>;
-        case "readability":
-          return (
-            <div>
-              <p>Select one or more indices to extract</p>
-              <ReadabilityOptions filePaths={this.state.selectedFilesPaths} type="readability" setScriptParameters={this.setScriptParameters} platform={this.state.platform} />
-            </div>);
-        case "custom":
-          return (
-            <div>
-              <p>Select options</p>
-              <CustomOptions platform={this.state.platform} electron={this.state.electron} isDev={this.state.isDev} type="custom" setScriptParameters={this.setScriptParameters} />
-            </div>);
-        default:
-          return <div />;
+    const dummyTab = (() => {
+      if (this.state.selectedFilesPaths.length !== 0) {
+        const file = new File(["foo"], this.state.selectedFilesPaths[0]);
+        return <p>Dummy method which pastes the path of the first selected file. {file.name}</p>;
       }
+      else return <p>No file selected.</p>;
     })();
+
+    const readabilityTab = (
+      <div>
+        <p>Select one or more indices to extract</p>
+        <ReadabilityOptions filePaths={this.state.selectedFilesPaths} type="readability" setScriptParameters={this.setScriptParameters} platform={this.state.platform} />
+      </div>);
+
+    const customScriptTab = (
+      <div>
+        <p>Select options</p>
+        <CustomOptions platform={this.state.platform} electron={this.state.electron} isDev={this.state.isDev} type="custom" setScriptParameters={this.setScriptParameters} />
+      </div>);
 
     return (
       <div className="App">
@@ -182,21 +173,24 @@ class App extends Component {
             </div>
             <div id=""></div>
           </div>
-          <div id="script-select">
-            <p>Select processing script</p>
-            <button onClick={this.setDisplay} value="dummy" id="built-in-dummy">
-              DummyScript
-          </button>
-            <button onClick={this.setDisplay} value="readability" id="built-in-readability">
-              Readability
-          </button>
-            <button onClick={this.setDisplay} value="custom" id="built-in-readability">
-              CustomScript
-          </button>
-          </div>
-          <div id="configuration-tab">
-            {renderType}
-          </div>
+          <p>Select processing script</p>
+          <Tabs id="script-select">
+            <TabList>
+              <Tab>DummyScript</Tab>
+              <Tab>Readability</Tab>
+              <Tab>CustomScript</Tab>
+            </TabList>
+            <TabPanel>
+              {dummyTab}
+            </TabPanel>
+            <TabPanel forceRender={true}>
+              {readabilityTab}
+            </TabPanel>
+            <TabPanel forceRender={true}>
+              {customScriptTab}
+            </TabPanel>
+          </Tabs>
+          <hr />
           <button id="execute" onClick={this.executeAll}>Execute</button>
           <div id="results">
           </div>
