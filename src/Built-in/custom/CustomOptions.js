@@ -104,7 +104,7 @@ class CustomOptions extends Component {
   render() {
     return (
       <div id="custom-scripts">
-        <p>{"Select options (access selected filepaths in commandArgs using {filepaths}"}</p>
+        <div>{"Select options (access selected filepaths in commandArgs using {filepaths}"}</div>
         {Object.values(this.state.displayData)}
       </div>);
   }

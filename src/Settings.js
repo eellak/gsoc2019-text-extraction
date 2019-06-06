@@ -32,6 +32,9 @@ class Settings extends Component {
             case "rlibrary-path":
                 name = "rlibPath";
                 break;
+            default:
+                name = ""
+                break;
         }
         const dialog = this.props.electron.remote.dialog;
         dialog.showOpenDialog(this.props.electron.remote.getCurrentWindow(),

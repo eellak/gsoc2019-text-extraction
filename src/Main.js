@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './Main.css';
-import ReadabilityOptions from './Built-in/readability/ReadabilityOptions'
-import CustomOptions from './Built-in/custom/CustomOptions'
+import FilesTab from './FilesTab'
+import ScriptsTab from './ScriptsTab'
+import ResultsTab from './ResultsTab'
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
-import SideNav, { Toggle, Nav, NavItem, NavIcon, NavText } from '@trendmicro/react-sidenav';;
+import SideNav, { NavItem, NavIcon, NavText } from '@trendmicro/react-sidenav';;
 import '@trendmicro/react-sidenav/dist/react-sidenav.css';
 import "react-tabs/style/react-tabs.css";
 
@@ -22,8 +23,8 @@ class Main extends Component {
     super(props);
     this.state = {
       selectedFilesPaths: [],
-      toExecute: {},
       resultList: [],
+      toExecute: {},
       settings: props.electron.remote.require('electron-settings'),
       tabIndex: 0
     };
@@ -45,38 +46,41 @@ class Main extends Component {
     this.executeScript(`${this.state.settings.get("rPath", "")}\\Rscript`, scriptPath, this.state.settings.get("rlibPath", "Rlibrary"));
   }
 
-  // /* addFilesDialog:
-  // * an electron dialog opens in order to select input files
-  // */
+  // // /* addFilesDialog:
+  // // * an electron dialog opens in order to select input files
+  // // */
 
-  addFilesDialog = () => {
-    const path = require('path');
-    const dialog = this.props.electron.remote.dialog;
-    dialog.showOpenDialog(this.props.electron.remote.getCurrentWindow(),
-      {
-        title: 'Add files to process',
-        defaultPath: this.props.isDev ? "/home/panagiotis/Documents/gsoc2019-text-extraction/data" : `${path.join(__dirname, '../data')}`,
-        properties: ['openFile', 'multiSelections']
-      },
-      (filePaths) => {
-        let filenames = []
-        if (filePaths !== undefined) {
-          this.setState({ selectedFilesPaths: filePaths });
-          filenames = filePaths.map((path) => {
-            switch (this.props.platform) {
-              case "win32":
-                return path.split('\\').slice(-1)[0];
-              case "linux":
-              default:
-                return path.split('/').slice(-1)[0];
-            }
-          });
-        }
-        filePaths === undefined ? {} : document.querySelector('#selected-files').innerHTML = 'You have selected ' + filenames.join(', ');
-      }
-    );
+  // addFilesDialog = () => {
+  //   const path = require('path');
+  //   const dialog = this.props.electron.remote.dialog;
+  //   dialog.showOpenDialog(this.props.electron.remote.getCurrentWindow(),
+  //     {
+  //       title: 'Add files to process',
+  //       defaultPath: this.props.isDev ? "/home/panagiotis/Documents/gsoc2019-text-extraction/data" : `${path.join(__dirname, '../data')}`,
+  //       properties: ['openFile', 'multiSelections']
+  //     },
+  //     (filePaths) => {
+  //       let filenames = []
+  //       if (filePaths !== undefined) {
+  //         this.setState({ selectedFilesPaths: filePaths });
+  //         filenames = filePaths.map((path) => {
+  //           switch (this.props.platform) {
+  //             case "win32":
+  //               return path.split('\\').slice(-1)[0];
+  //             case "linux":
+  //             default:
+  //               return path.split('/').slice(-1)[0];
+  //           }
+  //         });
+  //       }
+  //       filePaths === undefined ? {} : document.querySelector('#selected-files').innerHTML = 'You have selected ' + filenames.join(', ');
+  //     }
+  //   );
+  // }
+
+  setStateFromChildren = (obj) => {
+    this.setState(obj);
   }
-
 
   /* executeScript:
   * call an NLP script using the npm's child_process module
@@ -126,12 +130,6 @@ class Main extends Component {
     });
   }
 
-  executeAll = () => {
-    Object.values(this.state.toExecute).map((execObj) => {
-      this.executeScript(execObj.env, execObj.scriptPath, execObj.args);
-    })
-  }
-
   setScriptParameters = (remove, type, env, scriptPath, args) => {
     let toExecute = this.state.toExecute;
     if (remove) delete toExecute[type];
@@ -140,29 +138,18 @@ class Main extends Component {
       this.setState({ toExecute: toExecute });
     }
   }
-  changePanel = (tabIndex) => {
+
+  executeAll = () => {
+    Object.values(this.state.toExecute).map((execObj) => {
+      this.executeScript(execObj.env, execObj.scriptPath, execObj.args);
+    })
+  }
+
+
+  changeTab = (tabIndex) => {
     this.setState({ tabIndex: Number(tabIndex) })
   }
   render() {
-    // console.log(this.state.toExecute)
-    const dummyTab = (() => {
-      if (this.state.selectedFilesPaths.length !== 0) {
-        const file = new File(["foo"], this.state.selectedFilesPaths[0]);
-        return <div>Dummy method which pastes the path of the first selected file. {file.name}</div>;
-      }
-      else return <div>No file selected.</div>;
-    })();
-
-    const readabilityTab = (
-      <div>
-        <ReadabilityOptions filePaths={this.state.selectedFilesPaths} settings={this.state.settings} type="readability" setScriptParameters={this.setScriptParameters} platform={this.state.platform} />
-      </div>);
-
-    const customScriptTab = (
-      <div>
-        <CustomOptions platform={this.state.platform} settings={this.state.settings} electron={this.props.electron} isDev={this.state.isDev} type="custom" setScriptParameters={this.setScriptParameters} />
-      </div>);
-
     return (
       <div className="App">
         <div className="App-header">
@@ -170,32 +157,28 @@ class Main extends Component {
           <h2>Welcome to Testing grounds!</h2>
         </div>
         <div className="content">
-          <SideNav
-            onSelect={(selected) => {
-              // Add your code here
-            }}
-          >
+          <SideNav>
             <SideNav.Toggle />
-            <SideNav.Nav defaultSelected="1" onSelect={this.changePanel}>
+            <SideNav.Nav defaultSelected="1" onSelect={this.changeTab}>
               <NavItem eventKey="0">
                 <NavIcon>
-                  <i class="fas fa-file-alt"></i>
+                  <i className="fas fa-file-alt"></i>
                 </NavIcon>
                 <NavText>
                   Input
             </NavText>
               </NavItem>
-              <NavItem eventKey="1" onSelect={this.changePanel}>
+              <NavItem eventKey="1" onSelect={this.changeTab}>
                 <NavIcon>
-                  <i class="fas fa-tasks"></i>
+                  <i className="fas fa-tasks"></i>
                 </NavIcon>
                 <NavText>
                   Scripts
             </NavText>
               </NavItem>
-              <NavItem eventKey="2" onSelect={this.changePanel}>
+              <NavItem eventKey="2" onSelect={this.changeTab}>
                 <NavIcon>
-                  <i class="fas fa-signal"></i>
+                  <i className="fas fa-signal"></i>
                 </NavIcon>
                 <NavText>
                   Results
@@ -204,47 +187,40 @@ class Main extends Component {
             </SideNav.Nav>
           </SideNav>
           <Tabs selectedIndex={this.state.tabIndex} forceRenderTabPanel={true} onSelect={tabIndex => this.setState({ tabIndex: tabIndex })}>
+            <TabList className="collapsed">
+              <Tab />
+              <Tab />
+              <Tab />
+            </TabList>
             <TabPanel>
-              <div>
-                Select one or more files to be processed
-          </div>
-              <div id="add-files">
-                <button id="add-files-btn" onClick={this.addFilesDialog}>
-                  Add files
-            </button>
-                <div id="selected-files">
-                </div>
-                <div id=""></div>
-              </div>
+              <FilesTab
+                electron={this.props.electron}
+                platform={this.props.platform}
+                isDev={this.props.isDev}
+                setParentState={this.setStateFromChildren}
+              />
             </TabPanel>
             <TabPanel>
-              <div>Select processing script</div>
-              <Tabs id="script-select">
-                <TabList>
-                  <Tab>DummyScript</Tab>
-                  <Tab>Readability</Tab>
-                  <Tab>CustomScript</Tab>
-                </TabList>
-                <TabPanel>
-                  {dummyTab}
-                </TabPanel>
-                <TabPanel forceRender={true}>
-                  {readabilityTab}
-                </TabPanel>
-                <TabPanel forceRender={true}>
-                  {customScriptTab}
-                </TabPanel>
-              </Tabs>
+              <ScriptsTab
+                electron={this.props.electron}
+                platform={this.props.platform}
+                isDev={this.props.isDev}
+                setParentState={this.setStateFromChildren}
+                selectedFilesPaths={this.state.selectedFilesPaths}
+                settings={this.state.settings}
+                setScriptParameters={this.setScriptParameters}
+              />
             </TabPanel>
             <TabPanel>
-            <button id="execute" onClick={this.executeAll}>Execute</button>
-          <div id="results" />
+              <ResultsTab
+                executeAll={this.executeAll}
+              />
             </TabPanel>
           </Tabs>
         </div>
       </div>
     );
   }
-}
+};
 
 export default Main;
