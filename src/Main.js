@@ -4,6 +4,8 @@ import './Main.css';
 import ReadabilityOptions from './Built-in/readability/ReadabilityOptions'
 import CustomOptions from './Built-in/custom/CustomOptions'
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import SideNav, { Toggle, Nav, NavItem, NavIcon, NavText } from '@trendmicro/react-sidenav';;
+import '@trendmicro/react-sidenav/dist/react-sidenav.css';
 import "react-tabs/style/react-tabs.css";
 
 class Main extends Component {
@@ -22,7 +24,8 @@ class Main extends Component {
       selectedFilesPaths: [],
       toExecute: {},
       resultList: [],
-      settings: props.electron.remote.require('electron-settings')
+      settings: props.electron.remote.require('electron-settings'),
+      tabIndex: 0
     };
   }
 
@@ -80,9 +83,9 @@ class Main extends Component {
   */
 
   executeScript = (env, scriptPath, args = []) => {
-    if(env[0] === '\\') env = env.slice(1);
+    if (env[0] === '\\') env = env.slice(1);
     let replaceIndex = args.indexOf("{filepaths}")
-    if(replaceIndex !== -1) {
+    if (replaceIndex !== -1) {
       let firstPart = args.slice(0, replaceIndex);
       let secondPart = args.slice(replaceIndex + 1);
       args = firstPart.concat(this.state.selectedFilesPaths).concat(secondPart);
@@ -137,15 +140,17 @@ class Main extends Component {
       this.setState({ toExecute: toExecute });
     }
   }
-
+  changePanel = (tabIndex) => {
+    this.setState({ tabIndex: Number(tabIndex) })
+  }
   render() {
     // console.log(this.state.toExecute)
     const dummyTab = (() => {
       if (this.state.selectedFilesPaths.length !== 0) {
         const file = new File(["foo"], this.state.selectedFilesPaths[0]);
-        return <p>Dummy method which pastes the path of the first selected file. {file.name}</p>;
+        return <div>Dummy method which pastes the path of the first selected file. {file.name}</div>;
       }
-      else return <p>No file selected.</p>;
+      else return <div>No file selected.</div>;
     })();
 
     const readabilityTab = (
@@ -165,38 +170,77 @@ class Main extends Component {
           <h2>Welcome to Testing grounds!</h2>
         </div>
         <div className="content">
-          <p>
-            Select one or more files to be processed
-          </p>
-          <div id="add-files">
-            <button id="add-files-btn" onClick={this.addFilesDialog}>
-              Add files
-            </button>
-            <div id="selected-files">
-            </div>
-            <div id=""></div>
-          </div>
-          <p>Select processing script</p>
-          <Tabs id="script-select">
-            <TabList>
-              <Tab>DummyScript</Tab>
-              <Tab>Readability</Tab>
-              <Tab>CustomScript</Tab>
-            </TabList>
+          <SideNav
+            onSelect={(selected) => {
+              // Add your code here
+            }}
+          >
+            <SideNav.Toggle />
+            <SideNav.Nav defaultSelected="1" onSelect={this.changePanel}>
+              <NavItem eventKey="0">
+                <NavIcon>
+                  <i class="fas fa-file-alt"></i>
+                </NavIcon>
+                <NavText>
+                  Input
+            </NavText>
+              </NavItem>
+              <NavItem eventKey="1" onSelect={this.changePanel}>
+                <NavIcon>
+                  <i class="fas fa-tasks"></i>
+                </NavIcon>
+                <NavText>
+                  Scripts
+            </NavText>
+              </NavItem>
+              <NavItem eventKey="2" onSelect={this.changePanel}>
+                <NavIcon>
+                  <i class="fas fa-signal"></i>
+                </NavIcon>
+                <NavText>
+                  Results
+            </NavText>
+              </NavItem>
+            </SideNav.Nav>
+          </SideNav>
+          <Tabs selectedIndex={this.state.tabIndex} forceRenderTabPanel={true} onSelect={tabIndex => this.setState({ tabIndex: tabIndex })}>
             <TabPanel>
-              {dummyTab}
+              <div>
+                Select one or more files to be processed
+          </div>
+              <div id="add-files">
+                <button id="add-files-btn" onClick={this.addFilesDialog}>
+                  Add files
+            </button>
+                <div id="selected-files">
+                </div>
+                <div id=""></div>
+              </div>
             </TabPanel>
-            <TabPanel forceRender={true}>
-              {readabilityTab}
+            <TabPanel>
+              <div>Select processing script</div>
+              <Tabs id="script-select">
+                <TabList>
+                  <Tab>DummyScript</Tab>
+                  <Tab>Readability</Tab>
+                  <Tab>CustomScript</Tab>
+                </TabList>
+                <TabPanel>
+                  {dummyTab}
+                </TabPanel>
+                <TabPanel forceRender={true}>
+                  {readabilityTab}
+                </TabPanel>
+                <TabPanel forceRender={true}>
+                  {customScriptTab}
+                </TabPanel>
+              </Tabs>
             </TabPanel>
-            <TabPanel forceRender={true}>
-              {customScriptTab}
+            <TabPanel>
+            <button id="execute" onClick={this.executeAll}>Execute</button>
+          <div id="results" />
             </TabPanel>
           </Tabs>
-          <hr />
-          <button id="execute" onClick={this.executeAll}>Execute</button>
-          <div id="results">
-          </div>
         </div>
       </div>
     );

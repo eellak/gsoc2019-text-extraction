@@ -104,7 +104,7 @@ createMainWindow = (paramObj) => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', () => {
-  let { width, height } = settings.get('windowBounds', { width: 800, height: 660 });
+  let { width, height } = settings.get('windowBounds', { width: 1024, height: 800 });
   let { x, y } = settings.get('windowPosition', { x: 40, y: 60 });
   createMainWindow({
     width: width,
