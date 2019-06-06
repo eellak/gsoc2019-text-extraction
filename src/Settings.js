@@ -20,18 +20,30 @@ class Settings extends Component {
         };
     }
 
-    addFilesDialog = () => {
+    addFilesDialog = (e) => {
+        let name;
+        switch(e.target.getAttribute("id")) {
+            case "r-path":
+                name = "rPath";
+                break;
+                case "tree-path":
+                        name = "treePath";
+            break;
+        }
         const dialog = this.props.electron.remote.dialog;
         dialog.showOpenDialog(this.props.electron.remote.getCurrentWindow(),
             {
                 title: 'Add path',
-                defaultPath: this.state.settings.get('rPath', __dirname),
-                properties: ['openDirectory']
-            },
+                defaultPath: this.state.settings.get(name, __dirname),
+                properties: ['openDirectory'],
+                filters: [
+                    { name: "All Files", extensions: ['*'] }
+                ]
+                },
             (dir) => {
                 if (dir !== undefined) {
-                    document.querySelector('#r-path').innerText = dir[0];
-                    this.state.settings.set('rPath', dir[0])
+                    this.state.settings.set(name, dir[0])
+                    this.setState({});
                 }
             }
         );
@@ -46,7 +58,14 @@ class Settings extends Component {
                         <Tab>Workspace</Tab>
                     </TabList>
                     <TabPanel forceRender={true}>
-                        R bin directory (e.g. C:\Program Files\R\R-3.6.0\bin) <button onClick={this.addFilesDialog} id="r-path">{this.state.settings.get('rPath', "browse")}</button>
+                        <ul>
+                        <li>
+                            R bin directory (e.g. C:\Program Files\R\R-3.6.0\bin) <input type="text" value={this.state.settings.get('rPath', "")} readonlyy/><button onClick={this.addFilesDialog} id="r-path">...</button>
+                            </li>
+                        <li>
+                            Treetagger bin directory (e.g. C:\TreeTagger\bin) <input type="text" value={this.state.settings.get('treePath', "")} readonlyy/><button onClick={this.addFilesDialog} id="tree-path">...</button>
+                            </li>
+                        </ul>
                     </TabPanel>
                 </Tabs>
             </div>
