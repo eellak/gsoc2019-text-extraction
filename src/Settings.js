@@ -22,13 +22,16 @@ class Settings extends Component {
 
     addFilesDialog = (e) => {
         let name;
-        switch(e.target.getAttribute("id")) {
+        switch (e.target.getAttribute("id")) {
             case "r-path":
                 name = "rPath";
                 break;
-                case "tree-path":
-                        name = "treePath";
-            break;
+            case "tree-path":
+                name = "treePath";
+                break;
+            case "rlibrary-path":
+                name = "rlibPath";
+                break;
         }
         const dialog = this.props.electron.remote.dialog;
         dialog.showOpenDialog(this.props.electron.remote.getCurrentWindow(),
@@ -39,7 +42,7 @@ class Settings extends Component {
                 filters: [
                     { name: "All Files", extensions: ['*'] }
                 ]
-                },
+            },
             (dir) => {
                 if (dir !== undefined) {
                     this.state.settings.set(name, dir[0])
@@ -59,11 +62,14 @@ class Settings extends Component {
                     </TabList>
                     <TabPanel forceRender={true}>
                         <ul>
-                        <li>
-                            R bin directory (e.g. C:\Program Files\R\R-3.6.0\bin) <input type="text" value={this.state.settings.get('rPath', "")} readonlyy/><button onClick={this.addFilesDialog} id="r-path">...</button>
+                            <li>
+                                R bin directory (e.g. C:\Program Files\R\R-3.6.0\bin) <input type="text" value={this.state.settings.get('rPath', "")} readonlyy /><button onClick={this.addFilesDialog} id="r-path">...</button>
                             </li>
-                        <li>
-                            Treetagger bin directory (e.g. C:\TreeTagger\bin) <input type="text" value={this.state.settings.get('treePath', "")} readonlyy/><button onClick={this.addFilesDialog} id="tree-path">...</button>
+                            <li>
+                                Treetagger bin directory (e.g. C:\TreeTagger\bin) <input type="text" value={this.state.settings.get('treePath', "")} readonlyy /><button onClick={this.addFilesDialog} id="tree-path">...</button>
+                            </li>
+                            <li>
+                                Rlibrary directory (e.g. C:\Users\panos\Documents\R\win-library\3.6) <input type="text" value={this.state.settings.get('rlibPath', "")} readonlyy /><button onClick={this.addFilesDialog} id="rlibrary-path">...</button>
                             </li>
                         </ul>
                     </TabPanel>

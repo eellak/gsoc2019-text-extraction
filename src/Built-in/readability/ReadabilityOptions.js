@@ -44,7 +44,7 @@ class ReadabilityOptions extends Component {
         { indexName: "Tuldava", displayName: "Tuldava" },
         { indexName: "Wheeler.Smith", displayName: "Wheeler.Smith" },
       ],
-      env: 'Rscript',
+      env: `${props.settings.get("rPath", "")}\\Rscript`,
       scriptPath: (() => {
         switch (props.platform) {
           case "win32":

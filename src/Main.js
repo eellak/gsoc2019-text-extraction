@@ -16,12 +16,13 @@ class Main extends Component {
   * resultList: a global array to store the results of the nlp scripts
   */
 
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
       selectedFilesPaths: [],
       toExecute: {},
       resultList: [],
+      settings: props.electron.remote.require('electron-settings')
     };
   }
 
@@ -38,7 +39,7 @@ class Main extends Component {
           return './src/initializeR.R';
       }
     })()
-    this.executeScript('Rscript', scriptPath);
+    this.executeScript(`${this.state.settings.get("rPath", "")}\\Rscript`, scriptPath, this.state.settings.get("rlibPath", "Rlibrary"));
   }
 
   // /* addFilesDialog:
@@ -79,6 +80,7 @@ class Main extends Component {
   */
 
   executeScript = (env, scriptPath, args = []) => {
+    if(env[0] === '\\') env = env.slice(1);
     let replaceIndex = args.indexOf("{filepaths}")
     if(replaceIndex !== -1) {
       let firstPart = args.slice(0, replaceIndex);
@@ -148,12 +150,12 @@ class Main extends Component {
 
     const readabilityTab = (
       <div>
-        <ReadabilityOptions filePaths={this.state.selectedFilesPaths} type="readability" setScriptParameters={this.setScriptParameters} platform={this.state.platform} />
+        <ReadabilityOptions filePaths={this.state.selectedFilesPaths} settings={this.state.settings} type="readability" setScriptParameters={this.setScriptParameters} platform={this.state.platform} />
       </div>);
 
     const customScriptTab = (
       <div>
-        <CustomOptions platform={this.state.platform} electron={this.state.electron} isDev={this.state.isDev} type="custom" setScriptParameters={this.setScriptParameters} />
+        <CustomOptions platform={this.state.platform} settings={this.state.settings} electron={this.props.electron} isDev={this.state.isDev} type="custom" setScriptParameters={this.setScriptParameters} />
       </div>);
 
     return (

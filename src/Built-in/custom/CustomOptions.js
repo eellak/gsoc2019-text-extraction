@@ -3,14 +3,15 @@ import './CustomOptions.css';
 
 class CustomOptions extends Component {
 
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
       resultList: [],
       environments: [
-        "Rscript",
-        "python3",
-        "python"],
+        { displayName: "Rscript", path: `${props.settings.get("rPath", "")}\\Rscript`},
+        { displayName: "python3", path: `${props.settings.get("python3Path", "")}\\python3`},
+        { displayName: "python", path: `${props.settings.get("python", "")}\\python`}
+      ],
       scriptPaths: {},
       id: 0,
       displayData: {}
@@ -82,8 +83,8 @@ class CustomOptions extends Component {
   spawnCustomOption = () => {
     const envSelect =
       <select defaultValue="Choose environment">
-        {this.state.environments.map((env, i) =>
-          <option key={i} value={env}>{env}</option>
+        {this.state.environments.map((envObj, i) =>
+          <option key={i} value={envObj.path}>{envObj.displayName}</option>
         )}
       </select>
     const child = (
