@@ -9,9 +9,8 @@ const ResultsTab = props => {
     const header = (() => {
         try {
             return (<tr>
-                <th>FileName</th>
-                {props.resultList[0].readIndices.map((resultObj, i) =>
-                    <th key={i}>{resultObj.id}</th>
+                {Object.keys(props.resultList[0]).map((indexName, i) =>
+                    <th key={i}>{indexName}</th>
                 )}
             </tr>)
         }
@@ -25,11 +24,10 @@ const ResultsTab = props => {
     
     const body = (() => {
         try {
-            return (props.resultList.map((resultObj, i) =>
+            return (props.resultList.map((docIndices, i) =>
             <tr key={i}>
-                <td>{resultObj.name[0]}</td>
-                {resultObj.readIndices.map((readIndicesObj, i) =>
-                    <td key={i}>{readIndicesObj.grade}</td>
+                {Object.values(docIndices).map((value, i) =>
+                    <td key={i}>{value}</td>
                 )}
                 </tr>))
         }
