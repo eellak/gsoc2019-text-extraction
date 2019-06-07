@@ -26,7 +26,10 @@ for(arg in args) {
     }
     temp <- c(temp, arg);
 }
+
+resultFilePath <- "results.json"
 index <- temp;
+write("[", file=resultFilePath)
 for (i in 1:length(filePaths)) {
     # book <- readtext(filePaths[i])
     tagged_text <- treetag(filePaths[i], treetagger="manual", lang=get.kRp.env(lang=T), TT.options=list(path="C:\\TreeTagger", preset="en"), doc_id="sample")
@@ -39,11 +42,14 @@ for (i in 1:length(filePaths)) {
     read_indices <- readability(tagged_text, index=index, hyphen=hyphened_text, word.lists=list(Bormuth=dale_chall_wordlist$text1, Dale.Chall=dale_chall_wordlist$text1, Harris.Jacobson=dale_chall_wordlist$text1, Spache=dale_chall_wordlist$text1))
     
     indices <- list()
+    result <- c()
     for(id in index) {
         # Delete unwanted fields of data frames
         slot(read_indices, id)[c("word.list", "not.on.list", "FOG.hard.words", "dropped")] <- NULL
         slot(read_indices, id)["id"] <- id
         # indices <- append(indices, slot(read_indices, id))
-        print(toJSON(slot(read_indices, id), auto_unbox=T))
+        result <- c(result, toJSON(slot(read_indices, id), auto_unbox=T))
     }
 }
+write(result, file=resultFilePath, append=T, sep=',', ncolumns=length(result))
+write("]", file=resultFilePath, append=T)

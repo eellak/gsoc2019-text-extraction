@@ -16,7 +16,6 @@ class Main extends Component {
   * isDev: the mode in which the application runs (production or development)
   * toExecute: object with the scripts that are to be executed
   * selectedFilePaths: array which stores the paths of input files
-  * resultList: a global array to store the results of the nlp scripts
   */
 
   constructor(props) {
@@ -26,7 +25,8 @@ class Main extends Component {
       resultList: [],
       toExecute: {},
       settings: props.electron.remote.require('electron-settings'),
-      tabIndex: 0
+      tabIndex: 0,
+      fs: window.require('fs')
     };
   }
 
@@ -106,26 +106,17 @@ class Main extends Component {
     process.stdout.on('data', (data) => {
       // will probably read from a database
       console.log(`${data}`)
-      // data = String(data);
-      // if (data.startsWith('{')) {
-      //   try{
-      //     this.state.resultList.push(JSON.parse(data));
-      //   }
-      //   catch(e) {
-      //     if(e === SyntaxError) {
-      //       const multipleDataList = data.split('\n');
-      //       multipleDataList.forEach((json) => {
-      //         this.state.resultList.push(JSON.parse(json));
-      //       });
-      //     }
-      //   }
-      // }
     });
 
     process.on('exit', (code) => {
-      // console.log(this.state.resultList);
+      this.state.fs.readFile('results.json', 'utf8', (err, jsonString) => {
+        if (err) {
+          console.log("File read failed:", err)
+          return;
+        }
+        this.setState({ resultList: JSON.parse(jsonString) });
+      })
       console.log(`child process exited with code ${code}`);
-      // this.state.resultList = [];
       execButton.disabled = false;
     });
   }
@@ -149,6 +140,7 @@ class Main extends Component {
   changeTab = (tabIndex) => {
     this.setState({ tabIndex: Number(tabIndex) })
   }
+
   render() {
     return (
       <div className="App">
@@ -159,7 +151,7 @@ class Main extends Component {
         <div className="content">
           <SideNav>
             <SideNav.Toggle />
-            <SideNav.Nav defaultSelected="1" onSelect={this.changeTab}>
+            <SideNav.Nav defaultSelected="0" onSelect={this.changeTab}>
               <NavItem eventKey="0">
                 <NavIcon>
                   <i className="fas fa-file-alt"></i>
@@ -213,6 +205,7 @@ class Main extends Component {
             </TabPanel>
             <TabPanel>
               <ResultsTab
+              resultList={this.state.resultList}
                 executeAll={this.executeAll}
               />
             </TabPanel>

@@ -66,13 +66,13 @@ class Settings extends Component {
                     <TabPanel forceRender={true}>
                         <ul>
                             <li>
-                                R bin directory (e.g. C:\Program Files\R\R-3.6.0\bin) <input type="text" value={this.state.settings.get('rPath', "")} readonlyy /><button onClick={this.addFilesDialog} id="r-path">...</button>
+                                R bin directory (e.g. C:\Program Files\R\R-3.6.0\bin) <input type="text" value={this.state.settings.get('rPath', "")} readOnly /><button onClick={this.addFilesDialog} id="r-path">...</button>
                             </li>
                             <li>
-                                Treetagger bin directory (e.g. C:\TreeTagger\bin) <input type="text" value={this.state.settings.get('treePath', "")} readonlyy /><button onClick={this.addFilesDialog} id="tree-path">...</button>
+                                Treetagger bin directory (e.g. C:\TreeTagger\bin) <input type="text" value={this.state.settings.get('treePath', "")} readOnly /><button onClick={this.addFilesDialog} id="tree-path">...</button>
                             </li>
                             <li>
-                                Rlibrary directory (e.g. C:\Users\panos\Documents\R\win-library\3.6) <input type="text" value={this.state.settings.get('rlibPath', "")} readonlyy /><button onClick={this.addFilesDialog} id="rlibrary-path">...</button>
+                                Rlibrary directory (e.g. C:\Users\panos\Documents\R\win-library\3.6) <input type="text" value={this.state.settings.get('rlibPath', "")} readOnly /><button onClick={this.addFilesDialog} id="rlibrary-path">...</button>
                             </li>
                         </ul>
                     </TabPanel>
