@@ -34,15 +34,20 @@ for(i in 1:length(filePaths)) {
 }
 
 result <- list()
+result[["documents"]] <- fileNames
 result[["TokensNum"]] <- tokensNum
 result[["Vocabulary"]] <- vocabularyNum
 if(!is.null(args[["readIndex"]])) {
     readIndex <- unlist(strsplit(args[["readIndex"]], split=','))
-    result[["readability"]] <- textstat_readability(corp, measure=readIndex)
+    temp <- textstat_readability(corp, measure=readIndex)
+    temp[["document"]] <- NULL 
+    result[["readability"]] <- temp
 }
 if(!is.null(args[["lexdivIndex"]])) {
     lexdivIndex <- unlist(strsplit(args[["lexdivIndex"]], split=','))
-    result[["lexdiv"]] <- textstat_lexdiv(toks, measure=lexdivIndex)
+    temp <- textstat_lexdiv(toks, measure=lexdivIndex)
+    temp[["document"]] <- NULL 
+    result[["lexdiv"]] <- temp
 }
-print(toJSON(result, auto_unbox=T))
-write(toJSON(result, auto_unbox=T), file=resultFilePath, sep=',')
+print(toJSON(result))
+write(toJSON(result), file=resultFilePath, sep=',')

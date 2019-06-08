@@ -6,61 +6,75 @@ import "react-tabs/style/react-tabs.css";
 const ResultsTab = props => {
     console.log(props.resultList);
 
-    const header = (() => {
-        try {
-            return (<tr>
-                {Object.keys(props.resultList).map((indexName, i) =>
-                    <th key={i}>{indexName}</th>
-                )}
-            </tr>)
-        }
-        catch (e) {
-            return (
-                <tr>
-                    <div>No results</div>
-                </tr>)
-        }
-    })()
-    
-    const body = (() => {
-        try {
-            return (Object.values(props.resultList).map((value, i) => {
-            if(typeof(value) === typeof({})) {
-                Object.value(value).map((val) => {
-                    <td>{val}</td>
-                })
-            }
-            else {
-            return <tr key={i}>
-                <td>
-                {value}
-                </td>
-            </tr> 
-            }
-        })
-            )
-        }
-        catch (e) {
-            return (
-                <tr>
-                </tr>)
-        }
-    })()
-
-    const resultTable =
-        <table id="results">
-            <thead>
-                {header}
-            </thead>
-            <tbody>
-                {body}
-            </tbody>
-
-        </table>
     return (
         <div>
             <button id="execute" onClick={props.executeAll}>Execute</button>
-            {resultTable}
+            <table id="results">
+                {(() => {
+                    try {
+                        return (<thead>
+                            <tr>
+                                {Object.keys(props.resultList).map((indexName, i) => {
+                                    if (typeof (props.resultList[indexName][0]) !== typeof ({})) {
+                                        console.log(props.resultList[indexName])
+                                        return <th rowSpan="2" key={i}>{indexName}</th>
+                                    }
+                                        return <th colSpan={Object.keys(Object.keys(props.resultList[indexName][0])).length} key={i}>{indexName}</th>
+
+                                })}
+                            </tr>
+                            <tr>
+                                {Object.keys(props.resultList).map((indexName, i) => {
+                                    if (typeof (props.resultList[indexName][0]) !== typeof ({}))
+                                        return;
+                                    return Object.values(props.resultList[indexName]).map(elem => 
+                                        Object.keys(elem).map((el, idx) =><th key={idx}>{el}</th>
+                                        )
+                                    )
+                                })}
+                            </tr>
+                        </thead>
+                        )
+                    }
+                    catch (e) {
+                        return (
+                            <thead>
+                                <tr>
+                                    <td>No results</td>
+                                </tr>
+                            </thead>
+                        )
+                    }
+                })()}
+                <tbody>
+                    {(() => {
+                        try {
+                            return props.resultList.documents.map((e, i) =>
+                                <tr key={i}>
+                                    {Object.values(props.resultList).map((value, id) => {
+                                        console.log(value[i])
+                                        if (typeof (value[i]) === typeof ({})) {
+                                            // return <td key={id}>kako</td>
+                                            return Object.values(value[i]).map((val, i) =>
+                                                <td key={i}>{val}</td>
+                                            )
+                                        }
+                                        else {
+                                            return <td key={id}>{value[i]}</td>
+                                        }
+                                    })
+                                    }
+                                </tr>)
+                        }
+                        catch (e) {
+                            console.log("ofh")
+                            return (
+                                <tr>
+                                </tr>)
+                        }
+                    })()}
+                </tbody>
+            </table>
         </div>
     );
 };
