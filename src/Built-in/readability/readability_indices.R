@@ -1,51 +1,48 @@
 # Load necessary packages
-.libPaths("Rlibrary")
-libPath <- "Rlibrary"
+args <- commandArgs(trailingOnly=T)
+.libPaths(args[1])
+libPath <- args[1]
+library("R.utils")
 library("quanteda")
 library("readtext")
 library("jsonlite")
 
 # Get and split commandArgs (paths of the files to process and readability indices)
-args <- commandArgs(trailingOnly=T)
-filePaths <- c();
-index <- c();
-temp <- c();
-for(arg in args) {
-    if(arg == "-filePaths") {
-        next;
-    }
-    else if (arg == "-index") {
-       filePaths <- temp;
-        temp <- c();
-        next;
-    }
-    temp <- c(temp, arg);
-}
-index <- temp;
+args <- commandArgs(trailingOnly=T, asValues=T)
+filePaths <- unlist(strsplit(args[["filePaths"]], split=','));
+
 
 fileNames <- basename(filePaths)
 resultFilePath <- "results.json"
-
 books <- c()
 for (i in 1:length(filePaths)) {
     books <- c(books, readtext(filePaths[i])$text)
 }
-    texts <- corpus(books, docnames=fileNames)    
-    read_indices <- textstat_readability(texts, measure=index)
-    
-    toks <- tokens(texts, remove_punct=T)
-    tokensNum <- c()
-    for(name in fileNames) {
+corp <- corpus(books, docnames=fileNames)    
+toks <- tokens(corp, remove_punct=T)
+
+tokensNum <- c()
+for(name in fileNames) {
     tokensNum <- c(tokensNum, length(toks[[name]]))
-    }
+}
 
-    features <- dfm(toks, stem=T, tolower=T)
+features <- dfm(toks, stem=T, tolower=T)
 
-    vocabularyNum <- c()
-    for(i in 1:length(filePaths)) {
+vocabularyNum <- c()
+for(i in 1:length(filePaths)) {
     vocabularyNum <- c(vocabularyNum, length(textstat_frequency(features[i])$feature))
-    }
-    read_indices["TokensNum"] <- tokensNum
-    read_indices["Vocabulary"] <- vocabularyNum
-print(toJSON(read_indices))
-write(toJSON(read_indices), file=resultFilePath, sep=',')
+}
+
+result <- list()
+result[["TokensNum"]] <- tokensNum
+result[["Vocabulary"]] <- vocabularyNum
+if(!is.null(args[["readIndex"]])) {
+    readIndex <- unlist(strsplit(args[["readIndex"]], split=','))
+    result[["readability"]] <- textstat_readability(corp, measure=readIndex)
+}
+if(!is.null(args[["lexdivIndex"]])) {
+    lexdivIndex <- unlist(strsplit(args[["lexdivIndex"]], split=','))
+    result[["lexdiv"]] <- textstat_lexdiv(toks, measure=lexdivIndex)
+}
+print(toJSON(result, auto_unbox=T))
+write(toJSON(result, auto_unbox=T), file=resultFilePath, sep=',')

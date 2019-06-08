@@ -9,7 +9,7 @@ const ResultsTab = props => {
     const header = (() => {
         try {
             return (<tr>
-                {Object.keys(props.resultList[0]).map((indexName, i) =>
+                {Object.keys(props.resultList).map((indexName, i) =>
                     <th key={i}>{indexName}</th>
                 )}
             </tr>)
@@ -24,12 +24,21 @@ const ResultsTab = props => {
     
     const body = (() => {
         try {
-            return (props.resultList.map((docIndices, i) =>
-            <tr key={i}>
-                {Object.values(docIndices).map((value, i) =>
-                    <td key={i}>{value}</td>
-                )}
-                </tr>))
+            return (Object.values(props.resultList).map((value, i) => {
+            if(typeof(value) === typeof({})) {
+                Object.value(value).map((val) => {
+                    <td>{val}</td>
+                })
+            }
+            else {
+            return <tr key={i}>
+                <td>
+                {value}
+                </td>
+            </tr> 
+            }
+        })
+            )
         }
         catch (e) {
             return (

@@ -70,7 +70,7 @@ class ReadabilityOptions extends Component {
 
   checkAll = () => {
     const checkboxes = document.querySelectorAll(".read-index");
-    const isChecked = document.querySelector("#check-all").checked;
+    const isChecked = document.querySelector("#readability-check-all").checked;
     checkboxes.forEach((checkbox) => {
       checkbox.checked = isChecked;
     });
@@ -84,7 +84,7 @@ class ReadabilityOptions extends Component {
         indexList.push(checkbox.value);
       }
       else {
-        document.querySelector("#check-all").checked = false;
+        document.querySelector("#readability-check-all").checked = false;
       }
     })
     if(indexList.length === 0 || this.props.filePaths.length === 0) {
@@ -93,7 +93,7 @@ class ReadabilityOptions extends Component {
       e.target.innerText = "add";
     }
     else {
-      const args = ["-filePaths"].concat(this.props.filePaths).concat("-index").concat(indexList);
+      const args = [`${this.props.settings.get("rlibPath")}`].concat(`-filePaths=${this.props.filePaths.join(',')}`).concat(`-readIndex=${indexList.join(',')}`);
       this.props.setScriptParameters(false, this.props.type, this.state.env, this.state.scriptPath, args);
       e.target.innerText = "update";
     }
@@ -104,7 +104,7 @@ class ReadabilityOptions extends Component {
       <div id="select-read-indices">
         <p>Select one or more indices to extract</p>
         <div>
-          <input type="checkbox" id="check-all" name="readability-index" value="all" onClick={this.checkAll} />All
+          <input type="checkbox" id="readability-check-all" name="readability-index" value="all" onClick={this.checkAll} />All
         {this.state.readabilityIndices.map((indexObj, i) =>
             <div key={i}><input type="checkbox" className="read-index" name="readability-index" value={indexObj.indexName} />{indexObj.displayName}</div>
           )}
