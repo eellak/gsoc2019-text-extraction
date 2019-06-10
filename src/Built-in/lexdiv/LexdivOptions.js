@@ -27,10 +27,10 @@ class LexdivOptions extends Component {
       scriptPath: (() => {
         switch (props.platform) {
           case "win32":
-            return "src\\Built-in\\readability\\readability_indices.R";
+            return "src\\Built-in\\lexdiv\\lexdiv_indices.R";
           case "linux":
           default:
-            return "src/Built-in/readability/readability_indices.R";
+            return "src/Built-in/lexdiv/lexdiv_indices.R";
         }
       })(),
     }

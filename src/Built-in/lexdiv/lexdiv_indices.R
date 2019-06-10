@@ -20,27 +20,13 @@ for (i in 1:length(filePaths)) {
 corp <- corpus(books, docnames=fileNames)    
 toks <- tokens(corp, remove_punct=T)
 
-tokensNum <- c()
-for(name in fileNames) {
-    tokensNum <- c(tokensNum, length(toks[[name]]))
-}
-
-features <- dfm(toks, stem=T, tolower=T)
-
-vocabularyNum <- c()
-for(i in 1:length(filePaths)) {
-    vocabularyNum <- c(vocabularyNum, length(textstat_frequency(features[i])$feature))
-}
-
 result <- list()
 result[["documents"]] <- fileNames
-result[["TokensNum"]] <- tokensNum
-result[["Vocabulary"]] <- vocabularyNum
-if(!is.null(args[["readIndex"]])) {
-    readIndex <- unlist(strsplit(args[["readIndex"]], split=','))
-    temp <- textstat_readability(corp, measure=readIndex)
+if(!is.null(args[["lexdivIndex"]])) {
+    lexdivIndex <- unlist(strsplit(args[["lexdivIndex"]], split=','))
+    temp <- textstat_lexdiv(toks, measure=lexdivIndex)
     temp[["document"]] <- NULL 
-    result[["readability"]] <- temp
+    result[["lexdiv"]] <- temp
 }
 print(toJSON(result))
 write(toJSON(result), file=resultFilePath, sep=',')
