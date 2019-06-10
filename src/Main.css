@@ -5,3 +5,21 @@
 .collapsed {
     display: none;
 }
+
+.main-tabs {
+    width: 100%;
+    margin: 15px 0 15px 0;
+}
+
+.content {
+    height: 100%
+}
+
+main {
+    border: 1px solid #000;
+}
+
+header {
+    overflow: auto;
+    background-color: #af6464;
+}

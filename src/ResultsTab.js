@@ -4,12 +4,11 @@ import '@trendmicro/react-sidenav/dist/react-sidenav.css';
 import "react-tabs/style/react-tabs.css";
 
 const ResultsTab = props => {
-    console.log(props.resultList);
 
     return (
         <div>
             <button id="execute" onClick={props.executeAll}>Execute</button>
-            <table id="results">
+            <table className="resultsTable">
                 {(() => {
                     try {
                         return (<thead>

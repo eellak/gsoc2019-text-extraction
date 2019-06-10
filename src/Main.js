@@ -144,73 +144,74 @@ class Main extends Component {
   render() {
     return (
       <div className="App">
-        <div className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
+        <header>
           <h2>Welcome to Testing grounds!</h2>
-        </div>
-        <div className="content">
-          <SideNav>
-            <SideNav.Toggle />
-            <SideNav.Nav defaultSelected="0" onSelect={this.changeTab}>
-              <NavItem eventKey="0">
-                <NavIcon>
-                  <i className="fas fa-file-alt"></i>
-                </NavIcon>
-                <NavText>
-                  Input
+        </header>
+        <main>
+          <div className="content">
+            <SideNav>
+              <SideNav.Toggle />
+              <SideNav.Nav defaultSelected="0" onSelect={this.changeTab}>
+                <NavItem eventKey="0">
+                  <NavIcon>
+                    <i className="fas fa-file-alt"></i>
+                  </NavIcon>
+                  <NavText>
+                    Input
             </NavText>
-              </NavItem>
-              <NavItem eventKey="1" onSelect={this.changeTab}>
-                <NavIcon>
-                  <i className="fas fa-tasks"></i>
-                </NavIcon>
-                <NavText>
-                  Scripts
+                </NavItem>
+                <NavItem eventKey="1" onSelect={this.changeTab}>
+                  <NavIcon>
+                    <i className="fas fa-tasks"></i>
+                  </NavIcon>
+                  <NavText>
+                    Scripts
             </NavText>
-              </NavItem>
-              <NavItem eventKey="2" onSelect={this.changeTab}>
-                <NavIcon>
-                  <i className="fas fa-signal"></i>
-                </NavIcon>
-                <NavText>
-                  Results
+                </NavItem>
+                <NavItem eventKey="2" onSelect={this.changeTab}>
+                  <NavIcon>
+                    <i className="fas fa-signal"></i>
+                  </NavIcon>
+                  <NavText>
+                    Results
             </NavText>
-              </NavItem>
-            </SideNav.Nav>
-          </SideNav>
-          <Tabs selectedIndex={this.state.tabIndex} forceRenderTabPanel={true} onSelect={tabIndex => this.setState({ tabIndex: tabIndex })}>
-            <TabList className="collapsed">
-              <Tab />
-              <Tab />
-              <Tab />
-            </TabList>
-            <TabPanel>
-              <FilesTab
-                electron={this.props.electron}
-                platform={this.props.platform}
-                isDev={this.props.isDev}
-                setParentState={this.setStateFromChildren}
-              />
-            </TabPanel>
-            <TabPanel>
-              <ScriptsTab
-                electron={this.props.electron}
-                platform={this.props.platform}
-                isDev={this.props.isDev}
-                setParentState={this.setStateFromChildren}
-                selectedFilesPaths={this.state.selectedFilesPaths}
-                settings={this.state.settings}
-                setScriptParameters={this.setScriptParameters}
-              />
-            </TabPanel>
-            <TabPanel>
-              <ResultsTab
-              resultList={this.state.resultList}
-                executeAll={this.executeAll}
-              />
-            </TabPanel>
-          </Tabs>
-        </div>
+                </NavItem>
+              </SideNav.Nav>
+            </SideNav>
+            <Tabs selectedIndex={this.state.tabIndex} forceRenderTabPanel={true} className="main-tabs" onSelect={tabIndex => this.setState({ tabIndex: tabIndex })}>
+              <TabList className="collapsed">
+                <Tab />
+                <Tab />
+                <Tab />
+              </TabList>
+              <TabPanel>
+                <FilesTab
+                  electron={this.props.electron}
+                  platform={this.props.platform}
+                  isDev={this.props.isDev}
+                  setParentState={this.setStateFromChildren}
+                />
+              </TabPanel>
+              <TabPanel>
+                <ScriptsTab
+                  electron={this.props.electron}
+                  platform={this.props.platform}
+                  isDev={this.props.isDev}
+                  setParentState={this.setStateFromChildren}
+                  selectedFilesPaths={this.state.selectedFilesPaths}
+                  settings={this.state.settings}
+                  setScriptParameters={this.setScriptParameters}
+                />
+              </TabPanel>
+              <TabPanel>
+                <ResultsTab
+                  resultList={this.state.resultList}
+                  executeAll={this.executeAll}
+                />
+              </TabPanel>
+            </Tabs>
+          </div>
+        </main>
       </div>
     );
   }

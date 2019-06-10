@@ -33,7 +33,7 @@ const ScriptsTab = props => {
 
     return (
         <div>
-            <div>Select processing script</div>
+            <h4>Select processing script</h4>
             <Tabs id="script-select">
                 <TabList>
                     <Tab>DummyScript</Tab>

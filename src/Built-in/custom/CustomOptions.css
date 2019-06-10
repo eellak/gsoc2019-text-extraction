@@ -1,3 +1,7 @@
 .remove-script {
     display: none;
 }
+
+#custom-scripts select, #custom-scripts button, #custom-scripts input{
+    font-size: inherit;
+}

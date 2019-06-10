@@ -39,7 +39,7 @@ const FilesTab = props => {
 
     return (
         <div>
-            <div>Select one or more files to be processed</div>
+            <h4>Select one or more files to be processed</h4>
             <div id="add-files">
                 <button id="add-files-btn" onClick={addFilesDialog}>Add files</button>
                 <div id="selected-files" />

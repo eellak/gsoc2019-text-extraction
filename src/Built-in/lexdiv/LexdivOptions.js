@@ -70,7 +70,7 @@ class LexdivOptions extends Component {
   render() {
     return (
       <div id="select-lexdiv-indices">
-        <p>Select one or more indices to extract</p>
+        <h4>Select one or more indices to extract</h4>
         <div>
           <input type="checkbox" id="lexdiv-check-all" name="lexdiv-index" value="all" onClick={this.checkAll} />All
         {this.state.lexdivIndices.map((indexObj, i) =>
