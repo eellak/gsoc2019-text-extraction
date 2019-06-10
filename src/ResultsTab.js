@@ -26,10 +26,8 @@ const ResultsTab = props => {
                                 {Object.keys(props.resultList).map((indexName, i) => {
                                     if (typeof (props.resultList[indexName][0]) !== typeof ({}))
                                         return;
-                                    return Object.values(props.resultList[indexName]).map(elem => 
-                                        Object.keys(elem).map((el, idx) =><th key={idx}>{el}</th>
+                                        return Object.keys(Object.values(props.resultList[indexName])[0]).map((el, idx) =><th key={idx}>{el}</th>
                                         )
-                                    )
                                 })}
                             </tr>
                         </thead>
@@ -51,7 +49,7 @@ const ResultsTab = props => {
                             return props.resultList.documents.map((e, i) =>
                                 <tr key={i}>
                                     {Object.values(props.resultList).map((value, id) => {
-                                        console.log(value[i])
+                                        // console.log(value[i])
                                         if (typeof (value[i]) === typeof ({})) {
                                             // return <td key={id}>kako</td>
                                             return Object.values(value[i]).map((val, i) =>
@@ -66,7 +64,6 @@ const ResultsTab = props => {
                                 </tr>)
                         }
                         catch (e) {
-                            console.log("ofh")
                             return (
                                 <tr>
                                 </tr>)
