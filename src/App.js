@@ -11,7 +11,7 @@ class App extends Component {
     this.state = {
       platform: window.process.platform,
       electron: window.require('electron'),
-      isDev: window.require('electron-is-dev'),
+      isDev: window.require('electron-is-dev')
     };
   }
   render() {

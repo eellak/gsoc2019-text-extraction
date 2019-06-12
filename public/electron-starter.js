@@ -3,13 +3,13 @@ const corpusSchema = require('../public/corpus.js');
 const electron = require('electron');
 // Module to control application life
 // Module to create native browser window.
-const { app, BrowserWindow, Menu } = electron;
+const { app, BrowserWindow, Menu, ipcMain } = electron;
 const isDev = require('electron-is-dev');
 const path = require('path');
 const settings = require('electron-settings');
 const mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost:27017/text_extraction_db', { useNewUrlParser: true }, (error) => {
-  if(error) console.log(error);
+  if (error) console.log(error);
   else console.log("Connection successful");
 });
 
@@ -21,7 +21,7 @@ let mainWindow;
 let settingsWindow;
 
 createSettingsWindow = () => {
-  if(settingsWindow) return;
+  if (settingsWindow) return;
 
   settingsWindow = new BrowserWindow({
     title: "Settings",
@@ -43,7 +43,7 @@ createSettingsWindow = () => {
   }
   settingsWindow.on('closed', function () {
     settingsWindow = null;
-});
+  });
 
 };
 
@@ -53,11 +53,12 @@ createMainWindow = (paramObj) => {
       label: "File",
       submenu: [
         { type: "separator" },
-        { 
+        {
           label: "Settings",
-      click() {
-        this.createSettingsWindow();
-      }},
+          click() {
+            this.createSettingsWindow();
+          }
+        },
         {
           label: "Exit",
           role: "quit",
@@ -107,6 +108,15 @@ createMainWindow = (paramObj) => {
     mainWindow = null;
   })
 }
+
+ipcMain.on('add-book', (e, data) => {
+  console.log(data);
+  Corpus.create({
+    name: data.documents[0], indices: {
+      readability: data.readability
+    }
+  });
+})
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.

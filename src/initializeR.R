@@ -7,7 +7,6 @@ options(repos = r)
 rm(r)
 
 args <- commandArgs(trailingOnly=T)
-print(args)
 # Create the environment in which R will run
 .libPaths(args)
 libPath <- args

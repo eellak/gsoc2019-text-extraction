@@ -26,7 +26,8 @@ class Main extends Component {
       toExecute: {},
       settings: props.electron.remote.require('electron-settings'),
       tabIndex: 0,
-      fs: window.require('fs')
+      fs: window.require('fs'),
+      ipc : props.electron.ipcRenderer
     };
   }
 
@@ -104,8 +105,9 @@ class Main extends Component {
     // });
 
     process.stdout.on('data', (data) => {
-      // will probably read from a database
+      // will probably store to a database
       console.log(`${data}`)
+      this.state.ipc.send('add-book', JSON.parse(data));
     });
 
     process.on('exit', (code) => {

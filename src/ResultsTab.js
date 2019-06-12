@@ -15,7 +15,7 @@ const ResultsTab = props => {
                             <tr>
                                 {Object.keys(props.resultList).map((indexName, i) => {
                                     if (typeof (props.resultList[indexName][0]) !== typeof ({})) {
-                                        console.log(props.resultList[indexName])
+                                        // console.log(props.resultList[indexName])
                                         return <th rowSpan="2" key={i}>{indexName}</th>
                                     }
                                         return <th colSpan={Object.keys(Object.keys(props.resultList[indexName][0])).length} key={i}>{indexName}</th>
