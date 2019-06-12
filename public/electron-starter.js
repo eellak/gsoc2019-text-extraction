@@ -1,3 +1,4 @@
+const corpusSchema = require('../public/corpus.js');
 // Modules to control application life and create native browser window
 const electron = require('electron');
 // Module to control application life
@@ -6,6 +7,13 @@ const { app, BrowserWindow, Menu } = electron;
 const isDev = require('electron-is-dev');
 const path = require('path');
 const settings = require('electron-settings');
+const mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost:27017/text_extraction_db', { useNewUrlParser: true }, (error) => {
+  if(error) console.log(error);
+  else console.log("Connection successful");
+});
+
+let Corpus = mongoose.model('corpus', corpusSchema);
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
