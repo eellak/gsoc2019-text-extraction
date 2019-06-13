@@ -33,9 +33,10 @@ for(i in 1:length(filePaths)) {
 }
 
 result <- list()
-result[["documents"]] <- fileNames
-result[["TokensNum"]] <- tokensNum
-result[["Vocabulary"]] <- vocabularyNum
+result[["fileNames"]] <- fileNames
+result[["filePaths"]] <- filePaths
+result[["tokensNum"]] <- tokensNum
+result[["vocabularyNum"]] <- vocabularyNum
 if(!is.null(args[["readIndex"]])) {
     readIndex <- unlist(strsplit(args[["readIndex"]], split=','))
     temp <- textstat_readability(corp, measure=readIndex)

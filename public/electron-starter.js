@@ -8,7 +8,11 @@ const isDev = require('electron-is-dev');
 const path = require('path');
 const settings = require('electron-settings');
 const mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost:27017/text_extraction_db', { useNewUrlParser: true }, (error) => {
+mongoose.connect('mongodb://localhost:27017/text_extraction_db', {
+  useNewUrlParser: true,
+  useCreateIndex: true,
+  useFindAndModify: false
+}, (error) => {
   if (error) console.log(error);
   else console.log("Connection successful");
 });
@@ -111,12 +115,23 @@ createMainWindow = (paramObj) => {
 
 ipcMain.on('add-book', (e, data) => {
   console.log(data);
-  Corpus.create({
-    name: data.documents[0], indices: {
-      readability: data.readability
+  for (var i = 0; i < data.fileNames.length; i++) {
+    const newBook = {
+      name: data.fileNames[i],
+      path: data.filePaths[i],
+      indices: {
+        readability: data.readability === undefined ? undefined : data.readability[i],
+        lexdiv: data.lexdiv === undefined ? undefined : data.lexdiv[i],
+        tokens: data.tokensNum === undefined ? undefined : data.tokensNum[i],
+        vocabulary: data.vocabularyNum === undefined ? undefined : data.vocabularyNum[i]
+      }
     }
-  });
-})
+    Corpus.findOneAndUpdate({ path: data.filePaths[i] }, newBook, { upsert: true }, () => {
+      console.log("mphka")
+    })
+  }
+});
+
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
