@@ -32,10 +32,18 @@ for(i in 1:length(filePaths)) {
     vocabularyNum <- c(vocabularyNum, length(textstat_frequency(features[i])$feature))
 }
 
+toksList <- list()
+for (i in 1:length(filePaths)) {
+    toksList[[i]] <- toks[[fileNames[i]]]
+}
+
+tokensDataframe = data.frame(id=1:length(filePaths))
+tokensDataframe$tokens = (toksList)
+
 result <- list()
 result[["fileNames"]] <- fileNames
 result[["filePaths"]] <- filePaths
-result[["tokensNum"]] <- tokensNum
+result[["tokens"]] <- tokensDataframe
 result[["vocabularyNum"]] <- vocabularyNum
 if(!is.null(args[["readIndex"]])) {
     readIndex <- unlist(strsplit(args[["readIndex"]], split=','))

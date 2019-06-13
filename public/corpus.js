@@ -10,7 +10,7 @@ const corpusSchema = new Schema({
     indices: {
         readability: Array,
         lexdiv: Array,
-        tokens: Number,
+        tokens: Array,
         vocabulary: Number
     }
 });

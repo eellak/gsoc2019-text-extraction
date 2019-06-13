@@ -115,18 +115,22 @@ createMainWindow = (paramObj) => {
 
 ipcMain.on('add-book', (e, data) => {
   console.log(data);
-  for (var i = 0; i < data.fileNames.length; i++) {
-    const newBook = {
-      name: data.fileNames[i],
-      path: data.filePaths[i],
-      indices: {
-        readability: data.readability === undefined ? undefined : data.readability[i],
-        lexdiv: data.lexdiv === undefined ? undefined : data.lexdiv[i],
-        tokens: data.tokensNum === undefined ? undefined : data.tokensNum[i],
-        vocabulary: data.vocabularyNum === undefined ? undefined : data.vocabularyNum[i]
-      }
-    }
-    Corpus.findOneAndUpdate({ path: data.filePaths[i] }, newBook, { upsert: true }, () => {
+  const booksNum = data.fileNames.length
+  const filePaths = data.filePaths;
+  delete data.filePaths;
+  const fileNames = data.fileNames;
+  delete data.fileNames;
+  let indices = {};
+  Object.keys(data).forEach(key => { 
+    indices[`indices.${key}`] = data[key];
+  });
+  console.log(indices)
+  for (var i = 0; i < booksNum; i++) {
+    Corpus.findOneAndUpdate({ path: filePaths[i] }, {
+      name: fileNames[i],
+      path: filePaths[i],
+      $set: indices
+  }, { upsert: true }, () => {
       console.log("mphka")
     })
   }
