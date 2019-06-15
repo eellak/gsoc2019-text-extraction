@@ -51,5 +51,5 @@ if(!is.null(args[["readIndex"]])) {
     temp[["document"]] <- NULL 
     result[["readability"]] <- temp
 }
-print(toJSON(result))
 write(toJSON(result), file=resultFilePath, sep=',')
+print("add book")

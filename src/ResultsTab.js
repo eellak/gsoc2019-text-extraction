@@ -4,7 +4,22 @@ import '@trendmicro/react-sidenav/dist/react-sidenav.css';
 import "react-tabs/style/react-tabs.css";
 
 const ResultsTab = props => {
+    // pass by value
+    // TODO : find better way?
+    let resultList = [];
+    props.resultList.forEach(elem => {
+        resultList.push(Object.assign([], elem)); 
+    });
 
+    resultList.forEach(bookObj => {
+        const indices = bookObj.indices;
+        delete bookObj.indices;
+        Object.keys(indices).map(index => {
+            if(indices[index].length !== 0)
+            bookObj[index] = indices[index];
+        });
+        return bookObj
+    });
     return (
         <div>
             <button id="execute" onClick={props.executeAll}>Execute</button>
@@ -13,20 +28,19 @@ const ResultsTab = props => {
                     try {
                         return (<thead>
                             <tr>
-                                {Object.keys(props.resultList).map((indexName, i) => {
-                                    if (typeof (props.resultList[indexName][0]) !== typeof ({})) {
-                                        // console.log(props.resultList[indexName])
+                                {Object.keys(resultList[0]).map((indexName, i) => {
+                                    if (typeof(resultList[0][indexName]) !== typeof({})) {
                                         return <th rowSpan="2" key={i}>{indexName}</th>
                                     }
-                                        return <th colSpan={Object.keys(Object.keys(props.resultList[indexName][0])).length} key={i}>{indexName}</th>
-
+                                    return <th colSpan={Object.keys(Object.keys(resultList[0][indexName])).length} key={i}>{indexName}</th>
+                                    
                                 })}
                             </tr>
                             <tr>
-                                {Object.keys(props.resultList).map((indexName, i) => {
-                                    if (typeof (props.resultList[indexName][0]) !== typeof ({}))
-                                        return;
-                                        return Object.keys(Object.values(props.resultList[indexName])[0]).map((el, idx) =><th key={idx}>{el}</th>
+                                {Object.keys(resultList[0]).map((indexName, i) => {
+                                    if (typeof(resultList[0][indexName]) !== typeof({}))
+                                    return;
+                                        return Object.keys(resultList[0][indexName]).map((el, idx) =><th key={idx}>{el}</th>
                                         )
                                 })}
                             </tr>
@@ -46,18 +60,17 @@ const ResultsTab = props => {
                 <tbody>
                     {(() => {
                         try {
-                            return props.resultList.documents.map((e, i) =>
+                            return resultList.map((elem, i) =>
                                 <tr key={i}>
-                                    {Object.values(props.resultList).map((value, id) => {
-                                        // console.log(value[i])
-                                        if (typeof (value[i]) === typeof ({})) {
+                                    {Object.values(elem).map((value, id) => {
+                                        if (typeof (value) === typeof ({})) {
                                             // return <td key={id}>kako</td>
-                                            return Object.values(value[i]).map((val, i) =>
+                                            return Object.values(value).map((val, i) =>
                                                 <td key={i}>{val}</td>
                                             )
                                         }
                                         else {
-                                            return <td key={id}>{value[i]}</td>
+                                            return <td key={id}>{value}</td>
                                         }
                                     })
                                     }

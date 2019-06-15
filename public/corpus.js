@@ -8,8 +8,8 @@ const corpusSchema = new Schema({
         unique: true
     },
     indices: {
-        readability: Array,
-        lexdiv: Array,
+        readability: Object,
+        lexdiv: Object,
         tokens: Array,
         vocabulary: Number
     }

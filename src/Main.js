@@ -27,8 +27,11 @@ class Main extends Component {
       settings: props.electron.remote.require('electron-settings'),
       tabIndex: 0,
       fs: window.require('fs'),
-      ipc : props.electron.ipcRenderer
+      ipc: props.electron.ipcRenderer
     };
+    this.state.ipc.on('receive-books', (event, arg) => {
+      this.setDistantState({ resultList: arg });
+    });
   }
 
   /* R environment is initialized immediately after startup*
@@ -46,6 +49,7 @@ class Main extends Component {
     })()
     this.executeScript(`${this.state.settings.get("rPath", "")}\\Rscript`, scriptPath, this.state.settings.get("rlibPath", "Rlibrary"));
   }
+
 
   // // /* addFilesDialog:
   // // * an electron dialog opens in order to select input files
@@ -79,7 +83,7 @@ class Main extends Component {
   //   );
   // }
 
-  setStateFromChildren = (obj) => {
+  setDistantState = (obj) => {
     this.setState(obj);
   }
 
@@ -87,7 +91,7 @@ class Main extends Component {
   * call an NLP script using the npm's child_process module
   */
 
-  executeScript = (env, scriptPath, args = []) => {
+  executeScript = (env, scriptPath, args = [], callback = undefined) => {
     if (env[0] === '\\') env = env.slice(1);
     let replaceIndex = args.indexOf("{filepaths}")
     if (replaceIndex !== -1) {
@@ -95,50 +99,56 @@ class Main extends Component {
       let secondPart = args.slice(replaceIndex + 1);
       args = firstPart.concat(this.state.selectedFilesPaths).concat(secondPart);
     }
-    const execButton = document.querySelector('#execute');
-    execButton.disabled = true;
     const { spawn } = window.require('child_process');
     const process = spawn(env, [scriptPath].concat(args));
-
+    
     // process.stderr.on('data', (data) => {
-    //   console.log(`${data}`);
-    // });
-
-    process.stdout.on('data', (data) => {
-      // will probably store to a database
-      console.log(`${data}`)
-      this.state.ipc.send('add-book', JSON.parse(data));
-    });
-
-    process.on('exit', (code) => {
-      this.state.fs.readFile('results.json', 'utf8', (err, jsonString) => {
-        if (err) {
-          console.log("File read failed:", err)
-          return;
+      //   console.log(`${data}`);
+      // });
+      
+      process.stdout.on('data', (data) => {
+        // will probably store to a database
+        this.state.ipc.send('add-books');
+      });
+      
+      process.on('exit', (code) => {
+        console.log(`child process exited with code ${code}`);
+        if(callback !== undefined) {
+          callback();
         }
-        this.setState({ resultList: JSON.parse(jsonString) });
-      })
-      console.log(`child process exited with code ${code}`);
+      });
+    }
+    
+    setScriptParameters = (remove, type, env, scriptPath, args) => {
+      let toExecute = this.state.toExecute;
+      if (remove) delete toExecute[type];
+      else {
+        toExecute[type] = { env: env, scriptPath: scriptPath, args: args }
+        this.setState({ toExecute: toExecute });
+      }
+    }
+    
+    executeAll = () => {
+      let promises = [];
+      const execButton = document.querySelector('#execute');
+      execButton.disabled = true;
+    
+    const createAsync = execObj => {
+      return new Promise((resolve, reject) => {
+        this.executeScript(execObj.env, execObj.scriptPath, execObj.args, () => resolve());
+      });
+    };
+    
+    Object.values(this.state.toExecute).map((execObj) => {
+      promises.push(createAsync(execObj))
+    });
+    Promise.all(promises)
+    .then(() => {
+      this.state.ipc.send('get-books', this.state.selectedFilesPaths);
       execButton.disabled = false;
     });
   }
-
-  setScriptParameters = (remove, type, env, scriptPath, args) => {
-    let toExecute = this.state.toExecute;
-    if (remove) delete toExecute[type];
-    else {
-      toExecute[type] = { env: env, scriptPath: scriptPath, args: args }
-      this.setState({ toExecute: toExecute });
-    }
-  }
-
-  executeAll = () => {
-    Object.values(this.state.toExecute).map((execObj) => {
-      this.executeScript(execObj.env, execObj.scriptPath, execObj.args);
-    })
-  }
-
-
+  
   changeTab = (tabIndex) => {
     this.setState({ tabIndex: Number(tabIndex) })
   }
@@ -191,7 +201,7 @@ class Main extends Component {
                   electron={this.props.electron}
                   platform={this.props.platform}
                   isDev={this.props.isDev}
-                  setParentState={this.setStateFromChildren}
+                  setParentState={this.setDistantState}
                 />
               </TabPanel>
               <TabPanel>
@@ -199,7 +209,7 @@ class Main extends Component {
                   electron={this.props.electron}
                   platform={this.props.platform}
                   isDev={this.props.isDev}
-                  setParentState={this.setStateFromChildren}
+                  setParentState={this.setDistantState}
                   selectedFilesPaths={this.state.selectedFilesPaths}
                   settings={this.state.settings}
                   setScriptParameters={this.setScriptParameters}
@@ -207,6 +217,7 @@ class Main extends Component {
               </TabPanel>
               <TabPanel>
                 <ResultsTab
+                  ipc={this.state.ipc}
                   resultList={this.state.resultList}
                   executeAll={this.executeAll}
                 />

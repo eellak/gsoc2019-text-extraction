@@ -8,6 +8,7 @@ const isDev = require('electron-is-dev');
 const path = require('path');
 const settings = require('electron-settings');
 const mongoose = require('mongoose');
+const fs = require('fs');
 mongoose.connect('mongodb://localhost:27017/text_extraction_db', {
   useNewUrlParser: true,
   useCreateIndex: true,
@@ -113,29 +114,59 @@ createMainWindow = (paramObj) => {
   })
 }
 
-ipcMain.on('add-book', (e, data) => {
-  console.log(data);
-  const booksNum = data.fileNames.length
-  const filePaths = data.filePaths;
-  delete data.filePaths;
-  const fileNames = data.fileNames;
-  delete data.fileNames;
-  let indices = {};
-  Object.keys(data).forEach(key => { 
-    indices[`indices.${key}`] = data[key];
+ipcMain.on('add-books', e => {
+  fs.readFile('results.json', 'utf8', (err, jsonString) => {
+    if (err) {
+      console.log("File read failed:", err)
+      return;
+    }
+    const data = JSON.parse(jsonString);
+    const booksNum = data.fileNames.length
+    const filePaths = data.filePaths;
+    delete data.filePaths;
+    const fileNames = data.fileNames;
+    delete data.fileNames;
+    for (var i = 0; i < booksNum; i++) {
+      let indices = {};
+      Object.keys(data).forEach(key => {
+        if(key === "tokens") {
+          indices[`indices.${key}`] = data[key][i][key];
+        }
+        else {
+        indices[`indices.${key}`] = data[key][i];
+        }
+      });
+      Corpus.findOneAndUpdate({ path: filePaths[i] }, {
+        name: fileNames[i],
+        path: filePaths[i],
+        $set: indices
+      }, { upsert: true }, () => {
+      })
+    }
   });
-  console.log(indices)
-  for (var i = 0; i < booksNum; i++) {
-    Corpus.findOneAndUpdate({ path: filePaths[i] }, {
-      name: fileNames[i],
-      path: filePaths[i],
-      $set: indices
-  }, { upsert: true }, () => {
-      console.log("mphka")
-    })
-  }
 });
 
+ipcMain.on('get-books', (event, filePaths) => {
+  Corpus.aggregate([
+    {
+      $match: {
+        path: {
+          $in: filePaths
+        }
+      }
+    }, {
+      $project: {
+        name: 1,
+        "indices.readability": 1,
+        "indices.lexdiv": 1,
+        "indices.vocabulary": 1,
+        "indices.tokensNum": { $size: "$indices.tokens" },
+        _id: 0,
+        }
+      }], (e, result) => {
+      event.sender.send('receive-books', result)
+    })
+});
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.

@@ -7,7 +7,6 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import "react-tabs/style/react-tabs.css";
 
 const ScriptsTab = props => {
-    // console.log(this.state.toExecute)
     const dummyTab = (() => {
         if (props.selectedFilesPaths.length !== 0) {
             const file = new File(["foo"], props.selectedFilesPaths[0]);
