@@ -29,5 +29,5 @@ if(!is.null(args[["lexdivIndex"]])) {
     temp[["document"]] <- NULL 
     result[["lexdiv"]] <- temp
 }
-print(toJSON(result))
 write(toJSON(result), file=resultFilePath, sep=',')
+print("add book")
