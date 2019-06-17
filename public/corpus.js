@@ -11,7 +11,7 @@ const corpusSchema = new Schema({
         readability: Object,
         lexdiv: Object,
         tokens: Array,
-        vocabulary: Number
+        vocabulary: Array
     }
 });
 

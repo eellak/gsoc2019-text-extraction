@@ -27,24 +27,21 @@ for(name in fileNames) {
 
 features <- dfm(toks, stem=T, tolower=T)
 
-vocabularyNum <- c()
+vocabularyList <- list()
 for(i in 1:length(filePaths)) {
-    vocabularyNum <- c(vocabularyNum, length(textstat_frequency(features[i])$feature))
+    vocabularyList[[i]] <- featnames(features[i, colSums(features[i] != 0) > 0])
 }
 
 toksList <- list()
 for (i in 1:length(filePaths)) {
     toksList[[i]] <- toks[[fileNames[i]]]
-}
-
-tokensDataframe = data.frame(id=1:length(filePaths))
-tokensDataframe$tokens = (toksList)
+} 
 
 result <- list()
 result[["fileNames"]] <- fileNames
 result[["filePaths"]] <- filePaths
-result[["tokens"]] <- tokensDataframe
-result[["vocabularyNum"]] <- vocabularyNum
+result[["tokens"]] <- toksList
+result[["vocabulary"]] <- vocabularyList
 if(!is.null(args[["readIndex"]])) {
     readIndex <- unlist(strsplit(args[["readIndex"]], split=','))
     temp <- textstat_readability(corp, measure=readIndex)

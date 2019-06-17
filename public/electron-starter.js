@@ -129,12 +129,7 @@ ipcMain.on('add-books', e => {
     for (var i = 0; i < booksNum; i++) {
       let indices = {};
       Object.keys(data).forEach(key => {
-        if(key === "tokens") {
-          indices[`indices.${key}`] = data[key][i][key];
-        }
-        else {
         indices[`indices.${key}`] = data[key][i];
-        }
       });
       Corpus.findOneAndUpdate({ path: filePaths[i] }, {
         name: fileNames[i],
@@ -159,7 +154,7 @@ ipcMain.on('get-books', (event, filePaths) => {
         name: 1,
         "indices.readability": 1,
         "indices.lexdiv": 1,
-        "indices.vocabulary": 1,
+        "indices.vocabularyNum": { $size: "$indices.vocabulary" },
         "indices.tokensNum": { $size: "$indices.tokens" },
         _id: 0,
         }
