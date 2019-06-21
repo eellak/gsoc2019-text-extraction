@@ -101,54 +101,75 @@ class Main extends Component {
     }
     const { spawn } = window.require('child_process');
     const process = spawn(env, [scriptPath].concat(args));
-    
+
     // process.stderr.on('data', (data) => {
-      //   console.log(`${data}`);
-      // });
-      
-      process.stdout.on('data', (data) => {
-        // will probably store to a database
-        this.state.ipc.send('add-books');
-      });
-      
-      process.on('exit', (code) => {
-        console.log(`child process exited with code ${code}`);
-        if(callback !== undefined) {
-          callback();
-        }
-      });
-    }
-    
-    setScriptParameters = (remove, type, env, scriptPath, args) => {
-      let toExecute = this.state.toExecute;
-      if (remove) delete toExecute[type];
-      else {
-        toExecute[type] = { env: env, scriptPath: scriptPath, args: args }
-        this.setState({ toExecute: toExecute });
+    //   console.log(`${data}`);
+    // });
+
+    process.stdout.on('data', (data) => {
+      // will probably store to a database
+      this.state.ipc.send('add-books');
+    });
+
+    process.on('exit', (code) => {
+      console.log(`child process exited with code ${code}`);
+      if (callback !== undefined) {
+        callback();
       }
+    });
+  }
+
+  setScriptParameters = (remove, type, env, scriptPath, args) => {
+    let toExecute = this.state.toExecute;
+    if (remove) delete toExecute[type];
+    else {
+      toExecute[type] = { env: env, scriptPath: scriptPath, args: args }
+      this.setState({ toExecute: toExecute });
     }
-    
-    executeAll = () => {
-      let promises = [];
-      const execButton = document.querySelector('#execute');
-      execButton.disabled = true;
-    
+  }
+
+  executeAll = () => {
+    let promises = [];
+    const execButton = document.querySelector('#execute');
+    execButton.disabled = true;
+
     const createAsync = execObj => {
       return new Promise((resolve, reject) => {
         this.executeScript(execObj.env, execObj.scriptPath, execObj.args, () => resolve());
       });
     };
-    
-    Object.values(this.state.toExecute).map((execObj) => {
-      promises.push(createAsync(execObj))
+
+    let addFreqAnalysis = true;
+    Object.keys(this.state.toExecute).map((execKey) => {
+      if(execKey === "misc") {
+        const toExecute = this.state.toExecute;
+        toExecute[execKey].args[2] = toExecute[execKey].args[2] + "tokens,vocabulary";
+        this.setState({ toExecute: toExecute});
+        addFreqAnalysis = false;
+      }
+      promises.push(createAsync(this.state.toExecute[execKey]));
     });
+    if(addFreqAnalysis === true) {
+      promises.push(createAsync({env: `${this.state.settings.get("rPath", "")}\\Rscript`,
+      scriptPath: (() => {
+        switch (this.state.platform) {
+          case "win32":
+            return "src\\Built-in\\misc\\misc_indices.R";
+          case "linux":
+          default:
+            return "src/Built-in/misc/misc_indices.R";
+        }
+      })(),
+      args: [`${this.state.settings.get("rlibPath")}`].concat(`-filePaths=${this.state.selectedFilesPaths.join(',')}`).concat(`-miscIndex=tokens,vocabulary`)
+    }))
+    }
     Promise.all(promises)
-    .then(() => {
-      this.state.ipc.send('get-books', this.state.selectedFilesPaths);
-      execButton.disabled = false;
-    });
+      .then(() => {
+        this.state.ipc.send('get-books', this.state.selectedFilesPaths);
+        execButton.disabled = false;
+      });
   }
-  
+
   changeTab = (tabIndex) => {
     this.setState({ tabIndex: Number(tabIndex) })
   }
