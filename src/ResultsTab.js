@@ -7,6 +7,7 @@ const ResultsTab = props => {
     // pass by value
     // TODO : find better way?
     let resultList = [];
+    console.log(props.resultList)
     props.resultList.forEach(elem => {
         resultList.push(Object.assign([], elem)); 
     });
@@ -29,7 +30,7 @@ const ResultsTab = props => {
                         return (<thead>
                             <tr>
                                 {Object.keys(resultList[0]).map((indexName, i) => {
-                                    if (typeof(resultList[0][indexName]) !== typeof({})) {
+                                    if (typeof(resultList[0][indexName]) !== typeof({}) || Array.isArray(resultList[0][indexName])) {
                                         return <th rowSpan="2" key={i}>{indexName}</th>
                                     }
                                     return <th colSpan={Object.keys(Object.keys(resultList[0][indexName])).length} key={i}>{indexName}</th>
@@ -38,7 +39,7 @@ const ResultsTab = props => {
                             </tr>
                             <tr>
                                 {Object.keys(resultList[0]).map((indexName, i) => {
-                                    if (typeof(resultList[0][indexName]) !== typeof({}))
+                                    if (typeof(resultList[0][indexName]) !== typeof({}) || Array.isArray(resultList[0][indexName]))
                                     return;
                                         return Object.keys(resultList[0][indexName]).map((el, idx) =><th key={idx}>{el}</th>
                                         )
@@ -64,7 +65,6 @@ const ResultsTab = props => {
                                 <tr key={i}>
                                     {Object.values(elem).map((value, id) => {
                                         if (typeof (value) === typeof ({})) {
-                                            // return <td key={id}>kako</td>
                                             return Object.values(value).map((val, i) =>
                                                 <td key={i}>{val}</td>
                                             )

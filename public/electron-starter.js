@@ -121,6 +121,7 @@ ipcMain.on('add-books', e => {
       return;
     }
     const data = JSON.parse(jsonString);
+    
     const booksNum = data.fileNames.length
     const filePaths = data.filePaths;
     delete data.filePaths;
@@ -154,9 +155,11 @@ ipcMain.on('get-books', (event, filePaths) => {
         name: 1,
         "indices.readability": 1,
         "indices.lexdiv": 1,
-        "indices.vocabularyNum": { $size: "$indices.vocabulary" },
-        "indices.tokensNum": { $size: "$indices.tokens" },
-        _id: 0,
+        "indices.entropy": 1,
+        "indices.normentropy": 1,
+        "indices.tokensNum": 1,
+        "indices.vocabularyNum": 1,
+        _id: 0
         }
       }], (e, result) => {
       event.sender.send('receive-books', result)

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import './ScriptsTab.css';
 import ReadabilityOptions from './Built-in/readability/ReadabilityOptions'
 import LexdivOptions from './Built-in/lexdiv/LexdivOptions'
+import MiscOptions from './Built-in/misc/MiscOptions'
 import CustomOptions from './Built-in/custom/CustomOptions'
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import "react-tabs/style/react-tabs.css";
@@ -24,6 +25,11 @@ const ScriptsTab = props => {
         <div>
             <LexdivOptions filePaths={props.selectedFilesPaths} settings={props.settings} type="lexdiv" setScriptParameters={props.setScriptParameters} platform={props.platform} />
         </div>);
+
+    const miscTab = (
+        <div>
+            <MiscOptions filePaths={props.selectedFilesPaths} settings={props.settings} type="misc" setScriptParameters={props.setScriptParameters} platform={props.platform} />
+        </div>);
     
     const customScriptTab = (
         <div>
@@ -38,6 +44,7 @@ const ScriptsTab = props => {
                     <Tab>DummyScript</Tab>
                     <Tab>Readability</Tab>
                     <Tab>Lexical Diversity</Tab>
+                    <Tab>Mischellaneous</Tab>
                     <Tab>CustomScript</Tab>
                 </TabList>
                 <TabPanel>
@@ -48,6 +55,9 @@ const ScriptsTab = props => {
                 </TabPanel>
                 <TabPanel forceRender={true}>
                     {lexdivTab}
+                </TabPanel>
+                <TabPanel forceRender={true}>
+                    {miscTab}
                 </TabPanel>
                 <TabPanel forceRender={true}>
                     {customScriptTab}
