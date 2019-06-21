@@ -18,30 +18,10 @@ for (i in 1:length(filePaths)) {
     books <- c(books, readtext(filePaths[i])$text)
 }
 corp <- corpus(books, docnames=fileNames)    
-toks <- tokens(corp, remove_punct=T)
-
-tokensNum <- c()
-for(name in fileNames) {
-    tokensNum <- c(tokensNum, length(toks[[name]]))
-}
-
-features <- dfm(toks, stem=T, tolower=T)
-
-vocabularyList <- list()
-for(i in 1:length(filePaths)) {
-    vocabularyList[[i]] <- featnames(features[i, colSums(features[i] != 0) > 0])
-}
-
-toksList <- list()
-for (i in 1:length(filePaths)) {
-    toksList[[i]] <- toks[[fileNames[i]]]
-} 
 
 result <- list()
 result[["fileNames"]] <- fileNames
 result[["filePaths"]] <- filePaths
-result[["tokens"]] <- toksList
-result[["vocabulary"]] <- vocabularyList
 if(!is.null(args[["readIndex"]])) {
     readIndex <- unlist(strsplit(args[["readIndex"]], split=','))
     temp <- textstat_readability(corp, measure=readIndex)

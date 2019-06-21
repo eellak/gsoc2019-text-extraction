@@ -25,7 +25,9 @@ result <- list()
 result[["fileNames"]] <- fileNames
 result[["filePaths"]] <- filePaths
 tokensList <- list()
+tokensNumList <- list()
 vocabularyList <- list()
+vocabularyNumList <- list()
 entropyList <- list()
 normentropyList <- list()
 for (k in 1:length(filePaths)) {
@@ -44,17 +46,15 @@ for (k in 1:length(filePaths)) {
     V <- length(TYPES_LIST)
 
     freq_analysis <- textstat_frequency(features)
-
+    a <- tokenize(TYPES_LIST, format="obj", tag=F, lang=get.kRp.env(lang=T), split="\\ ")
     tagged_text <- treetag(TYPES_LIST, treetagger="manual", format="obj", lang=get.kRp.env(lang=T), TT.options=get.kRp.env(TT.options=T), doc_id=fileNames[k])
 
-    FREQ_TABLE <- data.frame(
-        AvgRank = freq_analysis$rank,
-        TYPE = freq_analysis$feature,
-        POS = tagged_text@TT.res$tag,
-        Frequency = freq_analysis$frequency
-    )
+    AvgRank = freq_analysis$rank
+    TYPE = freq_analysis$feature
+    POS = tagged_text@TT.res$tag
+    Frequency = freq_analysis$frequency
 
-    F <- FREQ_TABLE$Frequency
+    F <- Frequency
     ## INDICES    #######################################################################################
     ## Globals: TOKENS    or N    ... tokens count
     ##            TYPES    or V    ... types count
@@ -78,7 +78,7 @@ for (k in 1:length(filePaths)) {
 
     INDEX_TYPES_INT            <- as.integer(TYPES)
     # INDEX_TYPES_INT            <- place(INDEX_TYPES_INT)
-    INDEX_TYPES_EXT            <- FREQ_TABLE #TYPES_LIST
+    # INDEX_TYPES_EXT            <- FREQ_TABLE #TYPES_LIST
 
     INDEX_TTR                <- TYPES / TOKENS;
     # INDEX_TTR                <- place(INDEX_TTR)
@@ -407,16 +407,20 @@ for (k in 1:length(filePaths)) {
     # }
 
 
-    tokensList[[k]] <- TOKENS_LIST 
+    tokensList[[k]] <- TOKENS_LIST
+    tokensNumList[[k]] <- TOKENS
     vocabularyList[[k]] <- TYPES_LIST
+    vocabularyNumList[[k]] <- TYPES
     entropyList[[k]] <- INDEX_ENTROPY
     normentropyList[[k]] <- INDEX_NORMENTROPY
 }
     if(is.element("tokens", indices)) {
         result[["tokens"]] <- tokensList
+        result[["tokensNum"]] <- tokensNumList
     }
     if(is.element("vocabulary", indices)) {
         result[["vocabulary"]] <- vocabularyList
+        result[["vocabularyNum"]] <- vocabularyNumList
     }
     if(is.element("entropy", indices)) {
         result[["entropy"]] <- entropyList
