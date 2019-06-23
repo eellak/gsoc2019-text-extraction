@@ -30,17 +30,17 @@ class ScriptsTab extends Component {
 
         const readabilityTab = (
             <div>
-                <ReadabilityOptions filePaths={this.props.selectedFilesPaths} settings={this.props.settings} type="readability" setScriptParameters={this.props.setScriptParameters} platform={this.props.platform} />
+                <ReadabilityOptions setDistantState={this.props.setDistantState} selectedIndices={this.props.readIndex} filePaths={this.props.selectedFilesPaths} settings={this.props.settings} type="readability" setScriptParameters={this.props.setScriptParameters} platform={this.props.platform} />
             </div>);
 
         const lexdivTab = (
             <div>
-                <LexdivOptions filePaths={this.props.selectedFilesPaths} settings={this.props.settings} type="lexdiv" setScriptParameters={this.props.setScriptParameters} platform={this.props.platform} />
+                <LexdivOptions setDistantState={this.props.setDistantState} selectedIndices={this.props.lexdivIndex} filePaths={this.props.selectedFilesPaths} settings={this.props.settings} type="lexdiv" setScriptParameters={this.props.setScriptParameters} platform={this.props.platform} />
             </div>);
 
         const miscTab = (
             <div>
-                <MiscOptions filePaths={this.props.selectedFilesPaths} settings={this.props.settings} type="misc" setScriptParameters={this.props.setScriptParameters} platform={this.props.platform} />
+                <MiscOptions setDistantState={this.props.setDistantState} selectedIndices={this.props.miscIndex} filePaths={this.props.selectedFilesPaths} settings={this.props.settings} type="misc" setScriptParameters={this.props.setScriptParameters} platform={this.props.platform} />
             </div>);
 
         const customScriptTab = (

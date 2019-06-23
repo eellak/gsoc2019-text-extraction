@@ -74,6 +74,9 @@ class Main extends Component {
     super(props);
     this.state = {
       openDrawer: false,
+      readIndex: [],
+      lexdivIndex: [],
+      miscIndex: [],
       selectedFilesPaths: [],
       resultList: [],
       toExecute: {},
@@ -299,13 +302,16 @@ class Main extends Component {
                 electron={this.props.electron}
                 platform={this.props.platform}
                 isDev={this.props.isDev}
-                setParentState={this.setDistantState}
+                setDistantState={this.setDistantState}
               />}
               {this.state.tabIndex === 1 && <ScriptsTab
+                readIndex={this.state.readIndex}
+                lexdivIndex={this.state.lexdivIndex}
+                miscIndex={this.state.miscIndex}
                 electron={this.props.electron}
                 platform={this.props.platform}
                 isDev={this.props.isDev}
-                setParentState={this.setDistantState}
+                setDistantState={this.setDistantState}
                 selectedFilesPaths={this.state.selectedFilesPaths}
                 settings={this.state.settings}
                 setScriptParameters={this.setScriptParameters}

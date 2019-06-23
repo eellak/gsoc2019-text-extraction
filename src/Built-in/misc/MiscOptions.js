@@ -1,11 +1,17 @@
 import React, { Component } from 'react';
+import clsx from 'clsx';
 import './MiscOptions.css';
+import GridList from '@material-ui/core/GridList';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import Checkbox from '@material-ui/core/Checkbox';
 
 class MiscOptions extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
+      selectAll: false,
       miscIndices: [
         //TODO probably will add a "what to return" field. Maybe load from database
         { indexName: "entropy", displayName: "Entropy" },
@@ -24,48 +30,65 @@ class MiscOptions extends Component {
     }
   };
 
-  checkAll = () => {
-    const checkboxes = document.querySelectorAll(".misc-index");
-    const isChecked = document.querySelector("#misc-check-all").checked;
-    checkboxes.forEach((checkbox) => {
-      checkbox.checked = isChecked;
-    });
-  }
-
-  changeArgs = (e) => {
-    const checkboxes = document.querySelectorAll(".misc-index");
-    let indexList = [];
-    checkboxes.forEach((checkbox) => {
-      if (checkbox.checked) {
-        indexList.push(checkbox.value);
+  handleToggle = value => {
+    let newChecked = [];
+    if (value === "all") {
+      if (this.state.selectAll) {
+        this.setState({ selectAll: false });
+        newChecked = [...this.props.selectedIndices];
       }
       else {
-        document.querySelector("#misc-check-all").checked = false;
+        newChecked = this.state.miscIndices.map(indexObj => indexObj.indexName);
+        this.setState({ selectAll: true });
       }
-    })
-    if (indexList.length === 0 || this.props.filePaths.length === 0) {
+    }
+    else {
+      const currentIndex = this.props.selectedIndices.indexOf(value);
+      newChecked = [...this.props.selectedIndices];
+
+      if (currentIndex === -1) {
+        newChecked.push(value);
+      } else {
+        newChecked.splice(currentIndex, 1);
+      }
+    }
+    this.props.setDistantState({ miscIndex: newChecked });
+  };
+
+  changeArgs = (e) => {
+    if (this.props.selectedIndices.length === 0 || this.props.filePaths.length === 0) {
       console.log("Please select at least one file");
       this.props.setScriptParameters(true, this.props.type);
       e.target.innerText = "add";
     }
     else {
-      const args = [`${this.props.settings.get("rlibPath")}`].concat(`-filePaths=${this.props.filePaths.join(',')}`).concat(`-miscIndex=${indexList.join(',')}`);
+      const args = [`${this.props.settings.get("rlibPath")}`].concat(`-filePaths=${this.props.filePaths.join(',')}`).concat(`-miscIndex=${this.props.selectedIndices.join(',')}`);
       this.props.setScriptParameters(false, this.props.type, this.state.env, this.state.scriptPath, args);
       e.target.innerText = "update";
     }
-  }
+  };
 
   render() {
     return (
-      <div id="select-misc-indices">
+      <div>
         <h4>Select one or more indices to extract</h4>
-        <div>
-          <input type="checkbox" id="misc-check-all" name="misc-index" value="all" onClick={this.checkAll} />All
-        {this.state.miscIndices.map((indexObj, i) =>
-            <div key={i}><input type="checkbox" className="misc-index" name="misc-index" value={indexObj.indexName} />{indexObj.displayName}</div>
+        <GridList cols={5} cellHeight="auto">
+          <ListItem button onClick={() => this.handleToggle("all")}>
+              <Checkbox
+                checked={this.state.selectAll}
+              />
+            <ListItemText primary="All" />
+          </ListItem>
+          {this.state.miscIndices.map((indexObj, i) => (
+            <ListItem key={i} button onClick={() => this.handleToggle(indexObj.indexName)}>
+                <Checkbox
+                  checked={this.state.selectAll || this.props.selectedIndices.indexOf(indexObj.indexName) !== -1}
+                />
+              <ListItemText primary={indexObj.displayName} />
+            </ListItem>)
           )}
+        </GridList>
           <button id={`add-misc-${String(this.state.id)}`} onClick={this.changeArgs}>add</button>
-        </div>
       </div>
     );
   }

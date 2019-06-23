@@ -18,7 +18,7 @@ const FilesTab = props => {
             },
             (filePaths) => {
                 if (filePaths !== undefined) {
-                    props.setParentState({ selectedFilesPaths: filePaths });
+                    props.setDistantState({ selectedFilesPaths: filePaths });
                 }
             }
         );

@@ -1,11 +1,17 @@
 import React, { Component } from 'react';
+import clsx from 'clsx';
 import './ReadabilityOptions.css';
+import GridList from '@material-ui/core/GridList';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import Checkbox from '@material-ui/core/Checkbox';
 
 class ReadabilityOptions extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
+      selectAll: false,
       readabilityIndices: [
         //TODO probably will add a "what to return" field. Maybe load from database
         { indexName: "ARI", displayName: "ARI" },
@@ -68,50 +74,66 @@ class ReadabilityOptions extends Component {
     }
   };
 
-  checkAll = () => {
-    const checkboxes = document.querySelectorAll(".read-index");
-    const isChecked = document.querySelector("#readability-check-all").checked;
-    checkboxes.forEach((checkbox) => {
-      checkbox.checked = isChecked;
-    });
-  }
- 
-  changeArgs = (e) => {
-    const checkboxes = document.querySelectorAll(".read-index");
-    let indexList = [];
-    checkboxes.forEach((checkbox) => {
-      if (checkbox.checked) {
-        indexList.push(checkbox.value);
+  handleToggle = value => {
+    let newChecked = [];
+    if (value === "all") {
+      if (this.state.selectAll) {
+        this.setState({ selectAll: false });
+        newChecked = [...this.props.selectedIndices];
       }
       else {
-        document.querySelector("#readability-check-all").checked = false;
+        newChecked = this.state.readabilityIndices.map(indexObj => indexObj.indexName);
+        this.setState({ selectAll: true });
       }
-    })
-    if(indexList.length === 0 || this.props.filePaths.length === 0) {
+    }
+    else {
+      const currentIndex = this.props.selectedIndices.indexOf(value);
+      newChecked = [...this.props.selectedIndices];
+
+      if (currentIndex === -1) {
+        newChecked.push(value);
+      } else {
+        newChecked.splice(currentIndex, 1);
+      }
+    }
+    this.props.setDistantState({ readIndex: newChecked });
+  };
+
+  changeArgs = (e) => {
+    if (this.props.selectedIndices.length === 0 || this.props.filePaths.length === 0) {
       console.log("Please select at least one file");
       this.props.setScriptParameters(true, this.props.type);
       e.target.innerText = "add";
     }
     else {
-      const args = [`${this.props.settings.get("rlibPath")}`].concat(`-filePaths=${this.props.filePaths.join(',')}`).concat(`-readIndex=${indexList.join(',')}`);
+      const args = [`${this.props.settings.get("rlibPath")}`].concat(`-filePaths=${this.props.filePaths.join(',')}`).concat(`-readIndex=${this.props.selectedIndices.join(',')}`);
       this.props.setScriptParameters(false, this.props.type, this.state.env, this.state.scriptPath, args);
       e.target.innerText = "update";
     }
-}
+  };
 
   render() {
     return (
-      <div id="select-read-indices">
+      <div>
         <h4>Select one or more indices to extract</h4>
-        <div>
-          <input type="checkbox" id="readability-check-all" name="readability-index" value="all" onClick={this.checkAll} />All
-        {this.state.readabilityIndices.map((indexObj, i) =>
-            <div key={i}><input type="checkbox" className="read-index" name="readability-index" value={indexObj.indexName} />{indexObj.displayName}</div>
+        <GridList cols={5} cellHeight="auto">
+          <ListItem button onClick={() => this.handleToggle("all")}>
+              <Checkbox
+                checked={this.state.selectAll}
+              />
+            <ListItemText primary="All" />
+          </ListItem>
+          {this.state.readabilityIndices.map((indexObj, i) => (
+            <ListItem key={i} button onClick={() => this.handleToggle(indexObj.indexName)}>
+                <Checkbox
+                  checked={this.state.selectAll || this.props.selectedIndices.indexOf(indexObj.indexName) !== -1}
+                />
+              <ListItemText primary={indexObj.displayName} />
+            </ListItem>)
           )}
-          <button id={`add-readability-${String(this.state.id)}`} onClick={this.changeArgs}>add</button>
-        </div>
-      </div>
-    );
+        </GridList>
+        <button id={`add-readability-${String(this.state.id)}`} onClick={this.changeArgs}>add</button>
+      </div>);
   }
 }
 

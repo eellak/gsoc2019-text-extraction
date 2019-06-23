@@ -1,11 +1,17 @@
 import React, { Component } from 'react';
+import clsx from 'clsx';
 import './LexdivOptions.css';
+import GridList from '@material-ui/core/GridList';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import Checkbox from '@material-ui/core/Checkbox';
 
 class LexdivOptions extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
+      selectAll: false,
       lexdivIndices: [
         //TODO probably will add a "what to return" field. Maybe load from database
         { indexName: "TTR", displayName: "TTR" },
@@ -36,48 +42,65 @@ class LexdivOptions extends Component {
     }
   };
 
-  checkAll = () => {
-    const checkboxes = document.querySelectorAll(".lexdiv-index");
-    const isChecked = document.querySelector("#lexdiv-check-all").checked;
-    checkboxes.forEach((checkbox) => {
-      checkbox.checked = isChecked;
-    });
-  }
- 
-  changeArgs = (e) => {
-    const checkboxes = document.querySelectorAll(".lexdiv-index");
-    let indexList = [];
-    checkboxes.forEach((checkbox) => {
-      if (checkbox.checked) {
-        indexList.push(checkbox.value);
+  handleToggle = value => {
+    let newChecked = [];
+    if (value === "all") {
+      if (this.state.selectAll) {
+        this.setState({ selectAll: false });
+        newChecked = [...this.props.selectedIndices];
       }
       else {
-        document.querySelector("#lexdiv-check-all").checked = false;
+        newChecked = this.state.lexdivIndices.map(indexObj => indexObj.indexName);
+        this.setState({ selectAll: true });
       }
-    })
-    if(indexList.length === 0 || this.props.filePaths.length === 0) {
+    }
+    else {
+      const currentIndex = this.props.selectedIndices.indexOf(value);
+      newChecked = [...this.props.selectedIndices];
+
+      if (currentIndex === -1) {
+        newChecked.push(value);
+      } else {
+        newChecked.splice(currentIndex, 1);
+      }
+    }
+    this.props.setDistantState({ lexdivIndex: newChecked });
+  };
+ 
+  changeArgs = (e) => {
+    if (this.props.selectedIndices.length === 0 || this.props.filePaths.length === 0) {
       console.log("Please select at least one file");
       this.props.setScriptParameters(true, this.props.type);
       e.target.innerText = "add";
     }
     else {
-      const args = [`${this.props.settings.get("rlibPath")}`].concat(`-filePaths=${this.props.filePaths.join(',')}`).concat(`-lexdivIndex=${indexList.join(',')}`);
+      const args = [`${this.props.settings.get("rlibPath")}`].concat(`-filePaths=${this.props.filePaths.join(',')}`).concat(`-lexdivIndex=${this.props.selectedIndices.join(',')}`);
       this.props.setScriptParameters(false, this.props.type, this.state.env, this.state.scriptPath, args);
       e.target.innerText = "update";
     }
-}
+  };
 
   render() {
     return (
-      <div id="select-lexdiv-indices">
+      <div>
         <h4>Select one or more indices to extract</h4>
-        <div>
-          <input type="checkbox" id="lexdiv-check-all" name="lexdiv-index" value="all" onClick={this.checkAll} />All
-        {this.state.lexdivIndices.map((indexObj, i) =>
-            <div key={i}><input type="checkbox" className="lexdiv-index" name="lexdiv-index" value={indexObj.indexName} />{indexObj.displayName}</div>
+        <GridList cols={5} cellHeight="auto">
+          <ListItem button onClick={() => this.handleToggle("all")}>
+              <Checkbox
+                checked={this.state.selectAll}
+              />
+            <ListItemText primary="All" />
+          </ListItem>
+          {this.state.lexdivIndices.map((indexObj, i) => (
+            <ListItem key={i} button onClick={() => this.handleToggle(indexObj.indexName)}>
+                <Checkbox
+                  checked={this.state.selectAll || this.props.selectedIndices.indexOf(indexObj.indexName) !== -1}
+                />
+              <ListItemText primary={indexObj.displayName} />
+            </ListItem>)
           )}
+        </GridList>
           <button id={`add-lexdiv-${String(this.state.id)}`} onClick={this.changeArgs}>add</button>
-        </div>
       </div>
     );
   }
