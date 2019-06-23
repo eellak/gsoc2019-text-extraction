@@ -6,7 +6,7 @@ import { Switch, Route } from 'react-router-dom';
 import "react-tabs/style/react-tabs.css";
 
 class App extends Component {
-   constructor() {
+  constructor() {
     super();
     this.state = {
       platform: window.process.platform,
@@ -15,11 +15,11 @@ class App extends Component {
     };
   }
   render() {
-       return (
-         <Switch>
-          <Route path='/settings' render={() => <Settings platform={this.state.platform} electron={this.state.electron} isDev={this.state.isDev} />} />
-          <Route path='/main' render={() => <Main platform={this.state.platform} electron={this.state.electron} isDev={this.state.isDev} />} />
-         </Switch>
+    return (
+      <Switch>
+        <Route path='/settings' render={() => <Settings platform={this.state.platform} electron={this.state.electron} isDev={this.state.isDev} />} />
+        <Route path='/main' render={() => <Main platform={this.state.platform} electron={this.state.electron} isDev={this.state.isDev} />} />
+      </Switch>
     );
   }
 }

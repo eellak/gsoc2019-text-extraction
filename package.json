@@ -3,7 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@material-ui/core": "^4.1.1",
+    "@material-ui/icons": "^4.2.0",
     "@trendmicro/react-sidenav": "^0.4.5",
+    "clsx": "^1.0.4",
     "electron-is-dev": "^1.1.0",
     "electron-settings": "^3.2.0",
     "file-system": "^2.2.2",
