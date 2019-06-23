@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 import './FilesTab.css';
-import '@trendmicro/react-sidenav/dist/react-sidenav.css';
-import "react-tabs/style/react-tabs.css";
 
 const FilesTab = props => {
 

@@ -1,8 +1,5 @@
 import React, { Component } from 'react';
 import './ResultsTab.css';
-import '@trendmicro/react-sidenav/dist/react-sidenav.css';
-import "react-tabs/style/react-tabs.css";
-
 const ResultsTab = props => {
     // pass by value
     // TODO : find better way?

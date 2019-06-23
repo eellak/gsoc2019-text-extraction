@@ -1,13 +1,67 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
+import clsx from 'clsx';
 import './Main.css';
 import FilesTab from './FilesTab'
 import ScriptsTab from './ScriptsTab'
 import ResultsTab from './ResultsTab'
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
-import SideNav, { NavItem, NavIcon, NavText } from '@trendmicro/react-sidenav';;
-import '@trendmicro/react-sidenav/dist/react-sidenav.css';
 import "react-tabs/style/react-tabs.css";
+import { withStyles, withTheme, mergeClasses } from '@material-ui/styles';
+import AppBar from "@material-ui/core/AppBar";
+import Drawer from "@material-ui/core/Drawer";
+import Toolbar from "@material-ui/core/Toolbar";
+import IconButton from "@material-ui/core/IconButton";
+import Typography from "@material-ui/core/Typography";
+import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemText from "@material-ui/core/ListItemText";
+
+const drawerWidth = 240;
+
+const styles = theme => ({
+  appBar: {
+    zIndex: theme.zIndex.drawer + 1,
+  },
+  hide: {
+    display: 'none',
+  },
+  drawer: {
+    width: drawerWidth,
+    flexShrink: 0,
+    whiteSpace: 'nowrap',
+  },
+  drawerOpen: {
+    width: drawerWidth,
+    transition: theme.transitions.create('width', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  },
+  drawerClose: {
+    transition: theme.transitions.create('width', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+    overflowX: 'hidden',
+    width: theme.spacing(7) + 1,
+    [theme.breakpoints.up('sm')]: {
+      width: theme.spacing(9) + 1,
+    },
+  },
+  tabs: {
+    width: '100%',
+    margin: '15px 0 15px 0'
+  },
+  toolbar: theme.mixins.toolbar,
+  content: {
+    flexGrow: 1,
+    padding: theme.spacing(3),
+  },
+  main: {
+    display: "flex",
+    margin: "0 0 0 10px"
+  }
+});
 
 class Main extends Component {
   /* State:
@@ -21,13 +75,14 @@ class Main extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      openDrawer: false,
       selectedFilesPaths: [],
       resultList: [],
       toExecute: {},
       settings: props.electron.remote.require('electron-settings'),
       tabIndex: 0,
       fs: window.require('fs'),
-      ipc: props.electron.ipcRenderer
+      ipc: props.electron.ipcRenderer,
     };
     this.state.ipc.on('receive-books', (event, arg) => {
       this.setDistantState({ resultList: arg });
@@ -85,7 +140,7 @@ class Main extends Component {
 
   setDistantState = (obj) => {
     this.setState(obj);
-  }
+  };
 
   /* executeScript:
   * call an NLP script using the npm's child_process module
@@ -117,7 +172,7 @@ class Main extends Component {
         callback();
       }
     });
-  }
+  };
 
   setScriptParameters = (remove, type, env, scriptPath, args) => {
     let toExecute = this.state.toExecute;
@@ -126,7 +181,7 @@ class Main extends Component {
       toExecute[type] = { env: env, scriptPath: scriptPath, args: args }
       this.setState({ toExecute: toExecute });
     }
-  }
+  };
 
   executeAll = () => {
     let promises = [];
@@ -141,114 +196,132 @@ class Main extends Component {
 
     let addFreqAnalysis = true;
     Object.keys(this.state.toExecute).map((execKey) => {
-      if(execKey === "misc") {
+      if (execKey === "misc") {
         const toExecute = this.state.toExecute;
         toExecute[execKey].args[2] = toExecute[execKey].args[2] + "tokens,vocabulary";
-        this.setState({ toExecute: toExecute});
+        this.setState({ toExecute: toExecute });
         addFreqAnalysis = false;
       }
       promises.push(createAsync(this.state.toExecute[execKey]));
     });
-    if(addFreqAnalysis === true) {
-      promises.push(createAsync({env: `${this.state.settings.get("rPath", "")}\\Rscript`,
-      scriptPath: (() => {
-        switch (this.state.platform) {
-          case "win32":
-            return "src\\Built-in\\misc\\misc_indices.R";
-          case "linux":
-          default:
-            return "src/Built-in/misc/misc_indices.R";
-        }
-      })(),
-      args: [`${this.state.settings.get("rlibPath")}`].concat(`-filePaths=${this.state.selectedFilesPaths.join(',')}`).concat(`-miscIndex=tokens,vocabulary`)
-    }))
+    if (addFreqAnalysis === true) {
+      promises.push(createAsync({
+        env: `${this.state.settings.get("rPath", "")}\\Rscript`,
+        scriptPath: (() => {
+          switch (this.state.platform) {
+            case "win32":
+              return "src\\Built-in\\misc\\misc_indices.R";
+            case "linux":
+            default:
+              return "src/Built-in/misc/misc_indices.R";
+          }
+        })(),
+        args: [`${this.state.settings.get("rlibPath")}`].concat(`-filePaths=${this.state.selectedFilesPaths.join(',')}`).concat(`-miscIndex=tokens,vocabulary`)
+      }))
     }
     Promise.all(promises)
       .then(() => {
         this.state.ipc.send('get-books', this.state.selectedFilesPaths);
         execButton.disabled = false;
       });
-  }
+  };
 
   changeTab = (tabIndex) => {
     this.setState({ tabIndex: Number(tabIndex) })
-  }
+  };
+
+  handleDrawerOpen = () => {
+    this.setState({ openDrawer: true });
+  };
+
+  handleDrawerClose = () => {
+    this.setState({ openDrawer: false });
+  };
 
   render() {
+    const classes = this.props.classes;
+    const theme = this.props.theme;
     return (
-      <div className="App">
-        <header>
-          <h2>Welcome to Testing grounds!</h2>
-        </header>
-        <main>
-          <div className="content">
-            <SideNav>
-              <SideNav.Toggle />
-              <SideNav.Nav defaultSelected="0" onSelect={this.changeTab}>
-                <NavItem eventKey="0">
-                  <NavIcon>
-                    <i className="fas fa-file-alt"></i>
-                  </NavIcon>
-                  <NavText>
-                    Input
-            </NavText>
-                </NavItem>
-                <NavItem eventKey="1" onSelect={this.changeTab}>
-                  <NavIcon>
-                    <i className="fas fa-tasks"></i>
-                  </NavIcon>
-                  <NavText>
-                    Scripts
-            </NavText>
-                </NavItem>
-                <NavItem eventKey="2" onSelect={this.changeTab}>
-                  <NavIcon>
-                    <i className="fas fa-signal"></i>
-                  </NavIcon>
-                  <NavText>
-                    Results
-            </NavText>
-                </NavItem>
-              </SideNav.Nav>
-            </SideNav>
-            <Tabs selectedIndex={this.state.tabIndex} forceRenderTabPanel={true} className="main-tabs" onSelect={tabIndex => this.setState({ tabIndex: tabIndex })}>
-              <TabList className="collapsed">
-                <Tab />
-                <Tab />
-                <Tab />
-              </TabList>
-              <TabPanel>
-                <FilesTab
-                  electron={this.props.electron}
-                  platform={this.props.platform}
-                  isDev={this.props.isDev}
-                  setParentState={this.setDistantState}
-                />
-              </TabPanel>
-              <TabPanel>
-                <ScriptsTab
-                  electron={this.props.electron}
-                  platform={this.props.platform}
-                  isDev={this.props.isDev}
-                  setParentState={this.setDistantState}
-                  selectedFilesPaths={this.state.selectedFilesPaths}
-                  settings={this.state.settings}
-                  setScriptParameters={this.setScriptParameters}
-                />
-              </TabPanel>
-              <TabPanel>
-                <ResultsTab
-                  ipc={this.state.ipc}
-                  resultList={this.state.resultList}
-                  executeAll={this.executeAll}
-                />
-              </TabPanel>
-            </Tabs>
+      <div>
+        <AppBar
+          position="fixed"
+          className={clsx(classes.appBar, {
+            [classes.appBarShift]: open,
+          })}
+        >
+          <Toolbar>
+            <Typography variant="h6" noWrap>
+              Testing grounds!
+          </Typography>
+          </Toolbar>
+        </AppBar>
+        <main className={clsx(classes.main)}>
+          <Drawer
+            variant="permanent"
+            className={clsx(classes.drawer, {
+              [classes.drawerOpen]: this.state.openDrawer,
+              [classes.drawerClose]: !this.state.openDrawer,
+            })}
+            classes={{
+              paper: clsx({
+                [classes.drawerOpen]: this.state.openDrawer,
+                [classes.drawerClose]: !this.state.openDrawer,
+              }),
+            }}
+            open={this.state.openDrawer}
+          >
+            <div className={classes.toolbar} />
+            <IconButton
+              onClick={this.handleDrawerClose}
+              className={clsx({ [classes.hide]: !this.state.openDrawer })}
+            >
+            </IconButton>
+            <IconButton onClick={this.handleDrawerOpen}
+              className={clsx({ [classes.hide]: this.state.openDrawer })}
+            >
+            </IconButton>
+            <List>
+              {['Input', 'Scripts', 'Results'].map((text, index) => (
+                <ListItem
+                  button
+                  key={text}
+                  selected={this.state.tabIndex === index}
+                  onClick={() => this.changeTab(index)}
+                >
+                  <ListItemText primary={text} />
+                </ListItem>
+              ))}
+            </List>
+          </Drawer>
+          <div className={clsx(classes.content)}>
+            <div className={classes.toolbar} />
+            <div className={clsx(classes.tabs)}>
+              {this.state.tabIndex === 0 && <FilesTab
+                electron={this.props.electron}
+                platform={this.props.platform}
+                isDev={this.props.isDev}
+                setParentState={this.setDistantState}
+              />}
+              {this.state.tabIndex === 1 && <ScriptsTab
+                electron={this.props.electron}
+                platform={this.props.platform}
+                isDev={this.props.isDev}
+                setParentState={this.setDistantState}
+                selectedFilesPaths={this.state.selectedFilesPaths}
+                settings={this.state.settings}
+                setScriptParameters={this.setScriptParameters}
+              />}
+              {this.state.tabIndex === 2 && <ResultsTab
+                ipc={this.state.ipc}
+                resultList={this.state.resultList}
+                executeAll={this.executeAll}
+              />}
+            </div>
           </div>
         </main>
-      </div>
+      </div >
     );
   }
 };
 
-export default Main;
+export default withStyles(styles, { withTheme: true })(Main);
