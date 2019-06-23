@@ -17,31 +17,28 @@ const FilesTab = props => {
                 properties: ['openFile', 'multiSelections']
             },
             (filePaths) => {
-                let filenames = []
                 if (filePaths !== undefined) {
                     props.setParentState({ selectedFilesPaths: filePaths });
-                    filenames = filePaths.map((path) => {
-                        switch (props.platform) {
-                            case "win32":
-                                return path.split('\\').slice(-1)[0];
-                            case "linux":
-                            default:
-                                return path.split('/').slice(-1)[0];
-                        }
-                    });
                 }
-                filePaths === undefined ? {} : document.querySelector('#selected-files').innerHTML = 'You have selected ' + filenames.join(', ');
             }
         );
     }
 
+    const filenames = props.selectedFilesPaths.map(path => {
+        switch (props.platform) {
+            case "win32":
+                return `${path.split('\\').slice(-1)[0]}`;
+            case "linux":
+            default:
+                return `${path.split('/').slice(-1)[0]}`;
+        }
+    }).join(', ');
     return (
         <div>
             <h4>Select one or more files to be processed</h4>
             <div id="add-files">
                 <button id="add-files-btn" onClick={addFilesDialog}>Add files</button>
-                <div id="selected-files" />
-                <div id=""></div>
+                <div id="selected-files">{filenames.length === 0 ? `No files selected` : `You have selected ${filenames}`}</div>
             </div>
         </div>
     );

@@ -4,9 +4,7 @@ import './Main.css';
 import FilesTab from './FilesTab'
 import ScriptsTab from './ScriptsTab'
 import ResultsTab from './ResultsTab'
-import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
-import "react-tabs/style/react-tabs.css";
-import { withStyles, withTheme, mergeClasses } from '@material-ui/styles';
+import { withStyles } from '@material-ui/styles';
 import AppBar from "@material-ui/core/AppBar";
 import Drawer from "@material-ui/core/Drawer";
 import Toolbar from "@material-ui/core/Toolbar";
@@ -297,6 +295,7 @@ class Main extends Component {
             <div className={classes.toolbar} />
             <div className={clsx(classes.tabs)}>
               {this.state.tabIndex === 0 && <FilesTab
+                selectedFilesPaths={this.state.selectedFilesPaths}
                 electron={this.props.electron}
                 platform={this.props.platform}
                 isDev={this.props.isDev}
