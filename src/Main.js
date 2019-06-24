@@ -13,6 +13,7 @@ import Typography from "@material-ui/core/Typography";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
+import ListItemIcon from "@material-ui/core/ListItemIcon";
 
 const drawerWidth = 240;
 
@@ -276,22 +277,33 @@ class Main extends Component {
               onClick={this.handleDrawerClose}
               className={clsx({ [classes.hide]: !this.state.openDrawer })}
             >
+              <i className="material-icons">chevron_left</i>
             </IconButton>
             <IconButton onClick={this.handleDrawerOpen}
               className={clsx({ [classes.hide]: this.state.openDrawer })}
             >
+              <i className="material-icons">chevron_right</i>
             </IconButton>
             <List>
-              {['Input', 'Scripts', 'Results'].map((text, index) => (
-                <ListItem
+              {['Input', 'Scripts', 'Results'].map((text, index) => {
+                const iconstList = [
+                  <i className="material-icons">add_box</i>,
+                  <i className="material-icons">insert_drive_file</i>,
+                  <i className="material-icons">signal_cellular_4_bar</i>];
+
+                return (<ListItem
                   button
                   key={text}
                   selected={this.state.tabIndex === index}
                   onClick={() => this.changeTab(index)}
                 >
+                  <ListItemIcon>
+                    {iconstList[index]}
+                  </ListItemIcon>
                   <ListItemText primary={text} />
                 </ListItem>
-              ))}
+                )
+              })}
             </List>
           </Drawer>
           <div className={clsx(classes.content)}>

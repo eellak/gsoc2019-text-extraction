@@ -5,6 +5,7 @@ import GridList from '@material-ui/core/GridList';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import Checkbox from '@material-ui/core/Checkbox';
+import Typography from '@material-ui/core/Typography';
 
 class MiscOptions extends Component {
 
@@ -71,7 +72,7 @@ class MiscOptions extends Component {
   render() {
     return (
       <div>
-        <h4>Select one or more indices to extract</h4>
+        <Typography variant="subtitle1">Select one or more indices to extract</Typography>
         <GridList cols={5} cellHeight="auto">
           <ListItem button onClick={() => this.handleToggle("all")}>
               <Checkbox

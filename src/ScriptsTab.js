@@ -6,6 +6,7 @@ import MiscOptions from './Built-in/misc/MiscOptions'
 import CustomOptions from './Built-in/custom/CustomOptions'
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
+import Typography from '@material-ui/core/Typography';
 
 class ScriptsTab extends Component {
     constructor(props) {
@@ -23,9 +24,9 @@ class ScriptsTab extends Component {
         const dummyTab = (() => {
             if (this.props.selectedFilesPaths.length !== 0) {
                 const file = new File(["foo"], this.props.selectedFilesPaths[0]);
-                return <div>Dummy method which pastes the path of the first selected file. {file.name}</div>;
+                return <Typography variant="subtitle1">Dummy method which pastes the path of the first selected file. {file.name}</Typography>;
             }
-            else return <div>No file selected.</div>;
+            else return <Typography variant="subtitle1">No file selected.</Typography>;
         })();
 
         const readabilityTab = (
@@ -50,7 +51,7 @@ class ScriptsTab extends Component {
 
         return (
             <div className={this.props.className}>
-                <h4>Select processing script</h4>
+                <Typography variant="subtitle1" align="center">Select processing script</Typography>
                 <Tabs value={this.state.tabIndex} onChange={(event, tabIndex) => this.changeTab(tabIndex)}>
                     <Tab label="DummyScript" />
                     <Tab label="Readability" />

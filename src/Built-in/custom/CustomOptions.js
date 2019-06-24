@@ -8,9 +8,9 @@ class CustomOptions extends Component {
     this.state = {
       resultList: [],
       environments: [
-        { displayName: "Rscript", path: `${props.settings.get("rPath", "")}\\Rscript`},
-        { displayName: "python3", path: `${props.settings.get("python3Path", "")}\\python3`},
-        { displayName: "python", path: `${props.settings.get("python", "")}\\python`}
+        { displayName: "Rscript", path: `${props.settings.get("rPath", "")}\\Rscript` },
+        { displayName: "python3", path: `${props.settings.get("python3Path", "")}\\python3` },
+        { displayName: "python", path: `${props.settings.get("python", "")}\\python` }
       ],
       scriptPaths: {},
       id: 0,
@@ -66,7 +66,7 @@ class CustomOptions extends Component {
   addScript = (e) => {
     let [env, , , args] = e.target.parentNode.children;
     const id = e.target.parentNode.getAttribute("id").split('-').slice(-1);
-    if(document.querySelector(`#add-script-${id}`).innerText === "add") this.spawnCustomOption();
+    if (document.querySelector(`#add-script-${id}`).innerText === "add") this.spawnCustomOption();
     this.props.setScriptParameters(false, `${this.props.type}${id}`, env.value, this.state.scriptPaths.id, args.value.split(' '));
     document.querySelector(`#add-script-${id}`).innerText = "update";
     document.querySelector(`#remove-script-${id}`).style.display = "inline"

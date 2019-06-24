@@ -1,39 +1,13 @@
-.App {
-  text-align: center;
-  font-size: medium;
-}
-
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 80px;
-}
-
-.App-header {
-  background-color: #222;
-  height: 150px;
-  padding: 20px;
-  color: white;
-}
-
-.App-intro {
-  font-size: large;
-}
-
-@keyframes App-logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
 @font-face {
   font-family: 'Material Icons';
   font-style: normal;
   font-weight: 400;
-  src: url(../data/iconfont/MaterialIcons-Regular.eot); /* For IE6-8 */
+  src: url(MaterialIcons-Regular.eot); /* For IE6-8 */
   src: local('Material Icons'),
        local('MaterialIcons-Regular'),
-       url(../data/iconfont/MaterialIcons-Regular.woff2) format('woff2'),
-       url(../data/iconfont/MaterialIcons-Regular.woff) format('woff'),
-       url(../data/iconfont/MaterialIcons-Regular.ttf) format('truetype');
+       url(data/iconfont/MaterialIcons-Regular.woff2) format('woff2'),
+       url(data/iconfont/MaterialIcons-Regular.woff) format('woff'),
+       url(data/iconfont/MaterialIcons-Regular.ttf) format('truetype');
 }
 
 .material-icons {

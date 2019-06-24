@@ -5,6 +5,7 @@ import GridList from '@material-ui/core/GridList';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import Checkbox from '@material-ui/core/Checkbox';
+import Typography from '@material-ui/core/Typography';
 
 class LexdivOptions extends Component {
 
@@ -66,7 +67,7 @@ class LexdivOptions extends Component {
     }
     this.props.setDistantState({ lexdivIndex: newChecked });
   };
- 
+
   changeArgs = (e) => {
     if (this.props.selectedIndices.length === 0 || this.props.filePaths.length === 0) {
       console.log("Please select at least one file");
@@ -83,24 +84,24 @@ class LexdivOptions extends Component {
   render() {
     return (
       <div>
-        <h4>Select one or more indices to extract</h4>
+        <Typography variant="subtitle1">Select one or more indices to extract</Typography>
         <GridList cols={5} cellHeight="auto">
           <ListItem button onClick={() => this.handleToggle("all")}>
-              <Checkbox
-                checked={this.state.selectAll}
-              />
+            <Checkbox
+              checked={this.state.selectAll}
+            />
             <ListItemText primary="All" />
           </ListItem>
           {this.state.lexdivIndices.map((indexObj, i) => (
             <ListItem key={i} button onClick={() => this.handleToggle(indexObj.indexName)}>
-                <Checkbox
-                  checked={this.state.selectAll || this.props.selectedIndices.indexOf(indexObj.indexName) !== -1}
-                />
+              <Checkbox
+                checked={this.state.selectAll || this.props.selectedIndices.indexOf(indexObj.indexName) !== -1}
+              />
               <ListItemText primary={indexObj.displayName} />
             </ListItem>)
           )}
         </GridList>
-          <button id={`add-lexdiv-${String(this.state.id)}`} onClick={this.changeArgs}>add</button>
+        <button id={`add-lexdiv-${String(this.state.id)}`} onClick={this.changeArgs}>add</button>
       </div>
     );
   }
