@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import './CustomOptions.css';
+import Typography from '@material-ui/core/Typography';
 
 class CustomOptions extends Component {
 
@@ -104,7 +105,7 @@ class CustomOptions extends Component {
   render() {
     return (
       <div id="custom-scripts">
-        <h4>{"Select options (access selected filepaths in commandArgs using {filepaths})"}</h4>
+        <Typography variant="subtitle1" align="center">{"Select options (access selected filepaths in commandArgs using {filepaths})"}</Typography>
         {Object.values(this.state.displayData)}
       </div>);
   }

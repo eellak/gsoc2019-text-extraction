@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import './ScriptsTab.css';
 import ReadabilityOptions from './Built-in/readability/ReadabilityOptions'
 import LexdivOptions from './Built-in/lexdiv/LexdivOptions'
 import MiscOptions from './Built-in/misc/MiscOptions'

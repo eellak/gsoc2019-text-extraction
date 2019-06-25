@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import './FilesTab.css';
 import Typography from '@material-ui/core/Typography';
 
 const FilesTab = props => {

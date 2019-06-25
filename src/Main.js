@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import clsx from 'clsx';
-import './Main.css';
 import FilesTab from './FilesTab'
 import ScriptsTab from './ScriptsTab'
 import ResultsTab from './ResultsTab'

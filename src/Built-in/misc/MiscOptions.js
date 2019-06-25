@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import clsx from 'clsx';
-import './MiscOptions.css';
 import GridList from '@material-ui/core/GridList';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -72,7 +71,7 @@ class MiscOptions extends Component {
   render() {
     return (
       <div>
-        <Typography variant="subtitle1">Select one or more indices to extract</Typography>
+        <Typography variant="subtitle1" align="center">Select one or more indices to extract</Typography>
         <GridList cols={5} cellHeight="auto">
           <ListItem button onClick={() => this.handleToggle("all")}>
               <Checkbox

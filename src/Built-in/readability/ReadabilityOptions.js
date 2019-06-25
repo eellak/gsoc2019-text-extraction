@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import clsx from 'clsx';
-import './ReadabilityOptions.css';
 import GridList from '@material-ui/core/GridList';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -88,13 +87,18 @@ class ReadabilityOptions extends Component {
       }
     }
     else {
-      const currentIndex = this.props.selectedIndices.indexOf(value);
-      newChecked = [...this.props.selectedIndices];
+      if (this.state.selectAll) {
+        newChecked = this.state.readabilityIndices.map(indexObj => indexObj.indexName);
+      }
+      else {
+        const currentIndex = this.props.selectedIndices.indexOf(value);
+        newChecked = [...this.props.selectedIndices];
 
-      if (currentIndex === -1) {
-        newChecked.push(value);
-      } else {
-        newChecked.splice(currentIndex, 1);
+        if (currentIndex === -1) {
+          newChecked.push(value);
+        } else {
+          newChecked.splice(currentIndex, 1);
+        }
       }
     }
     this.props.setDistantState({ readIndex: newChecked });
@@ -116,19 +120,19 @@ class ReadabilityOptions extends Component {
   render() {
     return (
       <div>
-        <Typography variant="subtitle1">Select one or more indices to extract</Typography>
+        <Typography variant="subtitle1" align="center">Select one or more indices to extract</Typography>
         <GridList cols={5} cellHeight="auto">
           <ListItem button onClick={() => this.handleToggle("all")}>
-              <Checkbox
-                checked={this.state.selectAll}
-              />
+            <Checkbox
+              checked={this.state.selectAll}
+            />
             <ListItemText primary="All" />
           </ListItem>
           {this.state.readabilityIndices.map((indexObj, i) => (
             <ListItem key={i} button onClick={() => this.handleToggle(indexObj.indexName)}>
-                <Checkbox
-                  checked={this.state.selectAll || this.props.selectedIndices.indexOf(indexObj.indexName) !== -1}
-                />
+              <Checkbox
+                checked={this.state.selectAll || this.props.selectedIndices.indexOf(indexObj.indexName) !== -1}
+              />
               <ListItemText primary={indexObj.displayName} />
             </ListItem>)
           )}
