@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Typography from '@material-ui/core/Typography';
+import Button from '@material-ui/core/Button';
 
 const FilesTab = props => {
 
@@ -37,7 +38,7 @@ const FilesTab = props => {
         <div>
             <Typography variant="subtitle1" align="center">Select one or more files to be processed</Typography>
             <div id="add-files">
-                <button id="add-files-btn" onClick={addFilesDialog}>Add files</button>
+                <Button id="add-files-btn" onClick={addFilesDialog} variant="contained">Add files</Button>
                 <Typography id="selected-files">{filenames.length === 0 ? `No files selected` : `You have selected ${filenames}`}</Typography>
             </div>
         </div>

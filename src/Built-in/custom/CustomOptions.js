@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './CustomOptions.css';
 import Typography from '@material-ui/core/Typography';
+import Button from '@material-ui/core/Button';
 
 class CustomOptions extends Component {
 
@@ -91,11 +92,11 @@ class CustomOptions extends Component {
     const child = (
       <div key={this.state.id} id={`custom-options-${String(this.state.id)}`}>
         {envSelect}
-        <button onClick={this.addScriptDialog}>Select script</button>
+        <Button size="small"  variant="contained" onClick={this.addScriptDialog}>Select script</Button>
         <div id={`display-script-${String(this.state.id)}`}></div>
         <input type="text" placeholder="Insert necessary arguments" />
-        <button id={`add-script-${String(this.state.id)}`} onClick={this.addScript}>add</button>
-        <button className="remove-script" id={`remove-script-${String(this.state.id)}`} onClick={this.removeScript}>remove</button>
+        <Button size="small" variant="contained" id={`add-script-${String(this.state.id)}`} onClick={this.addScript}>add</Button>
+        <Button size="small" variant="contained" className="remove-script" id={`remove-script-${String(this.state.id)}`} onClick={this.removeScript}>remove</Button>
       </div>);
     let displayData = this.state.displayData;
     displayData[String(this.state.id)] = child;

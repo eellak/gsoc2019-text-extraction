@@ -5,6 +5,7 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import Checkbox from '@material-ui/core/Checkbox';
 import Typography from '@material-ui/core/Typography';
+import Button from '@material-ui/core/Button';
 
 class ReadabilityOptions extends Component {
 
@@ -137,7 +138,7 @@ class ReadabilityOptions extends Component {
             </ListItem>)
           )}
         </GridList>
-        <button id={`add-readability-${String(this.state.id)}`} onClick={this.changeArgs}>add</button>
+        <Button size="small" variant="contained" id={`add-readability-${String(this.state.id)}`} onClick={this.changeArgs}>add</Button>
       </div>);
   }
 }

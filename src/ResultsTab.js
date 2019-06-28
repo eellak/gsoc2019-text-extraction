@@ -7,6 +7,7 @@ import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
+import Button from '@material-ui/core/Button';
 
 const styles = theme => ({
 
@@ -40,7 +41,7 @@ const ResultsTab = props => {
 
     return (
         <div>
-            <button id="execute" onClick={props.executeAll}>Execute</button>
+            <Button variant="contained" id="execute" onClick={props.executeAll}>Execute</Button>
             <Table className={clsx(classes.table)}>
                 {(() => {
                     try {
