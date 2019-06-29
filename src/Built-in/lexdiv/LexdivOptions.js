@@ -56,13 +56,18 @@ class LexdivOptions extends Component {
       }
     }
     else {
-      const currentIndex = this.props.selectedIndices.indexOf(value);
-      newChecked = [...this.props.selectedIndices];
+      if (this.state.selectAll) {
+        newChecked = this.state.readabilityIndices.map(indexObj => indexObj.indexName);
+      }
+      else {
+        const currentIndex = this.props.selectedIndices.indexOf(value);
+        newChecked = [...this.props.selectedIndices];
 
-      if (currentIndex === -1) {
-        newChecked.push(value);
-      } else {
-        newChecked.splice(currentIndex, 1);
+        if (currentIndex === -1) {
+          newChecked.push(value);
+        } else {
+          newChecked.splice(currentIndex, 1);
+        }
       }
     }
     this.props.setDistantState({ lexdivIndex: newChecked });
@@ -101,7 +106,7 @@ class LexdivOptions extends Component {
             </ListItem>)
           )}
         </GridList>
-        <Button variant="contained" size="small" id={`add-lexdiv-${String(this.state.id)}`} onClick={this.changeArgs}>add</Button >
+        <Button variant="contained" size="small" onClick={this.changeArgs}>add</Button >
       </div>
     );
   }

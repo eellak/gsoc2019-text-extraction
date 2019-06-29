@@ -44,13 +44,18 @@ class MiscOptions extends Component {
       }
     }
     else {
-      const currentIndex = this.props.selectedIndices.indexOf(value);
-      newChecked = [...this.props.selectedIndices];
+      if (this.state.selectAll) {
+        newChecked = this.state.readabilityIndices.map(indexObj => indexObj.indexName);
+      }
+      else {
+        const currentIndex = this.props.selectedIndices.indexOf(value);
+        newChecked = [...this.props.selectedIndices];
 
-      if (currentIndex === -1) {
-        newChecked.push(value);
-      } else {
-        newChecked.splice(currentIndex, 1);
+        if (currentIndex === -1) {
+          newChecked.push(value);
+        } else {
+          newChecked.splice(currentIndex, 1);
+        }
       }
     }
     this.props.setDistantState({ miscIndex: newChecked });
@@ -75,21 +80,21 @@ class MiscOptions extends Component {
         <Typography variant="subtitle1" align="center">Select one or more indices to extract</Typography>
         <GridList cols={5} cellHeight="auto">
           <ListItem button onClick={() => this.handleToggle("all")}>
-              <Checkbox
-                checked={this.state.selectAll}
-              />
+            <Checkbox
+              checked={this.state.selectAll}
+            />
             <ListItemText primary="All" />
           </ListItem>
           {this.state.miscIndices.map((indexObj, i) => (
             <ListItem key={i} button onClick={() => this.handleToggle(indexObj.indexName)}>
-                <Checkbox
-                  checked={this.state.selectAll || this.props.selectedIndices.indexOf(indexObj.indexName) !== -1}
-                />
+              <Checkbox
+                checked={this.state.selectAll || this.props.selectedIndices.indexOf(indexObj.indexName) !== -1}
+              />
               <ListItemText primary={indexObj.displayName} />
             </ListItem>)
           )}
         </GridList>
-        <Button size="small" variant="contained" id={`add-misc-${String(this.state.id)}`} onClick={this.changeArgs}>add</Button>
+        <Button size="small" variant="contained" onClick={this.changeArgs}>add</Button>
       </div>
     );
   }

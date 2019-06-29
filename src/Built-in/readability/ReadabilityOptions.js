@@ -60,7 +60,7 @@ class ReadabilityOptions extends Component {
         { indexName: "Traenkle.Bailer.2", displayName: "Traenkle.Bailer 2" },
         { indexName: "Wheeler.Smith", displayName: "Wheeler.Smith" },
         { indexName: "meanSentenceLength", displayName: "Mean Sentence Length" },
-        { indexName: "meanWordSyllables", displayName: "Mean Word Syllables" },
+        { indexName: "meanWordSyllables", displayName: "Mean Word Syllables" }
       ],
       env: `${props.settings.get("rPath", "")}\\Rscript`,
       scriptPath: (() => {
@@ -138,7 +138,7 @@ class ReadabilityOptions extends Component {
             </ListItem>)
           )}
         </GridList>
-        <Button size="small" variant="contained" id={`add-readability-${String(this.state.id)}`} onClick={this.changeArgs}>add</Button>
+        <Button size="small" variant="contained" onClick={this.changeArgs}>add</Button>
       </div>);
   }
 }
