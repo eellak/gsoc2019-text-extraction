@@ -94,7 +94,10 @@ class Main extends Component {
     };
     this.state.ipc.on('receive-books', (event, arg) => {
       this.setDistantState({ resultList: arg });
-      console.log(arg);
+    });
+
+    this.state.ipc.on('receive-indices', (event, arg) => {
+      this.setDistantState({ indices: arg });
     });
   }
 
@@ -112,6 +115,7 @@ class Main extends Component {
       }
     })()
     this.executeScript(`${this.state.settings.get("rPath", "")}\\Rscript`, scriptPath, this.state.settings.get("rlibPath", "Rlibrary"));
+    this.state.ipc.send('get-indices');
   }
 
   /* executeScript:
@@ -208,7 +212,7 @@ class Main extends Component {
   changeTab = (tabIndex) => {
     this.setState({ tabIndex: Number(tabIndex) })
   };
- 
+
   // Open/close side drawer
   handleDrawerToggle = () => {
     this.setState({ openDrawer: !this.state.openDrawer });
@@ -217,10 +221,10 @@ class Main extends Component {
   /* Method that is passed to children components in order
   * to change the state of this component
   */
- setDistantState = (obj) => {
-   this.setState(obj);
+  setDistantState = (obj) => {
+    this.setState(obj);
   };
- 
+
   /* Method that is passed to children in order to
   * add a new script to be executed
   */
@@ -310,6 +314,7 @@ class Main extends Component {
                 setDistantState={this.setDistantState}
               />}
               {this.state.tabIndex === 1 && <ScriptsTab
+                indices={this.state.indices}
                 readIndex={this.state.readIndex}
                 lexdivIndex={this.state.lexdivIndex}
                 miscIndex={this.state.miscIndex}

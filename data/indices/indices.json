@@ -1,0 +1,271 @@
+[
+    {
+        "indexType": "readability",
+        "indexTypeDisplayName": "Readability",
+        "scriptPath": "src\\Built-in\\readability\\readability_indices.R",
+        "indicesDeclaration": [
+            {
+                "indexName": "ARI",
+                "displayName": "ARI"
+            },
+            {
+                "indexName": "ARI.NRI",
+                "displayName": "ARI NRI"
+            },
+            {
+                "indexName": "ARI.simple",
+                "displayName": "ARI simplified"
+            },
+            {
+                "indexName": "Bormuth.MC",
+                "displayName": "BormuthMC"
+            },
+            {
+                "indexName": "Bormuth.GP",
+                "displayName": "BormuthGP"
+            },
+            {
+                "indexName": "Coleman",
+                "displayName": "Coleman"
+            },
+            {
+                "indexName": "Coleman.C2",
+                "displayName": "ColemanC2"
+            },
+            {
+                "indexName": "Coleman.Liau.ECP",
+                "displayName": "Coleman.Liau.ECP"
+            },
+            {
+                "indexName": "Coleman.Liau.grade",
+                "displayName": "Coleman.Liau.grade"
+            },
+            {
+                "indexName": "Dale.Chall",
+                "displayName": "Dale.Chall"
+            },
+            {
+                "indexName": "Dale.Chall.old",
+                "displayName": "Dale.Chall.old"
+            },
+            {
+                "indexName": "Dale.Chall.PSK",
+                "displayName": "Dale.Chall.PSK"
+            },
+            {
+                "indexName": "Danielson.Bryan",
+                "displayName": "Danielson.Bryan"
+            },
+            {
+                "indexName": "Danielson.Bryan.2",
+                "displayName": "Danielson.Bryan2"
+            },
+            {
+                "indexName": "Dickes.Steiwer",
+                "displayName": "Dickes.Steiwer"
+            },
+            {
+                "indexName": "DRP",
+                "displayName": "DRP"
+            },
+            {
+                "indexName": "ELF",
+                "displayName": "ELF"
+            },
+            {
+                "indexName": "Farr.Jenkins.Paterson",
+                "displayName": "Farr.Jenkins.Paterson"
+            },
+            {
+                "indexName": "Flesch",
+                "displayName": "Flesch"
+            },
+            {
+                "indexName": "Flesch.PSK",
+                "displayName": "Flesch PSK"
+            },
+            {
+                "indexName": "Flesch.Kincaid",
+                "displayName": "Flesch.Kincaid"
+            },
+            {
+                "indexName": "FOG",
+                "displayName": "FOG"
+            },
+            {
+                "indexName": "FOG.PSK",
+                "displayName": "FOG PSK"
+            },
+            {
+                "indexName": "FOG.NRI",
+                "displayName": "FOG NRI"
+            },
+            {
+                "indexName": "FORCAST",
+                "displayName": "FORCAST"
+            },
+            {
+                "indexName": "FORCAST.RGL",
+                "displayName": "FORCAST Reading Grade Level"
+            },
+            {
+                "indexName": "Fucks",
+                "displayName": "Fucks"
+            },
+            {
+                "indexName": "Linsear.Write",
+                "displayName": "Linsear.Write"
+            },
+            {
+                "indexName": "LIW",
+                "displayName": "LIW"
+            },
+            {
+                "indexName": "nWS",
+                "displayName": "nWS"
+            },
+            {
+                "indexName": "nWS.2",
+                "displayName": "nWS 2"
+            },
+            {
+                "indexName": "nWS.3",
+                "displayName": "nWS 3"
+            },
+            {
+                "indexName": "nWS.4",
+                "displayName": "nWS 4"
+            },
+            {
+                "indexName": "RIX",
+                "displayName": "RIX"
+            },
+            {
+                "indexName": "Scrabble",
+                "displayName": "Scrabble"
+            },
+            {
+                "indexName": "SMOG",
+                "displayName": "SMOG"
+            },
+            {
+                "indexName": "SMOG.C",
+                "displayName": "SMOG C"
+            },
+            {
+                "indexName": "SMOG.simple",
+                "displayName": "SMOG simplified"
+            },
+            {
+                "indexName": "Spache",
+                "displayName": "Spache"
+            },
+            {
+                "indexName": "Spache.old",
+                "displayName": "Spache.old"
+            },
+            {
+                "indexName": "Strain",
+                "displayName": "Strain"
+            },
+            {
+                "indexName": "Traenkle.Bailer",
+                "displayName": "Traenkle.Bailer"
+            },
+            {
+                "indexName": "Traenkle.Bailer.2",
+                "displayName": "Traenkle.Bailer 2"
+            },
+            {
+                "indexName": "Wheeler.Smith",
+                "displayName": "Wheeler.Smith"
+            },
+            {
+                "indexName": "meanSentenceLength",
+                "displayName": "Mean Sentence Length"
+            },
+            {
+                "indexName": "meanWordSyllables",
+                "displayName": "Mean Word Syllables"
+            }
+        ]
+    },
+    {
+        "indexType": "lexdiv",
+        "indexTypeDisplayName": "Lexical Diversity",
+        "scriptPath": "src\\Built-in\\lexdiv\\lexdiv_indices.R",
+        "indicesDeclaration": [
+            {
+                "indexName": "TTR",
+                "displayName": "TTR"
+            },
+            {
+                "indexName": "C",
+                "displayName": "C"
+            },
+            {
+                "indexName": "R",
+                "displayName": "R"
+            },
+            {
+                "indexName": "CTTR",
+                "displayName": "CTTR"
+            },
+            {
+                "indexName": "U",
+                "displayName": "U"
+            },
+            {
+                "indexName": "S",
+                "displayName": "S"
+            },
+            {
+                "indexName": "K",
+                "displayName": "K"
+            },
+            {
+                "indexName": "D",
+                "displayName": "D"
+            },
+            {
+                "indexName": "Vm",
+                "displayName": "Vm"
+            },
+            {
+                "indexName": "Maas",
+                "displayName": "Maas"
+            },
+            {
+                "indexName": "MATTR",
+                "displayName": "MATTR"
+            },
+            {
+                "indexName": "MSTTR",
+                "displayName": "MSTTR"
+            },
+            {
+                "indexName": "lgV0",
+                "displayName": "lgV0"
+            },
+            {
+                "indexName": "lgeV0",
+                "displayName": "lgeV0"
+            }
+        ]
+    },
+    {
+        "indexType": "misc",
+        "indexTypeDisplayName": "Miscellaneous",
+        "scriptPath": "src\\Built-in\\misc\\misc_indices.R",
+        "indicesDeclaration": [
+            {
+                "indexName": "entropy",
+                "displayName": "Entropy"
+            },
+            {
+                "indexName": "normentropy",
+                "displayName": "Normalized Entropy"
+            }
+        ]
+    }
+]

@@ -1,5 +1,7 @@
 // Contains the MongoDB schema of corpora
 const corpusSchema = require('../public/corpus.js');
+// Contains the MongoDB schema of indices
+const indicesSchema = require('../public/indices.js');
 // Modules to control application life and create native browser window
 const electron = require('electron');
 // Module to control application life (app)
@@ -25,6 +27,7 @@ mongoose.connect('mongodb://localhost:27017/text_extraction_db', {
 });
 
 let Corpus = mongoose.model('corpus', corpusSchema);
+let Indices = mongoose.model('indices', indicesSchema);
 
 // Keep a global reference of the window objects, if you don't, the windows will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -185,12 +188,32 @@ ipcMain.on('get-books', (event, filePaths) => {
     })
 });
 
+/* Create a channel between main and rendered process
+* for indices fetch for modular front-end construction.
+*/
+ipcMain.on('get-indices', (event) => {
+  Indices.find({}, (error, result) => {
+    // Send found indices through main - renderer channel
+    event.sender.send('receive-indices', result);
+  });
+});
+
 /* When the Electron has finished initializastion create main window with
 * window position and dimensions as determined in last execution
 */
 app.on('ready', () => {
   let { width, height } = settings.get('windowBounds', { width: 1024, height: 800 });
   let { x, y } = settings.get('windowPosition', { x: 40, y: 60 });
+  const firstTime = settings.get("firstTime", true);
+  if (firstTime) {
+    fs.readFile('data\\indices\\indices.json', 'utf8', (err, jsonString) => {
+      if (err) {
+        console.log("File read failed:", err)
+        return;
+      }
+      Indices.insertMany(JSON.parse(jsonString));
+    })
+  }
   createMainWindow({
     width: width,
     height: height,
@@ -203,11 +226,15 @@ app.on('ready', () => {
 app.on('window-all-closed', () => {
   // On macOS it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
+  if (settings.get("firstTime")) {
+    settings.set("firstTime", false);
+}
   if (process.platform !== 'darwin') app.quit();
-})
+});
+
 
 app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (mainWindow === null) createMainWindow();
-})
+});
