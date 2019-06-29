@@ -14,6 +14,7 @@ import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 
+// Basic styles for this component
 const drawerWidth = 240;
 
 const styles = theme => ({
@@ -61,6 +62,12 @@ const styles = theme => ({
   }
 });
 
+/* Main is the main application component, which is responsible for the render
+* of everything the user can see on the main window and which stores
+* and operates the majority of the tool's functionality
+*/
+
+
 class Main extends Component {
   /* State:
   * platform: information about the platform (for cross-platform use)
@@ -73,20 +80,21 @@ class Main extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      settings: props.electron.remote.require('electron-settings'),
+      fs: window.require('fs'),
+      ipc: props.electron.ipcRenderer,
       openDrawer: false,
+      tabIndex: 0,
+      selectedFilesPaths: [],
       readIndex: [],
       lexdivIndex: [],
       miscIndex: [],
-      selectedFilesPaths: [],
-      resultList: [],
       toExecute: {},
-      settings: props.electron.remote.require('electron-settings'),
-      tabIndex: 0,
-      fs: window.require('fs'),
-      ipc: props.electron.ipcRenderer,
+      resultList: [],
     };
     this.state.ipc.on('receive-books', (event, arg) => {
       this.setDistantState({ resultList: arg });
+      console.log(arg);
     });
   }
 
@@ -106,49 +114,14 @@ class Main extends Component {
     this.executeScript(`${this.state.settings.get("rPath", "")}\\Rscript`, scriptPath, this.state.settings.get("rlibPath", "Rlibrary"));
   }
 
-
-  // // /* addFilesDialog:
-  // // * an electron dialog opens in order to select input files
-  // // */
-
-  // addFilesDialog = () => {
-  //   const path = require('path');
-  //   const dialog = this.props.electron.remote.dialog;
-  //   dialog.showOpenDialog(this.props.electron.remote.getCurrentWindow(),
-  //     {
-  //       title: 'Add files to process',
-  //       defaultPath: this.props.isDev ? "/home/panagiotis/Documents/gsoc2019-text-extraction/data" : `${path.join(__dirname, '../data')}`,
-  //       properties: ['openFile', 'multiSelections']
-  //     },
-  //     (filePaths) => {
-  //       let filenames = []
-  //       if (filePaths !== undefined) {
-  //         this.setState({ selectedFilesPaths: filePaths });
-  //         filenames = filePaths.map((path) => {
-  //           switch (this.props.platform) {
-  //             case "win32":
-  //               return path.split('\\').slice(-1)[0];
-  //             case "linux":
-  //             default:
-  //               return path.split('/').slice(-1)[0];
-  //           }
-  //         });
-  //       }
-  //       filePaths === undefined ? {} : document.querySelector('#selected-files').innerHTML = 'You have selected ' + filenames.join(', ');
-  //     }
-  //   );
-  // }
-
-  setDistantState = (obj) => {
-    this.setState(obj);
-  };
-
   /* executeScript:
-  * call an NLP script using the npm's child_process module
+  * call a script using the npm's child_process module
   */
 
   executeScript = (env, scriptPath, args = [], callback = undefined) => {
     if (env[0] === '\\') env = env.slice(1);
+
+    // Replace custom script argument with selected filepaths
     let replaceIndex = args.indexOf("{filepaths}")
     if (replaceIndex !== -1) {
       let firstPart = args.slice(0, replaceIndex);
@@ -162,11 +135,13 @@ class Main extends Component {
     //   console.log(`${data}`);
     // });
 
+    // Send message to main process to add new book to database
     process.stdout.on('data', (data) => {
-      // will probably store to a database
       this.state.ipc.send('add-books');
     });
 
+
+    // Call callback on exit (to resolve promise)
     process.on('exit', (code) => {
       console.log(`child process exited with code ${code}`);
       if (callback !== undefined) {
@@ -175,15 +150,13 @@ class Main extends Component {
     });
   };
 
-  setScriptParameters = (remove, type, env, scriptPath, args) => {
-    let toExecute = this.state.toExecute;
-    if (remove) delete toExecute[type];
-    else {
-      toExecute[type] = { env: env, scriptPath: scriptPath, args: args }
-      this.setState({ toExecute: toExecute });
-    }
-  };
-
+  /* executeAll:
+  * execute every script that currently is in the state's
+  * toExecute object and in addition, calculates tokens and types of selected
+  * files. The execution is done by creating a promise that
+  * calls executeScript function and thus, it is all done in an
+  * asynchronous manner.
+  */
   executeAll = () => {
     let promises = [];
     const execButton = document.querySelector('#execute');
@@ -205,6 +178,7 @@ class Main extends Component {
       }
       promises.push(createAsync(this.state.toExecute[execKey]));
     });
+    // Make tokens and types calculation compulsory
     if (addFreqAnalysis === true) {
       promises.push(createAsync({
         env: `${this.state.settings.get("rPath", "")}\\Rscript`,
@@ -220,6 +194,9 @@ class Main extends Component {
         args: [`${this.state.settings.get("rlibPath")}`].concat(`-filePaths=${this.state.selectedFilesPaths.join(',')}`).concat(`-miscIndex=tokens,vocabulary`)
       }))
     }
+    /* When every script has finished execution, fetch results and
+    * enable button
+    */
     Promise.all(promises)
       .then(() => {
         this.state.ipc.send('get-books', this.state.selectedFilesPaths);
@@ -227,16 +204,33 @@ class Main extends Component {
       });
   };
 
+  // Change view tab according to user's selection
   changeTab = (tabIndex) => {
     this.setState({ tabIndex: Number(tabIndex) })
   };
-
-  handleDrawerOpen = () => {
-    this.setState({ openDrawer: true });
+ 
+  // Open/close side drawer
+  handleDrawerToggle = () => {
+    this.setState({ openDrawer: !this.state.openDrawer });
   };
 
-  handleDrawerClose = () => {
-    this.setState({ openDrawer: false });
+  /* Method that is passed to children components in order
+  * to change the state of this component
+  */
+ setDistantState = (obj) => {
+   this.setState(obj);
+  };
+ 
+  /* Method that is passed to children in order to
+  * add a new script to be executed
+  */
+  setScriptParameters = (remove, type, env, scriptPath, args) => {
+    let toExecute = this.state.toExecute;
+    if (remove) delete toExecute[type];
+    else {
+      toExecute[type] = { env: env, scriptPath: scriptPath, args: args }
+      this.setState({ toExecute: toExecute });
+    }
   };
 
   render() {
@@ -273,12 +267,12 @@ class Main extends Component {
           >
             <div className={classes.toolbar} />
             <IconButton
-              onClick={this.handleDrawerClose}
+              onClick={this.handleDrawerToggle}
               className={clsx({ [classes.hide]: !this.state.openDrawer })}
             >
               <i className="material-icons">chevron_left</i>
             </IconButton>
-            <IconButton onClick={this.handleDrawerOpen}
+            <IconButton onClick={this.handleDrawerToggle}
               className={clsx({ [classes.hide]: this.state.openDrawer })}
             >
               <i className="material-icons">chevron_right</i>

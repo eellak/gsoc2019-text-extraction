@@ -1,12 +1,18 @@
+// Contains the MongoDB schema of corpora
 const corpusSchema = require('../public/corpus.js');
 // Modules to control application life and create native browser window
 const electron = require('electron');
-// Module to control application life
-// Module to create native browser window.
+// Module to control application life (app)
+// Module to create browser's windows (BrowserWindow)
+// Module to modify the menu bar and (Menu)
+// Module for interprocess communication (ipcMain)
 const { app, BrowserWindow, Menu, ipcMain } = electron;
+// Package to determine run mode
 const isDev = require('electron-is-dev');
 const path = require('path');
 const settings = require('electron-settings');
+// Package to connect to database
+// Package to connect to database
 const mongoose = require('mongoose');
 const fs = require('fs');
 mongoose.connect('mongodb://localhost:27017/text_extraction_db', {
@@ -20,7 +26,7 @@ mongoose.connect('mongodb://localhost:27017/text_extraction_db', {
 
 let Corpus = mongoose.model('corpus', corpusSchema);
 
-// Keep a global reference of the window object, if you don't, the window will
+// Keep a global reference of the window objects, if you don't, the windows will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
 let settingsWindow;
@@ -39,7 +45,7 @@ createSettingsWindow = () => {
     }
   });
 
-  // and load the index.html of the app.
+  // and load the html using the appropriate path
   settingsWindow.loadURL(isDev ? 'http://localhost:3000/settings' : /*TODO ??????????????????????*/ `file://${path.join(__dirname, '../build/index.html')}`);
   if (isDev) {
     // Open the DevTools.
@@ -92,41 +98,49 @@ createMainWindow = (paramObj) => {
   mainWindow.loadURL(isDev ? 'http://localhost:3000/main' : `file://${path.join(__dirname, '../build/index.html')}`);
   if (isDev) {
     // Open the DevTools.
-    //BrowserWindow.addDevToolsExtension('<location to your react chrome extension>');
     mainWindow.webContents.openDevTools();
   }
 
+  // Store the window dimensions on resize to use them on the next execution of the tool
   mainWindow.on('resize', () => {
     let { width, height } = mainWindow.getBounds();
     settings.set('windowBounds', { width, height });
   });
 
+  // Store the window position on move to use them on the next execution of the tool
   mainWindow.on('move', () => {
     let [x, y] = mainWindow.getPosition();
     settings.set('windowPosition', { x: x, y: y });
   });
-  // Emitted when the window is closed.
+
+  // Set window to null when the window is closed.
   mainWindow.on('closed', () => {
     // Dereference the window object, usually you would store windows
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
     mainWindow = null;
-  })
+  });
 }
 
+/* Create a channel between main and rendered process
+* for book insertion
+*/
 ipcMain.on('add-books', e => {
+  // Read data from certain json file
   fs.readFile('results.json', 'utf8', (err, jsonString) => {
     if (err) {
       console.log("File read failed:", err)
       return;
     }
     const data = JSON.parse(jsonString);
-    
+
+    // Save books metadata from data obj in order to use remaining fields as database fields
     const booksNum = data.fileNames.length
     const filePaths = data.filePaths;
     delete data.filePaths;
     const fileNames = data.fileNames;
     delete data.fileNames;
+    // Update or insert database with new data
     for (var i = 0; i < booksNum; i++) {
       let indices = {};
       Object.keys(data).forEach(key => {
@@ -142,6 +156,10 @@ ipcMain.on('add-books', e => {
   });
 });
 
+/* Create a channel between main and rendered process
+* for book search and return.
+* Returns all fields that there currently are in field
+*/
 ipcMain.on('get-books', (event, filePaths) => {
   Corpus.aggregate([
     {
@@ -160,15 +178,16 @@ ipcMain.on('get-books', (event, filePaths) => {
         "indices.tokensNum": 1,
         "indices.vocabularyNum": 1,
         _id: 0
-        }
-      }], (e, result) => {
+      }
+    }], (e, result) => {
+      // Send returned data through main - renderer channel
       event.sender.send('receive-books', result)
     })
 });
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
+/* When the Electron has finished initializastion create main window with
+* window position and dimensions as determined in last execution
+*/
 app.on('ready', () => {
   let { width, height } = settings.get('windowBounds', { width: 1024, height: 800 });
   let { x, y } = settings.get('windowPosition', { x: 40, y: 60 });
@@ -179,7 +198,6 @@ app.on('ready', () => {
     y: y
   });
 });
-
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
@@ -193,6 +211,3 @@ app.on('activate', () => {
   // dock icon is clicked and there are no other windows open.
   if (mainWindow === null) createMainWindow();
 })
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.

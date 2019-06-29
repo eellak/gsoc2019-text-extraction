@@ -7,6 +7,8 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 
+/* ScriptsTab is a component, which renders a script selection tab.
+*/
 class ScriptsTab extends Component {
     constructor(props) {
         super(props);
@@ -15,6 +17,7 @@ class ScriptsTab extends Component {
         }
     }
 
+    // Change view tab according to user's selection
     changeTab = (tabIndex) => {
         this.setState({ tabIndex: Number(tabIndex) })
     };

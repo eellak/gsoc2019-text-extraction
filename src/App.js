@@ -5,6 +5,10 @@ import Settings from './Settings';
 import { Switch, Route } from 'react-router-dom';
 import "react-tabs/style/react-tabs.css";
 
+/* App is the main component which renders all
+* application routes which relate to different application windows
+*/
+
 class App extends Component {
   constructor() {
     super();
