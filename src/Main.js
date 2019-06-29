@@ -86,9 +86,7 @@ class Main extends Component {
       openDrawer: false,
       tabIndex: 0,
       selectedFilesPaths: [],
-      readIndex: [],
-      lexdivIndex: [],
-      miscIndex: [],
+      selectedIndices: {},
       toExecute: {},
       resultList: [],
     };
@@ -238,6 +236,7 @@ class Main extends Component {
   };
 
   render() {
+    console.log(this.state.selectedIndices)
     const classes = this.props.classes;
     const theme = this.props.theme;
     return (
@@ -314,15 +313,14 @@ class Main extends Component {
                 setDistantState={this.setDistantState}
               />}
               {this.state.tabIndex === 1 && <ScriptsTab
-                indices={this.state.indices}
-                readIndex={this.state.readIndex}
-                lexdivIndex={this.state.lexdivIndex}
-                miscIndex={this.state.miscIndex}
+                ipc={this.state.ipc}
                 electron={this.props.electron}
                 platform={this.props.platform}
                 isDev={this.props.isDev}
                 setDistantState={this.setDistantState}
                 selectedFilesPaths={this.state.selectedFilesPaths}
+                indices={this.state.indices}
+                selectedIndices={this.state.selectedIndices}
                 settings={this.state.settings}
                 setScriptParameters={this.setScriptParameters}
               />}

@@ -189,12 +189,12 @@ ipcMain.on('get-books', (event, filePaths) => {
 });
 
 /* Create a channel between main and rendered process
-* for indices fetch for modular front-end construction.
+* to fetch indices based on their type.
 */
-ipcMain.on('get-indices', (event) => {
+ipcMain.on('get-indices', event => {
   Indices.find({}, (error, result) => {
     // Send found indices through main - renderer channel
-    event.sender.send('receive-indices', result);
+    event.sender.send('receive-indices', result.map(obj => obj._doc));
   });
 });
 

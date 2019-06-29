@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import ReadabilityOptions from './Built-in/readability/ReadabilityOptions'
 import LexdivOptions from './Built-in/lexdiv/LexdivOptions'
 import MiscOptions from './Built-in/misc/MiscOptions'
+import ScriptOptions from './Built-in/ScriptOptions'
 import CustomOptions from './Built-in/custom/CustomOptions'
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
@@ -31,41 +32,41 @@ class ScriptsTab extends Component {
             else return <Typography variant="subtitle1">No file selected.</Typography>;
         })();
 
-        const readabilityTab = (
-            <div>
-                <ReadabilityOptions setDistantState={this.props.setDistantState} selectedIndices={this.props.readIndex} filePaths={this.props.selectedFilesPaths} settings={this.props.settings} type="readability" setScriptParameters={this.props.setScriptParameters} platform={this.props.platform} />
-            </div>);
+       const customScriptTab = (
+            <CustomOptions platform={this.props.platform} settings={this.props.settings} electron={this.props.electron} isDev={this.props.isDev} type="custom" setScriptParameters={this.props.setScriptParameters} />
+        );
 
-        const lexdivTab = (
-            <div>
-                <LexdivOptions setDistantState={this.props.setDistantState} selectedIndices={this.props.lexdivIndex} filePaths={this.props.selectedFilesPaths} settings={this.props.settings} type="lexdiv" setScriptParameters={this.props.setScriptParameters} platform={this.props.platform} />
-            </div>);
-
-        const miscTab = (
-            <div>
-                <MiscOptions setDistantState={this.props.setDistantState} selectedIndices={this.props.miscIndex} filePaths={this.props.selectedFilesPaths} settings={this.props.settings} type="misc" setScriptParameters={this.props.setScriptParameters} platform={this.props.platform} />
-            </div>);
-
-        const customScriptTab = (
-            <div>
-                <CustomOptions platform={this.props.platform} settings={this.props.settings} electron={this.props.electron} isDev={this.props.isDev} type="custom" setScriptParameters={this.props.setScriptParameters} />
-            </div>);
-
+        const tabs = this.props.indices.map((obj, index) => {
+            return <ScriptOptions
+            key={index}
+            ipc={this.props.ipc}
+            setDistantState={this.props.setDistantState}
+            filePaths={this.props.selectedFilesPaths}
+            settings={this.props.settings}
+            type={obj.indexType}
+            env={obj.env}
+            indices={obj.indicesDeclaration}
+            scriptPath={obj.scripPath}
+            selectedIndices={this.props.selectedIndices}
+            setScriptParameters={this.props.setScriptParameters}
+            platform={this.props.platform} />
+        }
+        );
         return (
             <div className={this.props.className}>
                 <Typography variant="subtitle1" align="center">Select processing script</Typography>
                 <Tabs value={this.state.tabIndex} onChange={(event, tabIndex) => this.changeTab(tabIndex)}>
-                    <Tab label="DummyScript" />
-                    <Tab label="Readability" />
-                    <Tab label="Lexical Diversity" />
-                    <Tab label="Mischellaneous" />
+                    {this.props.indices.map((obj, index) => <Tab key={index} label={obj.indexTypeDisplayName} />)}
                     <Tab label="CustomScript" />
+                    <Tab label="DummyScript" />
                 </Tabs>
-                {this.state.tabIndex === 0 && dummyTab}
-                {this.state.tabIndex === 1 && readabilityTab}
-                {this.state.tabIndex === 2 && lexdivTab}
-                {this.state.tabIndex === 3 && miscTab}
-                {this.state.tabIndex === 4 && customScriptTab}
+                {tabs.map((component, index) => {
+                    if (index === this.state.tabIndex) {
+                        return component;
+                    }
+                })}
+                {this.state.tabIndex === this.props.indices.length && customScriptTab}
+                {this.state.tabIndex === this.props.indices.length + 1 && dummyTab}
             </div>
         );
     }
