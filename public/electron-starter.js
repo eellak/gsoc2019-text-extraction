@@ -164,6 +164,15 @@ ipcMain.on('add-results', e => {
 * Returns all fields that there currently are in field
 */
 ipcMain.on('get-results', (event, parameters) => {
+  let projection = {
+    name: 1,
+    "indices.tokensNum": 1,
+    "indices.vocabularyNum": 1,
+    _id: 0
+}
+  Object.keys(parameters.indices).map(indexType => {
+    return (parameters.indices[indexType]).map(indexName => projection[`indices.${indexType}.${indexName}`] = 1)
+  });
   Corpus.aggregate([
     {
       $match: {
@@ -172,15 +181,7 @@ ipcMain.on('get-results', (event, parameters) => {
         }
       }
     }, {
-      $project: {
-        name: 1,
-        "indices.readability": 1,
-        "indices.lexdiv": 1,
-        "indices.misc": 1,
-        "indices.tokensNum": 1,
-        "indices.vocabularyNum": 1,
-        _id: 0
-      }
+      $project: projection
     }], (e, result) => {
       // Send returned data through main - renderer channel
       event.sender.send('receive-results', result)
