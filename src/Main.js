@@ -90,7 +90,7 @@ class Main extends Component {
       toExecute: {},
       resultList: [],
     };
-    this.state.ipc.on('receive-books', (event, arg) => {
+    this.state.ipc.on('receive-results', (event, arg) => {
       this.setDistantState({ resultList: arg });
     });
 
@@ -139,7 +139,7 @@ class Main extends Component {
 
     // Send message to main process to add new book to database
     process.stdout.on('data', (data) => {
-      this.state.ipc.send('add-books');
+      this.state.ipc.send('add-results');
     });
 
 
@@ -174,7 +174,8 @@ class Main extends Component {
     Object.keys(this.state.toExecute).map((execKey) => {
       if (execKey === "misc") {
         const toExecute = this.state.toExecute;
-        toExecute[execKey].args[2] = toExecute[execKey].args[2] + "tokens,vocabulary";
+        console.log(toExecute)
+        toExecute[execKey].args[2] = toExecute[execKey].args[2] + ",tokens,vocabulary";
         this.setState({ toExecute: toExecute });
         addFreqAnalysis = false;
       }
@@ -193,7 +194,7 @@ class Main extends Component {
               return "src/Built-in/misc/misc_indices.R";
           }
         })(),
-        args: [`${this.state.settings.get("rlibPath")}`].concat(`-filePaths=${this.state.selectedFilesPaths.join(',')}`).concat(`-miscIndex=tokens,vocabulary`)
+        args: [`${this.state.settings.get("rlibPath")}`].concat(`-filePaths=${this.state.selectedFilesPaths.join(',')}`).concat(`-index=tokens,vocabulary`)
       }))
     }
     /* When every script has finished execution, fetch results and
@@ -201,7 +202,7 @@ class Main extends Component {
     */
     Promise.all(promises)
       .then(() => {
-        this.state.ipc.send('get-books', this.state.selectedFilesPaths);
+        this.state.ipc.send('get-results', { filePaths: this.state.selectedFilesPaths, indices: this.state.selectedIndices });
         execButton.disabled = false;
       });
   };
@@ -236,7 +237,6 @@ class Main extends Component {
   };
 
   render() {
-    console.log(this.state.selectedIndices)
     const classes = this.props.classes;
     const theme = this.props.theme;
     return (
@@ -313,6 +313,7 @@ class Main extends Component {
                 setDistantState={this.setDistantState}
               />}
               {this.state.tabIndex === 1 && <ScriptsTab
+                fs={this.state.fs}
                 ipc={this.state.ipc}
                 electron={this.props.electron}
                 platform={this.props.platform}

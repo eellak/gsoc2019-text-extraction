@@ -10,12 +10,11 @@ const corpusSchema = new Schema({
     indices: {
         readability: Object,
         lexdiv: Object,
+        misc: Object,
         tokens: Array,
         tokensNum: Array,
         vocabulary: Array,
-        vocabularyNum: Array,
-        entropy: Array,
-        normentropy: Array
+        vocabularyNum: Array
     }
 });
 

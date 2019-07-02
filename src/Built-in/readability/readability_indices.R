@@ -22,8 +22,8 @@ corp <- corpus(books, docnames=fileNames)
 result <- list()
 result[["fileNames"]] <- fileNames
 result[["filePaths"]] <- filePaths
-if(!is.null(args[["readIndex"]])) {
-    readIndex <- unlist(strsplit(args[["readIndex"]], split=','))
+if(!is.null(args[["index"]])) {
+    readIndex <- unlist(strsplit(args[["index"]], split=','))
     temp <- textstat_readability(corp, measure=readIndex)
     temp[["document"]] <- NULL 
     result[["readability"]] <- temp

@@ -17,7 +17,6 @@ class ScriptsTab extends Component {
             tabIndex: 0
         }
     }
-
     // Change view tab according to user's selection
     changeTab = (tabIndex) => {
         this.setState({ tabIndex: Number(tabIndex) })
@@ -26,32 +25,31 @@ class ScriptsTab extends Component {
     render() {
         const dummyTab = (() => {
             if (this.props.selectedFilesPaths.length !== 0) {
-                const file = new File(["foo"], this.props.selectedFilesPaths[0]);
-                return <Typography variant="subtitle1">Dummy method which pastes the path of the first selected file. {file.name}</Typography>;
+                // console.log(this.props.fs.statSync(this.props.selectedFilesPaths[0], {encoding: "utf8"}));
+                // <Typography variant="subtitle1">Dummy method which pastes the contents of the first selected file. {data}</Typography>));
             }
             else return <Typography variant="subtitle1">No file selected.</Typography>;
         })();
 
-       const customScriptTab = (
+        const customScriptTab = (
             <CustomOptions platform={this.props.platform} settings={this.props.settings} electron={this.props.electron} isDev={this.props.isDev} type="custom" setScriptParameters={this.props.setScriptParameters} />
         );
-
+        
         const tabs = this.props.indices.map((obj, index) => {
             return <ScriptOptions
-            key={index}
-            ipc={this.props.ipc}
-            setDistantState={this.props.setDistantState}
-            filePaths={this.props.selectedFilesPaths}
-            settings={this.props.settings}
-            type={obj.indexType}
-            env={obj.env}
-            indices={obj.indicesDeclaration}
-            scriptPath={obj.scripPath}
-            selectedIndices={this.props.selectedIndices}
-            setScriptParameters={this.props.setScriptParameters}
-            platform={this.props.platform} />
-        }
-        );
+                key={index}
+                ipc={this.props.ipc}
+                setDistantState={this.props.setDistantState}
+                filePaths={this.props.selectedFilesPaths}
+                settings={this.props.settings}
+                type={obj.indexType}
+                env={obj.env}
+                indices={obj.indicesDeclaration}
+                scriptPath={obj.scriptPath}
+                selectedIndices={this.props.selectedIndices}
+                setScriptParameters={this.props.setScriptParameters}
+                platform={this.props.platform} />
+        });
         return (
             <div className={this.props.className}>
                 <Typography variant="subtitle1" align="center">Select processing script</Typography>

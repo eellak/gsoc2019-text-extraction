@@ -37,9 +37,11 @@ class ScriptOptions extends Component {
 
   handleToggle = value => {
     let newChecked = [];
+    console.log(this.state.selectedIndices)
     if (value === "all") {
       if (this.state.selectAll) {
         this.setState({ selectAll: false });
+        console.log(this.state.selectedIndices)
         newChecked = this.state.selectedIndices;
       }
       else {
@@ -49,7 +51,8 @@ class ScriptOptions extends Component {
     }
     else {
       if (this.state.selectAll) {
-        newChecked = this.props.indices.map(indexObj => indexObj.indexName);
+        console.log(this.props.indices)
+        newChecked = this.state.indices.map(indexObj => indexObj.indexName);
       }
       else {
         const currentIndex = this.state.selectedIndices.indexOf(value);
@@ -74,7 +77,7 @@ class ScriptOptions extends Component {
       e.target.innerText = "add";
     }
     else {
-      const args = [`${this.props.settings.get("rlibPath")}`].concat(`-filePaths=${this.props.filePaths.join(',')}`).concat(`-readIndex=${this.state.selectedIndices.join(',')}`);
+      const args = [`${this.props.settings.get("rlibPath")}`].concat(`-filePaths=${this.props.filePaths.join(',')}`).concat(`-index=${this.state.selectedIndices.join(',')}`);
       this.props.setScriptParameters(false, this.props.type, this.state.env, this.state.scriptPath, args);
       e.target.innerText = "update";
     }

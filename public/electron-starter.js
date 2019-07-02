@@ -128,7 +128,7 @@ createMainWindow = (paramObj) => {
 /* Create a channel between main and rendered process
 * for book insertion
 */
-ipcMain.on('add-books', e => {
+ipcMain.on('add-results', e => {
   // Read data from certain json file
   fs.readFile('results.json', 'utf8', (err, jsonString) => {
     if (err) {
@@ -163,12 +163,12 @@ ipcMain.on('add-books', e => {
 * for book search and return.
 * Returns all fields that there currently are in field
 */
-ipcMain.on('get-books', (event, filePaths) => {
+ipcMain.on('get-results', (event, parameters) => {
   Corpus.aggregate([
     {
       $match: {
         path: {
-          $in: filePaths
+          $in: parameters.filePaths
         }
       }
     }, {
@@ -176,15 +176,14 @@ ipcMain.on('get-books', (event, filePaths) => {
         name: 1,
         "indices.readability": 1,
         "indices.lexdiv": 1,
-        "indices.entropy": 1,
-        "indices.normentropy": 1,
+        "indices.misc": 1,
         "indices.tokensNum": 1,
         "indices.vocabularyNum": 1,
         _id: 0
       }
     }], (e, result) => {
       // Send returned data through main - renderer channel
-      event.sender.send('receive-books', result)
+      event.sender.send('receive-results', result)
     })
 });
 

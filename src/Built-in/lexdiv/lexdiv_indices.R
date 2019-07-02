@@ -23,8 +23,8 @@ toks <- tokens(corp, remove_punct=T)
 result <- list()
 result[["fileNames"]] <- fileNames
 result[["filePaths"]] <- filePaths
-if(!is.null(args[["lexdivIndex"]])) {
-    lexdivIndex <- unlist(strsplit(args[["lexdivIndex"]], split=','))
+if(!is.null(args[["index"]])) {
+    lexdivIndex <- unlist(strsplit(args[["index"]], split=','))
     temp <- textstat_lexdiv(toks, measure=lexdivIndex)
     temp[["document"]] <- NULL 
     result[["lexdiv"]] <- temp

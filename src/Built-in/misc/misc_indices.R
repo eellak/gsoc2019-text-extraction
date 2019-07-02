@@ -16,8 +16,7 @@ set.kRp.env(lang="en", TT.options=list(path="C:\\TreeTagger", preset="en"))
 # Get and split commandArgs (paths of the files to process and readability indices)
 args <- commandArgs(trailingOnly=T, asValues=T)
 filePaths <- unlist(strsplit(args[["filePaths"]], split=','));
-indices <- unlist(strsplit(args[["miscIndex"]], split=','));
-
+indices <- unlist(strsplit(args[["index"]], split=','));
 fileNames <- basename(filePaths)
 resultFilePath <- "results.json"
 
@@ -28,8 +27,8 @@ tokensList <- list()
 tokensNumList <- list()
 vocabularyList <- list()
 vocabularyNumList <- list()
-entropyList <- list()
-normentropyList <- list()
+entropyList <- c()
+normentropyList <- c()
 for (k in 1:length(filePaths)) {
 
     book <- readtext(filePaths[k])$text
@@ -411,9 +410,19 @@ for (k in 1:length(filePaths)) {
     tokensNumList[[k]] <- TOKENS
     vocabularyList[[k]] <- TYPES_LIST
     vocabularyNumList[[k]] <- TYPES
-    entropyList[[k]] <- INDEX_ENTROPY
-    normentropyList[[k]] <- INDEX_NORMENTROPY
+    entropyList<- c(entropyList, INDEX_ENTROPY)
+    normentropyList <- c(normentropyList, INDEX_NORMENTROPY)
 }
+    temp <- data.frame(
+        entropy=entropyList,
+        normentropy=normentropyList
+    )
+    # if(is.element("entropy", indices)) {
+    #     temp[["entropy"]] <- entropyList
+    # }
+    # if(is.element("normentropy", indices)) {
+    #     temp[["normentropy"]] <- normentropyList
+    # }
     if(is.element("tokens", indices)) {
         result[["tokens"]] <- tokensList
         result[["tokensNum"]] <- tokensNumList
@@ -422,11 +431,6 @@ for (k in 1:length(filePaths)) {
         result[["vocabulary"]] <- vocabularyList
         result[["vocabularyNum"]] <- vocabularyNumList
     }
-    if(is.element("entropy", indices)) {
-        result[["entropy"]] <- entropyList
-    }
-    if(is.element("normentropy", indices)) {
-        result[["normentropy"]] <- normentropyList
-    }
+    result[["misc"]] <- temp;
     write(toJSON(result), file=resultFilePath, sep=',')
     print("add book")
