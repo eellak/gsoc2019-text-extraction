@@ -141,8 +141,8 @@ ipcMain.on('add-results', e => {
     const booksNum = data.fileNames.length
     const filePaths = data.filePaths;
     delete data.filePaths;
-    const fileNames = data.fileNames;
-    delete data.fileNames;
+    // const fileNames = data.fileNames;
+    // delete data.fileNames;
     // Update or insert database with new data
     for (var i = 0; i < booksNum; i++) {
       let indices = {};
@@ -160,8 +160,8 @@ ipcMain.on('add-results', e => {
 });
 
 /* Create a channel between main and rendered process
-* for book search and return.
-* Returns all fields that there currently are in field
+* for result search and return.
+* Returns user specified fields
 */
 ipcMain.on('get-results', (event, parameters) => {
   let projection = {
@@ -169,7 +169,7 @@ ipcMain.on('get-results', (event, parameters) => {
     "indices.tokensNum": 1,
     "indices.vocabularyNum": 1,
     _id: 0
-}
+  }
   Object.keys(parameters.indices).map(indexType => {
     return (parameters.indices[indexType]).map(indexName => projection[`indices.${indexType}.${indexName}`] = 1)
   });
@@ -186,6 +186,43 @@ ipcMain.on('get-results', (event, parameters) => {
       // Send returned data through main - renderer channel
       event.sender.send('receive-results', result)
     })
+});
+
+/* Create a channel between main and rendered process
+* for book retrieval.
+*/
+ipcMain.on('get-book', (event, parameters) => {
+  let projection = {
+    name: 1,
+    size: 1,
+    _id: 0
+  }
+  Corpus.aggregate([
+    {
+      $project: projection
+    }], (e, result) => {
+      // Send returned data through main - renderer channel
+      event.sender.send('receive-book', result)
+    })
+});
+
+/* Create a channel between main and rendered process
+* for book insertion.
+*/
+ipcMain.on('add-book', (event, parameters) => {
+  console.log({
+    name: parameters.fileName,
+    path: parameters.filePath,
+    size: parameters.size,
+    lastModified: parameters.lastModified,
+  })
+  Corpus.findOneAndUpdate({ path: parameters.filePaths }, {
+    name: parameters.fileName,
+    path: parameters.filePath,
+    size: parameters.size,
+    lastModified: parameters.lastModified,
+  }, { upsert: true }, () => {
+  })
 });
 
 /* Create a channel between main and rendered process
@@ -228,7 +265,7 @@ app.on('window-all-closed', () => {
   // to stay active until the user quits explicitly with Cmd + Q
   if (settings.get("firstTime")) {
     settings.set("firstTime", false);
-}
+  }
   if (process.platform !== 'darwin') app.quit();
 });
 

@@ -7,6 +7,8 @@ const corpusSchema = new Schema({
         type: String,
         unique: true
     },
+    size: Number,
+    lastModified: Number,
     indices: {
         readability: Object,
         lexdiv: Object,

@@ -85,6 +85,7 @@ class Main extends Component {
       ipc: props.electron.ipcRenderer,
       openDrawer: false,
       tabIndex: 0,
+      files: [],
       selectedFilesPaths: [],
       selectedIndices: {},
       toExecute: {},
@@ -96,6 +97,11 @@ class Main extends Component {
 
     this.state.ipc.on('receive-indices', (event, arg) => {
       this.setDistantState({ indices: arg });
+    });
+
+    this.state.ipc.on('receive-book', (event, arg) => {
+      console.log(arg)
+      this.setDistantState({ files: arg });
     });
   }
 
@@ -306,6 +312,9 @@ class Main extends Component {
             <div className={classes.toolbar} />
             <div className={clsx(classes.tabs)}>
               {this.state.tabIndex === 0 && <FilesTab
+                fs={this.state.fs}
+                ipc={this.state.ipc}
+                files={this.state.files}
                 selectedFilesPaths={this.state.selectedFilesPaths}
                 electron={this.props.electron}
                 platform={this.props.platform}

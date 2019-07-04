@@ -1,20 +1,44 @@
 import React, { Component } from 'react';
 import Typography from '@material-ui/core/Typography';
+import clsx from 'clsx';
+import { withStyles } from '@material-ui/styles';
 import Button from '@material-ui/core/Button';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+
+const styles = theme => ({
+
+    table: {
+        width: "100%",
+        margin: "0 10px 0 10px"
+    },
+
+});
 
 /* FilesTab is a stateless component, which renders
 * the tab responsible for file selection
 */
-const FilesTab = props => {
+class FilesTab extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {};
+    }
+
+    componentDidMount() {
+        this.props.ipc.send("get-book")
+    }
 
     /* addFilesDialog:
     * This function opens an electron dialog in order to select input files.
     * The selected files are then stored at the state of the Main component.
     */
-    const addFilesDialog = () => {
+    addFilesDialog = () => {
         const path = require('path');
-        const dialog = props.electron.remote.dialog;
-        dialog.showOpenDialog(props.electron.remote.getCurrentWindow(),
+        const dialog = this.props.electron.remote.dialog;
+        dialog.showOpenDialog(this.props.electron.remote.getCurrentWindow(),
             {
                 title: 'Add files to process',
                 defaultPath: `${path.join(__dirname, '../data')}`,
@@ -22,30 +46,63 @@ const FilesTab = props => {
             },
             (filePaths) => {
                 if (filePaths !== undefined) {
-                    props.setDistantState({ selectedFilesPaths: filePaths });
+                    const fileNames = filePaths.map(path => {
+                        switch (this.props.platform) {
+                            case "win32":
+                                return `${path.split('\\').slice(-1)[0]}`;
+                            case "linux":
+                            default:
+                                return `${path.split('/').slice(-1)[0]}`;
+                        }
+                    });
+                    filePaths.forEach((filePath, index) => {
+                        const res = this.props.fs.statSync(filePath, { encoding: "utf8" })
+                        console.log(res)
+                        this.props.ipc.send("add-book", {
+                            filePath: filePath,
+                            fileName: fileNames[index],
+                            size: res.size,
+                            lastModified: res.mtimeMs
+                        });
+                    });
+                    this.props.ipc.send("get-book")
+
                 }
             }
         );
     };
 
-    const fileΝames = props.selectedFilesPaths.map(path => {
-        switch (props.platform) {
-            case "win32":
-                return `${path.split('\\').slice(-1)[0]}`;
-            case "linux":
-            default:
-                return `${path.split('/').slice(-1)[0]}`;
-        }
-    }).join(', ');
-    return (
-        <div>
-            <Typography variant="subtitle1" align="center">Select one or more files to be processed</Typography>
-            <div id="add-files">
-                <Button id="add-files-btn" onClick={addFilesDialog} variant="contained">Add files</Button>
-                <Typography id="selected-files">{fileΝames.length === 0 ? `No files selected` : `You have selected ${fileΝames}`}</Typography>
-            </div>
-        </div>
-    );
-};
-
-export default FilesTab;
+    render() {
+        const classes = this.props.classes;
+        console.log(this.props.files);
+        return (
+            <div>
+                <Typography variant="subtitle1" align="center">Select one or more files to be processed</Typography>
+                <div id="add-files">
+                    <Button id="add-files-btn" onClick={this.addFilesDialog} variant="contained">Add files</Button>
+                    {this.props.files.length === 0 ? <Typography id="selected-files">No files selected</Typography> :
+                        <Table className={clsx(classes.table)}>
+                            <TableHead>
+                                <TableRow>
+                                    {Object.keys(this.props.files[0]).map(field =>
+                                        <TableCell key={field}>{field}</TableCell>
+                                    )}
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {this.props.files.map(fileObj => (
+                                    <TableRow>
+                                            {Object.values(fileObj).map((value, id) => (
+                                                <TableCell key={id}>{value}</TableCell>
+                                            ))}
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    }
+                </div>
+            </div >
+        );
+    };
+}
+export default withStyles(styles)(FilesTab);
