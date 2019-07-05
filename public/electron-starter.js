@@ -138,7 +138,7 @@ ipcMain.on('add-results', e => {
     const data = JSON.parse(jsonString);
 
     // Save books metadata from data obj in order to use remaining fields as database fields
-    const booksNum = data.fileNames.length
+    const booksNum = data.filePaths.length
     const filePaths = data.filePaths;
     delete data.filePaths;
     // const fileNames = data.fileNames;
@@ -150,7 +150,6 @@ ipcMain.on('add-results', e => {
         indices[`indices.${key}`] = data[key][i];
       });
       Corpus.findOneAndUpdate({ path: filePaths[i] }, {
-        name: fileNames[i],
         path: filePaths[i],
         $set: indices
       }, { upsert: true }, () => {
@@ -194,6 +193,7 @@ ipcMain.on('get-results', (event, parameters) => {
 ipcMain.on('get-book', (event, parameters) => {
   let projection = {
     name: 1,
+    path: 1,
     size: 1,
     _id: 0
   }

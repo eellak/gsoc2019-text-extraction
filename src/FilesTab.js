@@ -8,6 +8,7 @@ import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
+import Checkbox from '@material-ui/core/Checkbox';
 
 const styles = theme => ({
 
@@ -72,6 +73,28 @@ class FilesTab extends Component {
         );
     };
 
+    handleToggleAll = () => {
+        if (this.props.selectedFilesPaths.length === this.props.files.length) {
+            this.props.setDistantState({ selectedFilesPaths: [] });
+        } else {
+            this.props.setDistantState({selectedFilesPaths: this.props.files.map(fileObj => fileObj.path)})
+        }
+    };
+
+    handleToggle = (value) => {
+        console.log('asdf')
+        const currentIndex = this.props.selectedFilesPaths.indexOf(value);
+        const newChecked = [...this.props.selectedFilesPaths];
+
+        if (currentIndex === -1) {
+            newChecked.push(value);
+        } else {
+            newChecked.splice(currentIndex, 1);
+        }
+
+        this.props.setDistantState({ selectedFilesPaths: newChecked });
+    };
+
     render() {
         const classes = this.props.classes;
         console.log(this.props.files);
@@ -84,17 +107,29 @@ class FilesTab extends Component {
                         <Table className={clsx(classes.table)}>
                             <TableHead>
                                 <TableRow>
+                                    <TableCell>
+                                        <Checkbox
+                                            onClick={this.handleToggleAll}
+                                            checked={this.props.selectedFilesPaths.length === this.props.files.length}
+                                            indeterminate={this.props.selectedFilesPaths.length !== this.props.files.length && this.props.selectedFilesPaths.length !== 0} />
+
+                                    </TableCell>
                                     {Object.keys(this.props.files[0]).map(field =>
                                         <TableCell key={field}>{field}</TableCell>
                                     )}
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {this.props.files.map(fileObj => (
-                                    <TableRow>
-                                            {Object.values(fileObj).map((value, id) => (
-                                                <TableCell key={id}>{value}</TableCell>
-                                            ))}
+                                {this.props.files.map((fileObj, index) => (
+                                    <TableRow key={index}>
+                                        <TableCell>
+                                            <Checkbox
+                                                checked={this.props.selectedFilesPaths.indexOf(fileObj.path) !== -1}
+                                                onClick={() => this.handleToggle(fileObj.path)} />
+                                        </TableCell>
+                                        {Object.values(fileObj).map((value, id) => (
+                                            <TableCell key={id}>{value}</TableCell>
+                                        ))}
                                     </TableRow>
                                 ))}
                             </TableBody>
