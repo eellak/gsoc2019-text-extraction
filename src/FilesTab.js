@@ -56,6 +56,9 @@ class FilesTab extends Component {
                                 return `${path.split('/').slice(-1)[0]}`;
                         }
                     });
+                    const newChecked = [...this.props.selectedFilesPaths];
+                    newChecked = newChecked.concat(filePaths);
+                    this.props.setDistantState({ selectedFilesPaths: newChecked });
                     filePaths.forEach((filePath, index) => {
                         const res = this.props.fs.statSync(filePath, { encoding: "utf8" })
                         console.log(res)
@@ -77,12 +80,11 @@ class FilesTab extends Component {
         if (this.props.selectedFilesPaths.length === this.props.files.length) {
             this.props.setDistantState({ selectedFilesPaths: [] });
         } else {
-            this.props.setDistantState({selectedFilesPaths: this.props.files.map(fileObj => fileObj.path)})
+            this.props.setDistantState({ selectedFilesPaths: this.props.files.map(fileObj => fileObj.path) })
         }
     };
 
     handleToggle = (value) => {
-        console.log('asdf')
         const currentIndex = this.props.selectedFilesPaths.indexOf(value);
         const newChecked = [...this.props.selectedFilesPaths];
 
@@ -97,7 +99,8 @@ class FilesTab extends Component {
 
     render() {
         const classes = this.props.classes;
-        console.log(this.props.files);
+        console.log(this.props);
+        console.log(this.props.files.length, this.props.selectedFilesPaths.length);
         return (
             <div>
                 <Typography variant="subtitle1" align="center">Select one or more files to be processed</Typography>
