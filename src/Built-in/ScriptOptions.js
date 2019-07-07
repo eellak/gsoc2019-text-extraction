@@ -30,57 +30,46 @@ class ScriptOptions extends Component {
   };
 
   componentDidUpdate(prevProps) {
-    if (prevProps !== this.props) {
-      this.setState({ selectedIndices: this.props.selectedIndices[this.props.type] === undefined ? [] : this.props.selectedIndices[this.props.type] })
+    if (this.props.selectedIndices[this.props.type] !== prevProps.selectedIndices[this.props.type]) {
+      const selectedIndices = this.props.selectedIndices[this.props.type] === undefined ? [] : this.props.selectedIndices[this.props.type];
+      this.setState({ selectedIndices: selectedIndices });
+
+      if (selectedIndices.length === 0 || this.props.filePaths.length === 0) {
+        console.log("Please select at least one file");
+        this.props.setScriptParameters(true, this.props.type);
+      }
+      else {
+        const args = [`${this.props.settings.get("rlibPath")}`].concat(`-filePaths=${this.props.filePaths.join(',')}`).concat(`-index=${selectedIndices.join(',')}`);
+        this.props.setScriptParameters(false, this.props.type, this.state.env, this.state.scriptPath, args);
+      }
     }
   }
 
-  handleToggle = value => {
-    let newChecked = [];
-    console.log(this.state.selectedIndices)
-    if (value === "all") {
-      if (this.state.selectAll) {
-        this.setState({ selectAll: false });
-        console.log(this.state.selectedIndices)
-        newChecked = this.state.selectedIndices;
-      }
-      else {
-        newChecked = this.state.indices.map(indexObj => indexObj.indexName);
-        this.setState({ selectAll: true });
-      }
+  handleToggleAll = () => {
+    if (this.state.selectedIndices.length === this.state.indices.length) {
+      let selectedIndices = Object.assign({}, this.props.selectedIndices);
+      selectedIndices[this.props.type] = [];
+      this.props.setDistantState({ selectedIndices: selectedIndices });
+    } else {
+      let selectedIndices = Object.assign({}, this.props.selectedIndices);
+      selectedIndices[this.props.type] = this.state.indices.map(indexObj => indexObj.indexName);
+      this.props.setDistantState({ selectedIndices: selectedIndices });
     }
-    else {
-      if (this.state.selectAll) {
-        console.log(this.props.indices)
-        newChecked = this.state.indices.map(indexObj => indexObj.indexName);
-      }
-      else {
-        const currentIndex = this.state.selectedIndices.indexOf(value);
-        newChecked = this.state.selectedIndices;
-
-        if (currentIndex === -1) {
-          newChecked.push(value);
-        } else {
-          newChecked.splice(currentIndex, 1);
-        }
-      }
-    }
-    let selectedIndices = this.props.selectedIndices;
-    selectedIndices[this.props.type] = newChecked;
-    this.props.setDistantState({ selectedIndices: selectedIndices });
   };
 
-  changeArgs = (e) => {
-    if (this.state.selectedIndices.length === 0 || this.props.filePaths.length === 0) {
-      console.log("Please select at least one file");
-      this.props.setScriptParameters(true, this.props.type);
-      e.target.innerText = "add";
+  handleToggle = value => {
+    const currentIndex = this.state.selectedIndices.indexOf(value);
+    const newChecked = [...this.state.selectedIndices];
+
+    if (currentIndex === -1) {
+      newChecked.push(value);
+    } else {
+      newChecked.splice(currentIndex, 1);
     }
-    else {
-      const args = [`${this.props.settings.get("rlibPath")}`].concat(`-filePaths=${this.props.filePaths.join(',')}`).concat(`-index=${this.state.selectedIndices.join(',')}`);
-      this.props.setScriptParameters(false, this.props.type, this.state.env, this.state.scriptPath, args);
-      e.target.innerText = "update";
-    }
+
+    let selectedIndices = Object.assign({}, this.props.selectedIndices);
+    selectedIndices[this.props.type] = newChecked;
+    this.props.setDistantState({ selectedIndices: selectedIndices });
   };
 
   render() {
@@ -88,22 +77,23 @@ class ScriptOptions extends Component {
       <div>
         <Typography variant="subtitle1" align="center">Select one or more indices to extract</Typography>
         <GridList cols={5} cellHeight="auto">
-          <ListItem button onClick={() => this.handleToggle("all")}>
+          <ListItem button onClick={this.handleToggleAll}>
             <Checkbox
-              checked={this.state.selectAll}
+              checked={this.state.selectedIndices.length === this.state.indices.length}
+              indeterminate={this.state.selectedIndices.length !== this.state.indices.length && this.state.selectedIndices.length !== 0}
             />
             <ListItemText primary="All" />
           </ListItem>
           {this.state.indices.map((indexObj, i) => (
             <ListItem key={i} button onClick={() => this.handleToggle(indexObj.indexName)}>
               <Checkbox
-                checked={this.state.selectAll || this.state.selectedIndices.indexOf(indexObj.indexName) !== -1}
+                checked={this.state.selectedIndices.indexOf(indexObj.indexName) !== -1}
               />
               <ListItemText primary={indexObj.displayName} />
             </ListItem>)
           )}
         </GridList>
-        <Button size="small" variant="contained" onClick={this.changeArgs}>add</Button>
+        {/* <Button size="small" variant="contained" onClick={this.changeArgs}>add</Button> */}
       </div>);
   }
 }
