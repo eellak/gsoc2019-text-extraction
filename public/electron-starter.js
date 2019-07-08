@@ -135,7 +135,7 @@ ipcMain.on('add-results', e => {
       console.log("File read failed:", err)
       return;
     }
-    const data = JSON.parse(jsonString);
+    let data = JSON.parse(jsonString);
 
     // Save books metadata from data obj in order to use remaining fields as database fields
     const booksNum = data.filePaths.length
@@ -146,7 +146,17 @@ ipcMain.on('add-results', e => {
     // Update or insert database with new data
     for (var i = 0; i < booksNum; i++) {
       let indices = {};
+      // Replace '.' with '_' in index names in order to avoid problem with
+      // MongoDB indices retrieval
       Object.keys(data).forEach(key => {
+        // Check for indices that store objects (readability, lexdiv, misc etc)
+        if (data[key][i].length === undefined) {
+          let indicesObject = {};
+          Object.keys(data[key][i]).forEach(indexName => {
+            indicesObject[indexName.replace('.', '_')] = data[key][i][indexName];
+          })
+          data[key][i] = indicesObject;
+        }
         indices[`indices.${key}`] = data[key][i];
       });
       Corpus.findOneAndUpdate({ path: filePaths[i] }, {
@@ -170,7 +180,7 @@ ipcMain.on('get-results', (event, parameters) => {
     _id: 0
   }
   Object.keys(parameters.indices).map(indexType => {
-    return (parameters.indices[indexType]).map(indexName => projection[`indices.${indexType}.${indexName}`] = 1)
+    return (parameters.indices[indexType]).map(indexName => projection[`indices.${indexType}.${indexName.replace('.', '_')}`] = 1)
   });
   Corpus.aggregate([
     {
@@ -210,12 +220,6 @@ ipcMain.on('get-book', (event, parameters) => {
 * for book insertion.
 */
 ipcMain.on('add-book', (event, parameters) => {
-  console.log({
-    name: parameters.fileName,
-    path: parameters.filePath,
-    size: parameters.size,
-    lastModified: parameters.lastModified,
-  })
   Corpus.findOneAndUpdate({ path: parameters.filePaths }, {
     name: parameters.fileName,
     path: parameters.filePath,
