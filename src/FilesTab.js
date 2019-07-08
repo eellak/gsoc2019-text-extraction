@@ -3,6 +3,7 @@ import Typography from '@material-ui/core/Typography';
 import clsx from 'clsx';
 import { withStyles } from '@material-ui/styles';
 import Button from '@material-ui/core/Button';
+import IconButton from '@material-ui/core/IconButton';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -69,7 +70,7 @@ class FilesTab extends Component {
                             lastModified: res.mtimeMs
                         });
                     });
-                    this.props.ipc.send("get-book")
+                    this.props.ipc.send("get-book");
 
                 }
             }
@@ -99,8 +100,6 @@ class FilesTab extends Component {
 
     render() {
         const classes = this.props.classes;
-        console.log(this.props);
-        console.log(this.props.files.length, this.props.selectedFilesPaths.length);
         return (
             <div>
                 <Typography variant="subtitle1" align="center">Select one or more files to be processed</Typography>
@@ -129,6 +128,16 @@ class FilesTab extends Component {
                                             <Checkbox
                                                 checked={this.props.selectedFilesPaths.indexOf(fileObj.path) !== -1}
                                                 onClick={() => this.handleToggle(fileObj.path)} />
+                                            <IconButton
+                                                onClick={() => {
+                                                    this.props.ipc.send('delete-book', {
+                                                    path: fileObj.path
+                                                })
+                                                this.props.ipc.send('get-book');
+                                            }}
+                                                className={classes.button}>
+                                                <i className="material-icons">delete</i>
+                                            </IconButton>
                                         </TableCell>
                                         {Object.values(fileObj).map((value, id) => (
                                             <TableCell key={id}>{value}</TableCell>

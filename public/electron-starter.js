@@ -230,6 +230,15 @@ ipcMain.on('add-book', (event, parameters) => {
 });
 
 /* Create a channel between main and rendered process
+* for book deletion.
+*/
+ipcMain.on('delete-book', (event, parameters) => {
+  Corpus.deleteOne({ path: parameters.path }, err => {
+    if (err) return handleError(err);
+  });
+});
+
+/* Create a channel between main and rendered process
 * to fetch indices based on their type.
 */
 ipcMain.on('get-indices', event => {
