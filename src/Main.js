@@ -85,6 +85,7 @@ class Main extends Component {
       ipc: props.electron.ipcRenderer,
       openDrawer: false,
       tabIndex: 0,
+      processing: false,
       files: [],
       selectedFilesPaths: [],
       selectedIndices: {},
@@ -92,6 +93,7 @@ class Main extends Component {
       resultList: [],
     };
     this.state.ipc.on('receive-results', (event, arg) => {
+      console.log(arg)
       this.setDistantState({ resultList: arg });
     });
 
@@ -100,7 +102,6 @@ class Main extends Component {
     });
 
     this.state.ipc.on('receive-book', (event, arg) => {
-      console.log(arg)
       this.setDistantState({ files: arg });
     });
   }
@@ -169,6 +170,7 @@ class Main extends Component {
     let promises = [];
     const execButton = document.querySelector('#execute');
     execButton.disabled = true;
+    this.setState({ processing: true });
 
     const createAsync = execObj => {
       return new Promise((resolve, reject) => {
@@ -180,7 +182,6 @@ class Main extends Component {
     Object.keys(this.state.toExecute).map((execKey) => {
       if (execKey === "misc") {
         const toExecute = this.state.toExecute;
-        console.log(toExecute)
         toExecute[execKey].args[2] = toExecute[execKey].args[2] + ",tokens,vocabulary";
         this.setState({ toExecute: toExecute });
         addFreqAnalysis = false;
@@ -210,6 +211,7 @@ class Main extends Component {
       .then(() => {
         this.state.ipc.send('get-results', { filePaths: this.state.selectedFilesPaths, indices: this.state.selectedIndices });
         execButton.disabled = false;
+        this.setState({ processing: false });
       });
   };
 
@@ -249,9 +251,7 @@ class Main extends Component {
       <div>
         <AppBar
           position="fixed"
-          className={clsx(classes.appBar, {
-            [classes.appBarShift]: open,
-          })}
+          className={clsx(classes.appBar)}
         >
           <Toolbar>
             <Typography variant="h6" noWrap>
@@ -335,6 +335,8 @@ class Main extends Component {
                 setScriptParameters={this.setScriptParameters}
               />}
               {this.state.tabIndex === 2 && <ResultsTab
+                processing={this.state.processing}
+                fs={this.state.fs}
                 ipc={this.state.ipc}
                 resultList={this.state.resultList}
                 executeAll={this.executeAll}

@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import clsx from 'clsx';
-import './ResultsTab.css';
 import { withStyles } from '@material-ui/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -15,6 +14,26 @@ const styles = theme => ({
         width: "100%",
         margin: "0 10px 0 10px"
     },
+    execute: {
+        "background-color": "#009b15",
+        "-moz-border-radius": "28px",
+        "-webkit - border - radius": "28px",
+        "border-radius": "15px",
+        border: "1px #009b15 solid",
+        display: "inline-block",
+        cursor: "pointer",
+        color: "#fff",
+        "font-family": "Arial",
+        "font-size": "1.1rem",
+        padding: "15px 30px",
+        margin: "10px 0 10px 0",
+    },
+    disabled: {
+        opacity: "0.6",
+        "background-color": "black",
+        cursor: "default",
+        "background- color": "#148340"
+    }
 
 });
 
@@ -41,7 +60,7 @@ const ResultsTab = props => {
 
     return (
         <div>
-            <Button variant="contained" id="execute" onClick={props.executeAll}>Execute</Button>
+            <Button variant="contained" id="execute" className={clsx(classes.execute, { [classes.disabled] : props.processing })} onClick={props.executeAll}>Execute</Button>
             <Table className={clsx(classes.table)}>
                 {(() => {
                     try {
