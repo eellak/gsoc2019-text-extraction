@@ -58,11 +58,16 @@ class FilesTab extends Component {
                         }
                     });
                     const newChecked = [...this.props.selectedFilesPaths];
+                    newChecked.forEach(filePath => {
+                        const index = filePaths.indexOf(filePath);
+                        if (index !== -1) {
+                            filePaths.splice(index, 1);
+                        }
+                    })
                     newChecked = newChecked.concat(filePaths);
                     this.props.setDistantState({ selectedFilesPaths: newChecked });
                     filePaths.forEach((filePath, index) => {
                         const res = this.props.fs.statSync(filePath, { encoding: "utf8" })
-                        console.log(res)
                         this.props.ipc.send("add-book", {
                             filePath: filePath,
                             fileName: fileNames[index],
@@ -131,10 +136,13 @@ class FilesTab extends Component {
                                             <IconButton
                                                 onClick={() => {
                                                     this.props.ipc.send('delete-book', {
-                                                    path: fileObj.path
-                                                })
-                                                this.props.ipc.send('get-book');
-                                            }}
+                                                        path: fileObj.path
+                                                    })
+                                                    let selectedFilesPaths = Object.assign([], this.props.selectedFilesPaths);
+                                                    selectedFilesPaths.splice(selectedFilesPaths.indexOf(fileObj.path), 1);
+                                                    this.props.setDistantState({ selectedFilesPaths: selectedFilesPaths });
+                                                    this.props.ipc.send('get-book');
+                                                }}
                                                 className={classes.button}>
                                                 <i className="material-icons">delete</i>
                                             </IconButton>
