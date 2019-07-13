@@ -95,6 +95,11 @@ class Main extends Component {
         columnId: 0,
         by: 'name',
         asc: true
+      },
+      fileOrder: {
+        columnId: 0,
+        by: 'name',
+        asc: true
       }
     };
     this.state.ipc.on('receive-results', (event, arg) => {
@@ -229,7 +234,6 @@ class Main extends Component {
   };
 
   getResults = (order, filePaths = this.state.selectedFilesPaths, indices=this.state.selectedIndices) => {
-    console.log(order);
     this.state.ipc.send('get-results', {
       filePaths: filePaths,
       indices: indices,
@@ -337,6 +341,7 @@ class Main extends Component {
                 fs={this.state.fs}
                 ipc={this.state.ipc}
                 files={this.state.files}
+                order={this.state.fileOrder}
                 selectedFilesPaths={this.state.selectedFilesPaths}
                 electron={this.props.electron}
                 platform={this.props.platform}

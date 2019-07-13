@@ -198,15 +198,16 @@ ipcMain.on('get-results', (event, parameters) => {
         [parameters.order.by]: direction
       }
     }], (e, result) => {
-    // Send returned data through main - renderer channel
-    event.sender.send('receive-results', result)
-  })
+      // Send returned data through main - renderer channel
+      event.sender.send('receive-results', result)
+    })
 });
 
 /* Create a channel between main and rendered process
-* for book retrieval.
+* for book retrieval
 */
 ipcMain.on('get-book', (event, parameters) => {
+  let direction = parameters.order.asc ? 1 : -1;
   let projection = {
     name: 1,
     path: 1,
@@ -216,6 +217,11 @@ ipcMain.on('get-book', (event, parameters) => {
   Corpus.aggregate([
     {
       $project: projection
+    },
+    {
+      $sort: {
+        [parameters.order.by]: direction
+      }
     }], (e, result) => {
       // Send returned data through main - renderer channel
       event.sender.send('receive-book', result)

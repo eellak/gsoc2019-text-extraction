@@ -9,6 +9,7 @@ import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
+import TableSortLabel from '@material-ui/core/TableSortLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 
 const styles = theme => ({
@@ -30,8 +31,13 @@ class FilesTab extends Component {
     }
 
     componentDidMount() {
-        this.props.ipc.send("get-book")
+        this.getBook();
     }
+
+    getBook = (order = { order: this.props.order }) => {
+        console.log(order)
+        this.props.ipc.send("get-book", order);
+    };
 
     /* addFilesDialog:
     * This function opens an electron dialog in order to select input files.
@@ -76,7 +82,13 @@ class FilesTab extends Component {
                             lastModified: res.mtimeMs
                         });
                     });
-                    this.props.ipc.send("get-book");
+                    this.getBook({
+                        order: {
+                            id: 0,
+                            by: 'name',
+                            asc: true
+                        }
+                    });
 
                 }
             }
@@ -104,7 +116,30 @@ class FilesTab extends Component {
         this.props.setDistantState({ selectedFilesPaths: newChecked });
     };
 
+    sortByColumn = (field, columnId) => {
+        console.log(field)
+        let newOrder = {};
+        if (this.props.order.columnId === columnId) {
+            newOrder = {
+                columnId: columnId,
+                by: field,
+                asc: !this.props.order.asc
+            };
+            this.props.setDistantState({ fileOrder: newOrder });
+        }
+        else if (this.props.order.columnId !== columnId) {
+            newOrder = {
+                columnId: columnId,
+                by: field,
+                asc: true
+            }
+            this.props.setDistantState({ fileOrder: newOrder });
+        }
+        this.getBook({ order: newOrder });
+    }
+
     render() {
+        let columnId = 0;
         const classes = this.props.classes;
         return (
             <div>
@@ -122,8 +157,19 @@ class FilesTab extends Component {
                                             indeterminate={this.props.selectedFilesPaths.length !== this.props.files.length && this.props.selectedFilesPaths.length !== 0} />
 
                                     </TableCell>
-                                    {Object.keys(this.props.files[0]).map(field =>
-                                        <TableCell key={field}>{field}</TableCell>
+                                    {Object.keys(this.props.files[0]).map(field => {
+                                        const id = columnId++;
+                                        return (
+                                            <TableCell key={field}>
+                                                <TableSortLabel
+                                                    active={this.props.order.columnId === id}
+                                                    direction={this.props.order.asc ? 'asc' : 'desc'}
+                                                    onClick={() => this.sortByColumn(`${field}`, id)} >
+                                                    {field}
+                                                </TableSortLabel>
+                                            </TableCell>
+                                        )
+                                    }
                                     )}
                                 </TableRow>
                             </TableHead>
@@ -142,7 +188,7 @@ class FilesTab extends Component {
                                                     let selectedFilesPaths = Object.assign([], this.props.selectedFilesPaths);
                                                     selectedFilesPaths.splice(selectedFilesPaths.indexOf(fileObj.path), 1);
                                                     this.props.setDistantState({ selectedFilesPaths: selectedFilesPaths });
-                                                    this.props.ipc.send('get-book');
+                                                    this.getBook();
                                                 }}
                                                 className={classes.button}>
                                                 <i className="material-icons">delete</i>
