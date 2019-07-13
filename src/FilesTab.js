@@ -48,7 +48,7 @@ class FilesTab extends Component {
             },
             (filePaths) => {
                 if (filePaths !== undefined) {
-                    const fileNames = filePaths.map(path => {
+                    let fileNames = filePaths.map(path => {
                         switch (this.props.platform) {
                             case "win32":
                                 return `${path.split('\\').slice(-1)[0]}`;
@@ -62,6 +62,7 @@ class FilesTab extends Component {
                         const index = filePaths.indexOf(filePath);
                         if (index !== -1) {
                             filePaths.splice(index, 1);
+                            fileNames.splice(index, 1);
                         }
                     })
                     newChecked = newChecked.concat(filePaths);
