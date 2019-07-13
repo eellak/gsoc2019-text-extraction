@@ -92,6 +92,7 @@ class Main extends Component {
       toExecute: {},
       resultList: [],
       resultOrder: {
+        columnId: 0,
         by: 'name',
         asc: true
       }
@@ -219,6 +220,7 @@ class Main extends Component {
           processing: false,
           resultOrder:
           {
+            columnId: 0,
             by: 'name',
             asc: true
           }

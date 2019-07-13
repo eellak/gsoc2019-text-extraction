@@ -57,22 +57,24 @@ const ResultsTab = props => {
         return bookObj
     });
 
-    const doNothing = (id) => {
-        if(id !== 'name') {
-            id = 'indices.' + id;
+    const doNothing = (indexName, columnId) => {
+        if (indexName !== 'name') {
+            indexName = 'indices.' + indexName;
         }
-        console.log(id)
+        console.log(indexName)
         let newOrder = {};
-        if (props.order.by === id) {
+        if (props.order.columnId === columnId) {
             newOrder = {
-                by: id,
+                columnId: columnId,
+                by: indexName,
                 asc: !props.order.asc
             };
             props.setDistantState({ resultOrder: newOrder });
         }
-        else if (props.order.by !== id) {
+        else if (props.order.columnId !== columnId) {
             newOrder = {
-                by: id,
+                columnId: columnId,
+                by: indexName,
                 asc: true
             }
             props.setDistantState({ resultOrder: newOrder });
@@ -81,6 +83,7 @@ const ResultsTab = props => {
     }
 
     const classes = props.classes;
+    let columnId = 0;
     return (
         <div>
             <Button variant="contained" id="execute" className={clsx(classes.execute, { [classes.disabled]: props.processing })} onClick={props.executeAll}>Execute</Button>
@@ -91,12 +94,13 @@ const ResultsTab = props => {
                             <TableRow>
                                 {Object.keys(resultList[0]).map((indexName, i) => {
                                     if (typeof (resultList[0][indexName]) !== typeof ({}) || Array.isArray(resultList[0][indexName])) {
+                                        const id = columnId++;
                                         return (
                                             <TableCell rowSpan="2" key={i}>
                                                 <TableSortLabel
-                                                    active={props.order.by === indexName}
+                                                    active={props.order.columnId === id}
                                                     direction={props.order.asc ? 'asc' : 'desc'}
-                                                    onClick={() => doNothing(`${indexName}`)} >
+                                                    onClick={() => doNothing(`${indexName}`, id)} >
                                                     {indexName}
                                                 </TableSortLabel>
                                             </TableCell>
@@ -110,17 +114,20 @@ const ResultsTab = props => {
                                 {Object.keys(resultList[0]).map((indexName, i) => {
                                     if (typeof (resultList[0][indexName]) !== typeof ({}) || Array.isArray(resultList[0][indexName]))
                                         return;
-                                    return Object.keys(resultList[0][indexName]).map((el, idx) => (
-                                        <TableCell key={idx}>
-                                            <TableSortLabel
-                                                active={props.order.by === indexName}
-                                                direction={props.order.asc ? 'asc' : 'desc'}
-                                                onClick={() => doNothing(`${indexName}.${el}`)}
-                                            >
-                                                {el}
-                                            </TableSortLabel>
-                                        </TableCell>
-                                    ))
+                                    return Object.keys(resultList[0][indexName]).map((el, idx) => {
+                                        const id = columnId++;
+                                        return (
+                                            <TableCell key={idx}>
+                                                <TableSortLabel
+                                                    active={props.order.columnId === id}
+                                                    direction={props.order.asc ? 'asc' : 'desc'}
+                                                    onClick={() => doNothing(`${indexName}.${el}`, id)}
+                                                >
+                                                    {el}
+                                                </TableSortLabel>
+                                            </TableCell>
+                                        )
+                                    })
                                 })}
                             </TableRow>
                         </TableHead>
