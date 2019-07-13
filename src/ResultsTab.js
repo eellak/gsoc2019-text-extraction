@@ -42,7 +42,6 @@ const ResultsTab = props => {
     // pass by value
     // TODO : find better way?
     let resultList = [];
-    console.log(props.resultList)
     props.resultList.forEach(elem => {
         resultList.push(Object.assign([], elem));
     });
@@ -57,7 +56,7 @@ const ResultsTab = props => {
         return bookObj
     });
 
-    const doNothing = (indexName, columnId) => {
+    const sortByColumn = (indexName, columnId) => {
         if (indexName !== 'name') {
             indexName = 'indices.' + indexName;
         }
@@ -100,7 +99,7 @@ const ResultsTab = props => {
                                                 <TableSortLabel
                                                     active={props.order.columnId === id}
                                                     direction={props.order.asc ? 'asc' : 'desc'}
-                                                    onClick={() => doNothing(`${indexName}`, id)} >
+                                                    onClick={() => sortByColumn(`${indexName}`, id)} >
                                                     {indexName}
                                                 </TableSortLabel>
                                             </TableCell>
@@ -121,7 +120,7 @@ const ResultsTab = props => {
                                                 <TableSortLabel
                                                     active={props.order.columnId === id}
                                                     direction={props.order.asc ? 'asc' : 'desc'}
-                                                    onClick={() => doNothing(`${indexName}.${el}`, id)}
+                                                    onClick={() => sortByColumn(`${indexName}.${el}`, id)}
                                                 >
                                                     {el}
                                                 </TableSortLabel>
