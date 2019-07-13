@@ -6,6 +6,7 @@ import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
+import TableSortLabel from '@material-ui/core/TableSortLabel';
 import Button from '@material-ui/core/Button';
 
 const styles = theme => ({
@@ -56,11 +57,33 @@ const ResultsTab = props => {
         return bookObj
     });
 
-    const classes = props.classes;
+    const doNothing = (id) => {
+        if(id !== 'name') {
+            id = 'indices.' + id;
+        }
+        console.log(id)
+        let newOrder = {};
+        if (props.order.by === id) {
+            newOrder = {
+                by: id,
+                asc: !props.order.asc
+            };
+            props.setDistantState({ resultOrder: newOrder });
+        }
+        else if (props.order.by !== id) {
+            newOrder = {
+                by: id,
+                asc: true
+            }
+            props.setDistantState({ resultOrder: newOrder });
+        }
+        props.getResults(newOrder);
+    }
 
+    const classes = props.classes;
     return (
         <div>
-            <Button variant="contained" id="execute" className={clsx(classes.execute, { [classes.disabled] : props.processing })} onClick={props.executeAll}>Execute</Button>
+            <Button variant="contained" id="execute" className={clsx(classes.execute, { [classes.disabled]: props.processing })} onClick={props.executeAll}>Execute</Button>
             <Table className={clsx(classes.table)}>
                 {(() => {
                     try {
@@ -68,7 +91,16 @@ const ResultsTab = props => {
                             <TableRow>
                                 {Object.keys(resultList[0]).map((indexName, i) => {
                                     if (typeof (resultList[0][indexName]) !== typeof ({}) || Array.isArray(resultList[0][indexName])) {
-                                        return <TableCell rowSpan="2" key={i}>{indexName}</TableCell>
+                                        return (
+                                            <TableCell rowSpan="2" key={i}>
+                                                <TableSortLabel
+                                                    active={props.order.by === indexName}
+                                                    direction={props.order.asc ? 'asc' : 'desc'}
+                                                    onClick={() => doNothing(`${indexName}`)} >
+                                                    {indexName}
+                                                </TableSortLabel>
+                                            </TableCell>
+                                        )
                                     }
                                     return <TableCell colSpan={Object.keys(Object.keys(resultList[0][indexName])).length} key={i}>{indexName}</TableCell>
 
@@ -78,8 +110,17 @@ const ResultsTab = props => {
                                 {Object.keys(resultList[0]).map((indexName, i) => {
                                     if (typeof (resultList[0][indexName]) !== typeof ({}) || Array.isArray(resultList[0][indexName]))
                                         return;
-                                    return Object.keys(resultList[0][indexName]).map((el, idx) => <TableCell key={idx}>{el}</TableCell>
-                                    )
+                                    return Object.keys(resultList[0][indexName]).map((el, idx) => (
+                                        <TableCell key={idx}>
+                                            <TableSortLabel
+                                                active={props.order.by === indexName}
+                                                direction={props.order.asc ? 'asc' : 'desc'}
+                                                onClick={() => doNothing(`${indexName}.${el}`)}
+                                            >
+                                                {el}
+                                            </TableSortLabel>
+                                        </TableCell>
+                                    ))
                                 })}
                             </TableRow>
                         </TableHead>

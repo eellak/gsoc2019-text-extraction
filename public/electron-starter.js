@@ -173,6 +173,7 @@ ipcMain.on('add-results', e => {
 * Returns user specified fields
 */
 ipcMain.on('get-results', (event, parameters) => {
+  let direction = parameters.order.asc ? 1 : -1;
   let projection = {
     name: 1,
     "indices.tokensNum": 1,
@@ -190,11 +191,16 @@ ipcMain.on('get-results', (event, parameters) => {
         }
       }
     }, {
-      $project: projection
+      $project: projection,
+    },
+    {
+      $sort: {
+        [parameters.order.by]: direction
+      }
     }], (e, result) => {
-      // Send returned data through main - renderer channel
-      event.sender.send('receive-results', result)
-    })
+    // Send returned data through main - renderer channel
+    event.sender.send('receive-results', result)
+  })
 });
 
 /* Create a channel between main and rendered process

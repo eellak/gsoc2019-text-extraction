@@ -91,6 +91,10 @@ class Main extends Component {
       selectedIndices: {},
       toExecute: {},
       resultList: [],
+      resultOrder: {
+        by: 'name',
+        asc: true
+      }
     };
     this.state.ipc.on('receive-results', (event, arg) => {
       console.log(arg)
@@ -209,10 +213,26 @@ class Main extends Component {
     */
     Promise.all(promises)
       .then(() => {
-        this.state.ipc.send('get-results', { filePaths: this.state.selectedFilesPaths, indices: this.state.selectedIndices });
+        this.getResults(this.state.resultOrder);
         execButton.disabled = false;
-        this.setState({ processing: false });
+        this.setState({
+          processing: false,
+          resultOrder:
+          {
+            by: 'name',
+            asc: true
+          }
+        });
       });
+  };
+
+  getResults = (order, filePaths = this.state.selectedFilesPaths, indices=this.state.selectedIndices) => {
+    console.log(order);
+    this.state.ipc.send('get-results', {
+      filePaths: filePaths,
+      indices: indices,
+      order: order
+    });
   };
 
   // Change view tab according to user's selection
@@ -335,6 +355,9 @@ class Main extends Component {
                 setScriptParameters={this.setScriptParameters}
               />}
               {this.state.tabIndex === 2 && <ResultsTab
+                getResults={this.getResults}
+                setDistantState={this.setDistantState}
+                order={this.state.resultOrder}
                 processing={this.state.processing}
                 fs={this.state.fs}
                 ipc={this.state.ipc}
