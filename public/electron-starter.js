@@ -153,7 +153,7 @@ ipcMain.on('add-results', e => {
         if (data[key][i].length === undefined) {
           let indicesObject = {};
           Object.keys(data[key][i]).forEach(indexName => {
-            indicesObject[indexName.replace('.', '_')] = data[key][i][indexName];
+            indicesObject[indexName.replace(/[.]/g, '_')] = data[key][i][indexName];
           })
           data[key][i] = indicesObject;
         }
@@ -180,7 +180,7 @@ ipcMain.on('get-results', (event, parameters) => {
     _id: 0
   }
   Object.keys(parameters.indices).map(indexType => {
-    return (parameters.indices[indexType]).map(indexName => projection[`indices.${indexType}.${indexName.replace('.', '_')}`] = 1)
+    return (parameters.indices[indexType]).map(indexName => projection[`indices.${indexType}.${indexName.replace(/[.]/g, '_')}`] = 1)
   });
   Corpus.aggregate([
     {
