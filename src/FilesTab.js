@@ -35,7 +35,6 @@ class FilesTab extends Component {
     }
 
     getBook = (order = { order: this.props.order }) => {
-        console.log(order)
         this.props.ipc.send("get-book", order);
     };
 
@@ -152,9 +151,9 @@ class FilesTab extends Component {
                                 <TableRow>
                                     <TableCell>
                                         <Checkbox
-                                            onClick={this.handleToggleAll}
                                             checked={this.props.selectedFilesPaths.length === this.props.files.length}
-                                            indeterminate={this.props.selectedFilesPaths.length !== this.props.files.length && this.props.selectedFilesPaths.length !== 0} />
+                                            indeterminate={this.props.selectedFilesPaths.length !== this.props.files.length && this.props.selectedFilesPaths.length !== 0}
+                                            onClick={this.handleToggleAll} />
 
                                     </TableCell>
                                     {Object.keys(this.props.files[0]).map(field => {
@@ -175,18 +174,20 @@ class FilesTab extends Component {
                             </TableHead>
                             <TableBody>
                                 {this.props.files.map((fileObj, index) => (
-                                    <TableRow key={index}>
+                                    <TableRow key={index} onClick={() => this.handleToggle(fileObj.path)} >
                                         <TableCell>
                                             <Checkbox
-                                                checked={this.props.selectedFilesPaths.indexOf(fileObj.path) !== -1}
-                                                onClick={() => this.handleToggle(fileObj.path)} />
+                                                checked={this.props.selectedFilesPaths.indexOf(fileObj.path) !== -1} />
                                             <IconButton
-                                                onClick={() => {
+                                                onClick={(event) => {
+                                                    event.stopPropagation()
                                                     this.props.ipc.send('delete-book', {
                                                         path: fileObj.path
                                                     })
                                                     let selectedFilesPaths = Object.assign([], this.props.selectedFilesPaths);
+                                                    if(selectedFilesPaths.indexOf(fileObj.path) !== -1) {
                                                     selectedFilesPaths.splice(selectedFilesPaths.indexOf(fileObj.path), 1);
+                                                    }
                                                     this.props.setDistantState({ selectedFilesPaths: selectedFilesPaths });
                                                     this.getBook();
                                                 }}
