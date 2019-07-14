@@ -8,6 +8,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
 import Button from '@material-ui/core/Button';
+import { Checkbox } from '@material-ui/core';
 
 const styles = theme => ({
 
@@ -60,7 +61,6 @@ const ResultsTab = props => {
         if (indexName !== 'name') {
             indexName = 'indices.' + indexName;
         }
-        console.log(indexName)
         let newOrder = {};
         if (props.order.columnId === columnId) {
             newOrder = {
@@ -81,40 +81,102 @@ const ResultsTab = props => {
         props.getResults(newOrder);
     }
 
+    const handleToggleAll = () => {
+        if (props.selectedResultRows.length === props.resultList.length) {
+            props.setDistantState({ selectedResultRows: [] });
+        } else {
+            props.setDistantState({ selectedResultRows: props.resultList.map((fileObj, i) => i) })
+        }
+    };
+
+    const handleToggle = (value) => {
+        const currentIndex = props.selectedResultRows.indexOf(value);
+        const newChecked = [...props.selectedResultRows];
+
+        if (currentIndex === -1) {
+            newChecked.push(value);
+        } else {
+            newChecked.splice(currentIndex, 1);
+        }
+
+        props.setDistantState({ selectedResultRows: newChecked });
+    };
+
+    /* exportResultsDialog:
+    * This function opens an electron dialog in order to export selected results.
+    */
+    const exportResultsDialog = (type) => {
+        type = 'csv';
+        let exportArray = [resultTable[0]];
+        exportArray = exportArray.concat(props.selectedResultRows.sort().map(index => resultTable[index + 1]))
+
+        const path = require('path');
+        const dialog = props.electron.remote.dialog;
+        dialog.showSaveDialog(props.electron.remote.getCurrentWindow(),
+            {
+                title: 'Select file to save',
+                defaultPath: `${path.join(__dirname, '../data')}`
+            },
+            (filePath) => {
+                if (filePath !== undefined) {
+                    switch (type) {
+                        case 'csv':
+                            const exportString = (exportArray.map(exportList => exportList.join(','))).join('\n');
+                            props.fs.writeFileSync(filePath+'.csv', exportString)
+                            break;
+                    }
+                }
+            });
+    };
+
     const classes = props.classes;
-    let columnId = 0;
+
+    let resultTable = []
+    for (var i = 0; i <= props.resultList.length; i++) {
+        resultTable.push([]);
+    }
+
     return (
         <div>
             <Button variant="contained" disabled={props.processing} className={clsx(classes.execute, { [classes.disabled]: props.processing })} onClick={props.executeAll}>Execute</Button>
             <Table className={clsx(classes.table)}>
                 {(() => {
                     try {
+                        let columnId = 0;
                         return (<TableHead>
                             <TableRow>
+                                <TableCell>
+                                    <Checkbox
+                                        onClick={handleToggleAll}
+                                        checked={props.selectedResultRows.length === props.resultList.length}
+                                        indeterminate={props.selectedResultRows.length !== props.resultList.length && props.selectedResultRows.length !== 0} />
+                                </TableCell>
                                 {Object.keys(resultList[0]).map((indexName, i) => {
                                     if (typeof (resultList[0][indexName]) !== typeof ({}) || Array.isArray(resultList[0][indexName])) {
-                                        const id = columnId++;
-                                        return (
-                                            <TableCell rowSpan="2" key={i}>
-                                                <TableSortLabel
-                                                    active={props.order.columnId === id}
-                                                    direction={props.order.asc ? 'asc' : 'desc'}
-                                                    onClick={() => sortByColumn(`${indexName}`, id)} >
-                                                    {indexName}
-                                                </TableSortLabel>
-                                            </TableCell>
-                                        )
+                                        return <TableCell key={i} />
                                     }
                                     return <TableCell colSpan={Object.keys(Object.keys(resultList[0][indexName])).length} key={i}>{indexName}</TableCell>
 
                                 })}
                             </TableRow>
                             <TableRow>
+                                <TableCell />
                                 {Object.keys(resultList[0]).map((indexName, i) => {
-                                    if (typeof (resultList[0][indexName]) !== typeof ({}) || Array.isArray(resultList[0][indexName]))
-                                        return;
+                                    if (typeof (resultList[0][indexName]) !== typeof ({}) || Array.isArray(resultList[0][indexName])) {
+                                        const id = columnId++;
+                                        resultTable[0][id] = indexName;
+                                        return (<TableCell rowSpan="2" key={i}>
+                                            <TableSortLabel
+                                                active={props.order.columnId === id}
+                                                direction={props.order.asc ? 'asc' : 'desc'}
+                                                onClick={() => sortByColumn(`${indexName}`, id)} >
+                                                {indexName}
+                                            </TableSortLabel>
+                                        </TableCell>)
+                                    }
                                     return Object.keys(resultList[0][indexName]).map((el, idx) => {
                                         const id = columnId++;
+                                        resultTable[0][id] = el;
                                         return (
                                             <TableCell key={idx}>
                                                 <TableSortLabel
@@ -145,20 +207,31 @@ const ResultsTab = props => {
                 <TableBody>
                     {(() => {
                         try {
-                            return resultList.map((elem, i) =>
-                                <TableRow key={i}>
+                            return resultList.map((elem, i) => {
+                                let columnId = 0;
+                                return (<TableRow key={i} onClick={() => handleToggle(i)}>
+                                    <TableCell>
+                                        <Checkbox
+                                            checked={props.selectedResultRows.indexOf(i) !== -1} />
+                                    </TableCell>
                                     {Object.values(elem).map((value, id) => {
                                         if (typeof (value) === typeof ({})) {
-                                            return Object.values(value).map((val, i) =>
-                                                <TableCell key={i}>{val}</TableCell>
-                                            )
+                                            return Object.values(value).map((val, idx) => {
+                                                const id = columnId++;
+                                                resultTable[i + 1][id] = val;
+                                                return (
+                                                    <TableCell key={idx}>{val}</TableCell>)
+                                            })
                                         }
                                         else {
+                                            const id = columnId++;
+                                            resultTable[i + 1][id] = value;
                                             return <TableCell key={id}>{value}</TableCell>
                                         }
                                     })
                                     }
                                 </TableRow>)
+                            })
                         }
                         catch (e) {
                             return (
@@ -168,6 +241,7 @@ const ResultsTab = props => {
                     })()}
                 </TableBody>
             </Table>
+            <Button variant="contained" className={clsx(classes.execute, { [classes.disabled]: props.selectedResultRows.length === 0 })} onClick={exportResultsDialog}>Export Selected</Button>
         </div >
     );
 };

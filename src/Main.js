@@ -88,6 +88,7 @@ class Main extends Component {
       processing: false,
       files: [],
       selectedFilesPaths: [],
+      selectedResultRows: [],
       selectedIndices: {},
       toExecute: {},
       resultList: [],
@@ -103,7 +104,6 @@ class Main extends Component {
       }
     };
     this.state.ipc.on('receive-results', (event, arg) => {
-      console.log(arg)
       this.setDistantState({ resultList: arg });
     });
 
@@ -357,14 +357,16 @@ class Main extends Component {
                 selectedIndices={this.state.selectedIndices}
                 settings={this.state.settings}
                 setScriptParameters={this.setScriptParameters}
-              />}
+                />}
               {this.state.tabIndex === 2 && <ResultsTab
                 getResults={this.getResults}
                 setDistantState={this.setDistantState}
+                selectedResultRows={this.state.selectedResultRows}
                 order={this.state.resultOrder}
                 processing={this.state.processing}
                 fs={this.state.fs}
                 ipc={this.state.ipc}
+                electron={this.props.electron}
                 resultList={this.state.resultList}
                 executeAll={this.executeAll}
               />}
