@@ -178,8 +178,6 @@ class Main extends Component {
   */
   executeAll = () => {
     let promises = [];
-    const execButton = document.querySelector('#execute');
-    execButton.disabled = true;
     this.setState({ processing: true });
 
     const createAsync = execObj => {
@@ -220,7 +218,6 @@ class Main extends Component {
     Promise.all(promises)
       .then(() => {
         this.getResults(this.state.resultOrder);
-        execButton.disabled = false;
         this.setState({
           processing: false,
           resultOrder:

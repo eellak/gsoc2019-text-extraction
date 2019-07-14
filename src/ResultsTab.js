@@ -85,7 +85,7 @@ const ResultsTab = props => {
     let columnId = 0;
     return (
         <div>
-            <Button variant="contained" id="execute" className={clsx(classes.execute, { [classes.disabled]: props.processing })} onClick={props.executeAll}>Execute</Button>
+            <Button variant="contained" disabled={props.processing} className={clsx(classes.execute, { [classes.disabled]: props.processing })} onClick={props.executeAll}>Execute</Button>
             <Table className={clsx(classes.table)}>
                 {(() => {
                     try {
