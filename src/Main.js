@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import clsx from 'clsx';
 import FilesTab from './FilesTab'
 import ScriptsTab from './ScriptsTab'
+import Console from './Console'
 import ResultsTab from './ResultsTab'
 import { withStyles } from '@material-ui/styles';
 import AppBar from "@material-ui/core/AppBar";
@@ -100,6 +101,10 @@ class Main extends Component {
         columnId: 0,
         by: 'name',
         asc: true
+      },
+      logMessage: {
+        message: "",
+        type: ""
       }
     };
     this.state.ipc.on('receive-results', (event, arg) => {
@@ -230,7 +235,7 @@ class Main extends Component {
       });
   };
 
-  getResults = (order, filePaths = this.state.selectedFilesPaths, indices=this.state.selectedIndices) => {
+  getResults = (order, filePaths = this.state.selectedFilesPaths, indices = this.state.selectedIndices) => {
     this.state.ipc.send('get-results', {
       filePaths: filePaths,
       indices: indices,
@@ -265,6 +270,16 @@ class Main extends Component {
       toExecute[type] = { env: env, scriptPath: scriptPath, args: args }
       this.setState({ toExecute: toExecute });
     }
+  };
+
+  logMessage = (message, type) => {
+    this.setState({
+      logMessage:
+      {
+        message: message,
+        type: type
+      }
+    })
   };
 
   render() {
@@ -344,6 +359,7 @@ class Main extends Component {
                 platform={this.props.platform}
                 isDev={this.props.isDev}
                 setDistantState={this.setDistantState}
+                logMessage={this.logMessage}
               />}
               {this.state.tabIndex === 1 && <ScriptsTab
                 fs={this.state.fs}
@@ -357,6 +373,7 @@ class Main extends Component {
                 selectedIndices={this.state.selectedIndices}
                 settings={this.state.settings}
                 setScriptParameters={this.setScriptParameters}
+                logMessage={this.logMessage}
               />}
               {this.state.tabIndex === 2 && <ResultsTab
                 getResults={this.getResults}
@@ -367,10 +384,14 @@ class Main extends Component {
                 ipc={this.state.ipc}
                 resultList={this.state.resultList}
                 executeAll={this.executeAll}
+                logMessage={this.logMessage}
               />}
+          <Console
+            logMessage={this.state.logMessage} />
             </div>
           </div>
         </main>
+
       </div >
     );
   }
