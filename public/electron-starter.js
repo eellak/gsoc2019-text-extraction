@@ -232,21 +232,30 @@ ipcMain.on('get-book', (event, parameters) => {
 * for book insertion.
 */
 ipcMain.on('add-book', (event, parameters) => {
-  Corpus.findOneAndUpdate({ path: parameters.filePaths }, {
-    name: parameters.fileName,
-    path: parameters.filePath,
-    size: parameters.size,
-    lastModified: parameters.lastModified,
-  }, { upsert: true }, () => {
-  })
+  const operations = parameters.filePaths.map((filePath, index) => {
+    return {
+      updateOne:
+      {
+        filter: { path: filePath },
+        upsert: true,
+        update: {
+          name: parameters.fileNames[index],
+          path: parameters.filePaths[index],
+          size: parameters.size[index],
+          lastModified: parameters.lastModified[index]
+        }
+      }
+    }
+  });
+  Corpus.bulkWrite(operations, (error, res) => event.returnValue = res);
 });
-
 /* Create a channel between main and rendered process
 * for book deletion.
 */
 ipcMain.on('delete-book', (event, parameters) => {
   Corpus.deleteOne({ path: parameters.path }, err => {
     if (err) return handleError(err);
+    event.returnValue = 'done';
   });
 });
 

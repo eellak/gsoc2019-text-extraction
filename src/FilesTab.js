@@ -72,14 +72,16 @@ class FilesTab extends Component {
                     })
                     newChecked = newChecked.concat(filePaths);
                     this.props.setDistantState({ selectedFilesPaths: newChecked });
-                    filePaths.forEach((filePath, index) => {
-                        const res = this.props.fs.statSync(filePath, { encoding: "utf8" })
-                        this.props.ipc.send("add-book", {
-                            filePath: filePath,
-                            fileName: fileNames[index],
-                            size: res.size,
-                            lastModified: res.mtimeMs
-                        });
+
+                    let res = [];
+                    filePaths.forEach((filePath, index) => res.push(this.props.fs.statSync(filePath, { encoding: "utf8" })));
+
+                    // Send sync message in order to avoid sync errors when fetching books
+                    this.props.ipc.sendSync("add-book", {
+                        filePaths: filePaths,
+                        fileNames: fileNames,
+                        size: res.map(resObj => resObj.size),
+                        lastModified: res.map(resObj => resObj.mtimeMs)
                     });
                     this.getBook({
                         order: {
@@ -180,16 +182,17 @@ class FilesTab extends Component {
                                                 checked={this.props.selectedFilesPaths.indexOf(fileObj.path) !== -1} />
                                             <IconButton
                                                 onClick={(event) => {
-                                                    event.stopPropagation()
-                                                    this.props.ipc.send('delete-book', {
+                                                    event.stopPropagation();
+                                                    // Send sync message in order to avoid sync errors when fetching books
+                                                    this.props.ipc.sendSync('delete-book', {
                                                         path: fileObj.path
                                                     })
+                                                    this.getBook();
                                                     let selectedFilesPaths = Object.assign([], this.props.selectedFilesPaths);
-                                                    if(selectedFilesPaths.indexOf(fileObj.path) !== -1) {
-                                                    selectedFilesPaths.splice(selectedFilesPaths.indexOf(fileObj.path), 1);
+                                                    if (selectedFilesPaths.indexOf(fileObj.path) !== -1) {
+                                                        selectedFilesPaths.splice(selectedFilesPaths.indexOf(fileObj.path), 1);
                                                     }
                                                     this.props.setDistantState({ selectedFilesPaths: selectedFilesPaths });
-                                                    this.getBook();
                                                 }}
                                                 className={classes.button}>
                                                 <i className="material-icons">delete</i>
