@@ -299,7 +299,7 @@ class ResultsTab extends Component {
                     </TableBody>
                 </Table>
                 <ButtonGroup variant="contained" color="primary" ref={this.state.anchorRef} aria-label="Split button">
-                    <Button variant="contained" className={clsx(classes.execute, { [classes.disabled]: this.props.selectedResultRows.length === 0 })} onClick={this.exportResultsDialog}>Export selected as {this.state.selectedExportType.displayName}</Button>
+                    <Button variant="contained" disabled={this.props.selectedResultRows.length === 0} className={clsx(classes.execute, { [classes.disabled]: this.props.selectedResultRows.length === 0 })} onClick={this.exportResultsDialog}>Export selected as {this.state.selectedExportType.displayName}</Button>
                     <Button
                         color="primary"
                         variant="contained"
