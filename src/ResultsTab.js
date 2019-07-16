@@ -84,6 +84,7 @@ class ResultsTab extends Component {
                 return bookObj
             });
             this.setState({ resultList: resultList })
+            this.props.setDistantState({ selectedResultRows: [...Array(this.props.resultList.length).keys()] });
         }
     }
 
@@ -115,7 +116,7 @@ class ResultsTab extends Component {
         if (this.props.selectedResultRows.length === this.props.resultList.length) {
             this.props.setDistantState({ selectedResultRows: [] });
         } else {
-            this.props.setDistantState({ selectedResultRows: this.props.resultList.map((fileObj, i) => i) })
+            this.props.setDistantState({ selectedResultRows: [...Array(this.props.resultList.length).keys()] });
         }
     };
 
