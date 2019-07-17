@@ -20,7 +20,7 @@ for (i in 1:length(filePaths)) {
 corp <- corpus(books, docnames=fileNames)    
 
 result <- list()
-result[["fileNames"]] <- fileNames
+# result[["fileNames"]] <- fileNames
 result[["filePaths"]] <- filePaths
 if(!is.null(args[["index"]])) {
     readIndex <- unlist(strsplit(args[["index"]], split=','))

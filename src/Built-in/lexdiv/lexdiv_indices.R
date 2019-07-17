@@ -21,7 +21,7 @@ corp <- corpus(books, docnames=fileNames)
 toks <- tokens(corp, remove_punct=T)
 
 result <- list()
-result[["fileNames"]] <- fileNames
+# result[["fileNames"]] <- fileNames
 result[["filePaths"]] <- filePaths
 if(!is.null(args[["index"]])) {
     lexdivIndex <- unlist(strsplit(args[["index"]], split=','))

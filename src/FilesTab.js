@@ -35,7 +35,6 @@ class FilesTab extends Component {
     }
 
     getBook = (order = { order: this.props.order }) => {
-        console.log(order)
         this.props.ipc.send("get-book", order);
     };
 
@@ -44,6 +43,9 @@ class FilesTab extends Component {
     * The selected files are then stored at the state of the Main component.
     */
     addFilesDialog = () => {
+        if (this.props.isDev) {
+            this.props.logMessage('Open dialog for file selection', 'info');
+        }
         const path = require('path');
         const dialog = this.props.electron.remote.dialog;
         dialog.showOpenDialog(this.props.electron.remote.getCurrentWindow(),
@@ -54,12 +56,15 @@ class FilesTab extends Component {
             },
             (filePaths) => {
                 if (filePaths !== undefined) {
+                    if (this.props.isDev) {
+                        this.props.logMessage(`Dialog closed. Selected ${JSON.parse(JSON.stringify(filePaths))}`, 'info');
+                    }
                     let fileNames = filePaths.map(path => {
                         switch (this.props.platform) {
                             case "win32":
                                 return `${path.split('\\').slice(-1)[0]}`;
                             case "linux":
-                            default:
+                                default:
                                 return `${path.split('/').slice(-1)[0]}`;
                         }
                     });
@@ -73,14 +78,16 @@ class FilesTab extends Component {
                     })
                     newChecked = newChecked.concat(filePaths);
                     this.props.setDistantState({ selectedFilesPaths: newChecked });
-                    filePaths.forEach((filePath, index) => {
-                        const res = this.props.fs.statSync(filePath, { encoding: "utf8" })
-                        this.props.ipc.send("add-book", {
-                            filePath: filePath,
-                            fileName: fileNames[index],
-                            size: res.size,
-                            lastModified: res.mtimeMs
-                        });
+
+                    let res = [];
+                    filePaths.forEach((filePath, index) => res.push(this.props.fs.statSync(filePath, { encoding: "utf8" })));
+
+                    // Send sync message in order to avoid sync errors when fetching books
+                    this.props.ipc.sendSync("add-book", {
+                        filePaths: filePaths,
+                        fileNames: fileNames,
+                        size: res.map(resObj => resObj.size),
+                        lastModified: res.map(resObj => resObj.mtimeMs)
                     });
                     this.getBook({
                         order: {
@@ -89,16 +96,25 @@ class FilesTab extends Component {
                             asc: true
                         }
                     });
-
                 }
-            }
-        );
+                else {
+                    if (this.props.isDev) {
+                        this.props.logMessage(`Dialog closed. No files added`, 'info');
+                    }
+                }   
+            });
     };
 
     handleToggleAll = () => {
         if (this.props.selectedFilesPaths.length === this.props.files.length) {
+            if (this.props.isDev) {
+                this.props.logMessage(`Unselect all files`, 'info');
+            }
             this.props.setDistantState({ selectedFilesPaths: [] });
         } else {
+            if (this.props.isDev) {
+                this.props.logMessage(`Select all files`, 'info');
+            }
             this.props.setDistantState({ selectedFilesPaths: this.props.files.map(fileObj => fileObj.path) })
         }
     };
@@ -108,18 +124,27 @@ class FilesTab extends Component {
         const newChecked = [...this.props.selectedFilesPaths];
 
         if (currentIndex === -1) {
+            if (this.props.isDev) {
+                this.props.logMessage(`Select ${value}`, 'info');
+            }
             newChecked.push(value);
         } else {
+            if (this.props.isDev) {
+                this.props.logMessage(`Unselect ${value}`, 'info');
+            }
             newChecked.splice(currentIndex, 1);
         }
-
+        
         this.props.setDistantState({ selectedFilesPaths: newChecked });
     };
-
+    
     sortByColumn = (field, columnId) => {
         console.log(field)
         let newOrder = {};
         if (this.props.order.columnId === columnId) {
+            if (this.props.isDev) {
+                this.props.logMessage(`Sort by ${field}, ${this.props.order.asc ? 'ascending' : 'descending'}`, 'info');
+            }
             newOrder = {
                 columnId: columnId,
                 by: field,
@@ -152,9 +177,9 @@ class FilesTab extends Component {
                                 <TableRow>
                                     <TableCell>
                                         <Checkbox
-                                            onClick={this.handleToggleAll}
                                             checked={this.props.selectedFilesPaths.length === this.props.files.length}
-                                            indeterminate={this.props.selectedFilesPaths.length !== this.props.files.length && this.props.selectedFilesPaths.length !== 0} />
+                                            indeterminate={this.props.selectedFilesPaths.length !== this.props.files.length && this.props.selectedFilesPaths.length !== 0}
+                                            onClick={this.handleToggleAll} />
 
                                     </TableCell>
                                     {Object.keys(this.props.files[0]).map(field => {
@@ -175,20 +200,26 @@ class FilesTab extends Component {
                             </TableHead>
                             <TableBody>
                                 {this.props.files.map((fileObj, index) => (
-                                    <TableRow key={index}>
+                                    <TableRow key={index} onClick={() => this.handleToggle(fileObj.path)} >
                                         <TableCell>
                                             <Checkbox
-                                                checked={this.props.selectedFilesPaths.indexOf(fileObj.path) !== -1}
-                                                onClick={() => this.handleToggle(fileObj.path)} />
+                                                checked={this.props.selectedFilesPaths.indexOf(fileObj.path) !== -1} />
                                             <IconButton
-                                                onClick={() => {
-                                                    this.props.ipc.send('delete-book', {
+                                                onClick={(event) => {
+                                                    event.stopPropagation();
+                                                    // Send sync message in order to avoid sync errors when fetching books
+                                                    this.props.ipc.sendSync('delete-book', {
                                                         path: fileObj.path
                                                     })
-                                                    let selectedFilesPaths = Object.assign([], this.props.selectedFilesPaths);
-                                                    selectedFilesPaths.splice(selectedFilesPaths.indexOf(fileObj.path), 1);
-                                                    this.props.setDistantState({ selectedFilesPaths: selectedFilesPaths });
                                                     this.getBook();
+                                                    if (this.props.isDev) {
+                                                        this.props.logMessage(`Delete ${fileObj.path}`, 'info');
+                                                    }
+                                                    let selectedFilesPaths = Object.assign([], this.props.selectedFilesPaths);
+                                                    if (selectedFilesPaths.indexOf(fileObj.path) !== -1) {
+                                                        selectedFilesPaths.splice(selectedFilesPaths.indexOf(fileObj.path), 1);
+                                                    }
+                                                    this.props.setDistantState({ selectedFilesPaths: selectedFilesPaths });
                                                 }}
                                                 className={classes.button}>
                                                 <i className="material-icons">delete</i>

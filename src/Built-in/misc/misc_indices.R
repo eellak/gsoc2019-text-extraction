@@ -21,7 +21,7 @@ fileNames <- basename(filePaths)
 resultFilePath <- "results.json"
 
 result <- list()
-result[["fileNames"]] <- fileNames
+# result[["fileNames"]] <- fileNames
 result[["filePaths"]] <- filePaths
 tokensList <- list()
 tokensNumList <- list()
