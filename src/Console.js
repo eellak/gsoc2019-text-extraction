@@ -1,6 +1,19 @@
 import React, { Component } from 'react';
 import Typography from '@material-ui/core/Typography';
+import { withStyles } from '@material-ui/styles';
 import Button from '@material-ui/core/Button';
+
+const styles = theme => ({
+
+    footer: {
+        position: 'absolute',
+        bottom: '0',
+        width: '100%',
+        height: '250px',
+        overflow: 'scroll'
+    },
+
+});
 
 class Console extends Component {
 
@@ -28,8 +41,9 @@ class Console extends Component {
 
 
     render() {
+        const classes = this.props.classes;
         return (
-            <div >
+            <div className={classes.footer}>
                 {this.state.logArray.map((logObj, id) => (
                     <Typography key={id}>{logObj.message}</Typography>
                 )
@@ -38,4 +52,4 @@ class Console extends Component {
     }
 }
 
-export default Console;
+export default withStyles(styles)(Console);

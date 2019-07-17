@@ -60,3 +60,8 @@
   /* Support for IE. */
   font-feature-settings: 'liga';
 }
+
+body {
+  height: 100vh;
+  margin: 0;
+}

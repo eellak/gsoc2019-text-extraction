@@ -59,7 +59,7 @@ const styles = theme => ({
   },
   main: {
     display: "flex",
-    margin: "0 0 0 10px"
+    height: "100vh"
   }
 });
 
@@ -392,9 +392,9 @@ class Main extends Component {
                 executeAll={this.executeAll}
                 logMessage={this.logMessage}
               />}
-          <Console
-            logMessage={this.state.logMessage} />
             </div>
+            <Console
+              logMessage={this.state.logMessage} />
           </div>
         </main>
 
