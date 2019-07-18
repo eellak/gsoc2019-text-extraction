@@ -132,7 +132,7 @@ class Main extends Component {
           return './src/initializeR.R';
       }
     })()
-    this.executeScript(`${this.state.settings.get("rPath", "")}\\Rscript`, scriptPath, this.state.settings.get("rlibPath", "Rlibrary"));
+    this.executeScript(`${this.state.settings.get("rPath", "")}\\Rscript`, scriptPath, [this.state.settings.get("rlibPath", "Rlibrary")]);
     this.state.ipc.send('get-indices');
   }
 
