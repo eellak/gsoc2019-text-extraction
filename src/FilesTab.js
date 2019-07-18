@@ -56,15 +56,12 @@ class FilesTab extends Component {
             },
             (filePaths) => {
                 if (filePaths !== undefined) {
-                    if (this.props.isDev) {
-                        this.props.logMessage(`Dialog closed. Selected ${JSON.parse(JSON.stringify(filePaths))}`, 'info');
-                    }
                     let fileNames = filePaths.map(path => {
                         switch (this.props.platform) {
                             case "win32":
                                 return `${path.split('\\').slice(-1)[0]}`;
                             case "linux":
-                                default:
+                            default:
                                 return `${path.split('/').slice(-1)[0]}`;
                         }
                     });
@@ -83,12 +80,13 @@ class FilesTab extends Component {
                     filePaths.forEach((filePath, index) => res.push(this.props.fs.statSync(filePath, { encoding: "utf8" })));
 
                     // Send sync message in order to avoid sync errors when fetching books
-                    this.props.ipc.sendSync("add-book", {
+                    const insertResults = this.props.ipc.sendSync("add-book", {
                         filePaths: filePaths,
                         fileNames: fileNames,
                         size: res.map(resObj => resObj.size),
                         lastModified: res.map(resObj => resObj.mtimeMs)
-                    });
+                    })
+                    this.props.logMessage(`Dialog closed. ${insertResults.upsertedCount !== 0 ? `${insertResults.upsertedCount} file(s) added.` : 'No files added.'} `, 'info');
                     this.getBook({
                         order: {
                             id: 0,
@@ -98,10 +96,8 @@ class FilesTab extends Component {
                     });
                 }
                 else {
-                    if (this.props.isDev) {
-                        this.props.logMessage(`Dialog closed. No files added`, 'info');
-                    }
-                }   
+                    this.props.logMessage(`Dialog closed. No files added.`, 'info');
+                }
             });
     };
 
@@ -134,10 +130,10 @@ class FilesTab extends Component {
             }
             newChecked.splice(currentIndex, 1);
         }
-        
+
         this.props.setDistantState({ selectedFilesPaths: newChecked });
     };
-    
+
     sortByColumn = (field, columnId) => {
         console.log(field)
         let newOrder = {};
