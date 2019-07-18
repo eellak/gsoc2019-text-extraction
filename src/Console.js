@@ -30,11 +30,12 @@ class Console extends Component {
             let logMessage = { message: message, type: type };
             const date = new Date();
             logMessage = date.toTimeString().split(' ')[0] + ' ' + logMessage.message;
-            console.log(logMessage)
             this.logArray.push({
                 dateInstance: date,
                 message: logMessage
             });
+            // Rerender component
+            this.setState({render: 1});
         };
         props.setDistantState({logMessage: logMessage});
     }
