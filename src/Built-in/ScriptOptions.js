@@ -39,7 +39,7 @@ class ScriptOptions extends Component {
         this.props.setScriptParameters(true, this.props.type);
       }
       else {
-        const args = [`${this.props.settings.get("rlibPath")}`].concat(`-filePaths=${this.props.filePaths.join(',')}`).concat(`-index=${selectedIndices.join(',')}`);
+        const args = [`${this.props.settings.get("rlibPath")}`].concat('-filePaths=').concat(`-index=${selectedIndices.join(',')}`);
         this.props.setScriptParameters(false, this.props.type, this.state.env, this.state.scriptPath, args);
       }
     }

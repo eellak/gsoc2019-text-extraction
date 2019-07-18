@@ -104,7 +104,7 @@ class Main extends Component {
         by: 'name',
         asc: true
       },
-      logMessage: () => {}
+      logMessage: () => { }
     };
     this.state.ipc.on('receive-results', (event, arg) => {
       this.setDistantState({ resultList: arg });
@@ -142,29 +142,35 @@ class Main extends Component {
 
   executeScript = (env, scriptPath, args = [], callback = undefined) => {
     if (env[0] === '\\') env = env.slice(1);
-    // Replace custom script argument with selected filepaths
-    let replaceIndex = args.indexOf("{filepaths}")
+
+    // Copy args
+    let newArgs = [...args];
+    // Replace built in script argument with selected filepaths
+    let replaceIndex = args.indexOf("-filePaths=")
     if (replaceIndex !== -1) {
-      let firstPart = args.slice(0, replaceIndex);
-      let secondPart = args.slice(replaceIndex + 1);
-      args = firstPart.concat(this.state.selectedFilesPaths).concat(secondPart);
+      newArgs[replaceIndex] = newArgs[replaceIndex] + this.state.selectedFilesPaths.join(',');
+    }
+    // Replace custom script argument with selected filepaths
+    replaceIndex = newArgs.indexOf("{filepaths}")
+    if (replaceIndex !== -1) {
+      newArgs[replaceIndex] = this.state.selectedFilesPaths;
     }
     const { spawn } = window.require('child_process');
-    const process = spawn(env, [scriptPath].concat(args));
-    
+    const process = spawn(env, [scriptPath].concat(newArgs));
+
     // process.stderr.on('data', (data) => {
-      //   console.log(`${data}`);
-      // });
-      
-      // Send message to main process to add new book to database
-      process.stdout.on('data', (data) => {
-        this.state.ipc.send('add-results');
-      });
-      
-      
-      // Call callback on exit (to resolve promise)
-      process.on('exit', (code) => {
-        this.state.logMessage(`Finished execution of ${scriptPath} ${code === 0 ? 'successfully': 'unsuccessfully'}`, 'info');
+    //   console.log(`${data}`);
+    //   });
+
+    // Send message to main process to add new book to database
+    process.stdout.on('data', (data) => {
+      this.state.ipc.send('add-results');
+    });
+
+
+    // Call callback on exit (to resolve promise)
+    process.on('exit', (code) => {
+      this.state.logMessage(`Finished execution of ${scriptPath} ${code === 0 ? 'successfully' : 'unsuccessfully'}`, 'info');
       console.log(`child process exited with code ${code}`);
       if (callback !== undefined) {
         callback();
@@ -184,11 +190,11 @@ class Main extends Component {
     this.setState({ processing: true });
     const createAsync = execObj => {
       return new Promise((resolve, reject) => {
-      this.state.logMessage(`Start execution of ${execObj.scriptPath}`, 'info');
-      this.executeScript(execObj.env, execObj.scriptPath, execObj.args, () => resolve());
+        this.state.logMessage(`Start execution of ${execObj.scriptPath}`, 'info');
+        this.executeScript(execObj.env, execObj.scriptPath, execObj.args, () => resolve());
       });
     };
-    
+
     let addFreqAnalysis = true;
     Object.keys(this.state.toExecute).map((execKey) => {
       if (execKey === "misc") {
@@ -208,35 +214,35 @@ class Main extends Component {
           switch (this.state.platform) {
             case "win32":
               return "src\\Built-in\\misc\\misc_indices.R";
-              case "linux":
-                default:
-                  return "src/Built-in/misc/misc_indices.R";
-                }
-              })(),
-              args: [`${this.state.settings.get("rlibPath")}`].concat(`-filePaths=${this.state.selectedFilesPaths.join(',')}`).concat(`-index=tokens,vocabulary`)
-            }))
+            case "linux":
+            default:
+              return "src/Built-in/misc/misc_indices.R";
           }
+        })(),
+        args: [`${this.state.settings.get("rlibPath")}`].concat(`-filePaths=${this.state.selectedFilesPaths.join(',')}`).concat(`-index=tokens,vocabulary`)
+      }))
+    }
 
-          /* When every script has finished execution, fetch results and
-          * enable button
-          */
-         Promise.all(promises)
-         .then(() => {
-           this.getResults(this.state.resultOrder);
-           this.state.logMessage(`Get results`, 'info');
-           this.setState({
-             processing: false,
-             resultOrder:
-             {
-               columnId: 0,
-               by: 'name',
-               asc: true
-              }
-            });
-          });
-        };
-        
-        getResults = (order, filePaths = this.state.selectedFilesPaths, indices = this.state.selectedIndices) => {
+    /* When every script has finished execution, fetch results and
+    * enable button
+    */
+    Promise.all(promises)
+      .then(() => {
+        this.getResults(this.state.resultOrder);
+        this.state.logMessage(`Get results`, 'info');
+        this.setState({
+          processing: false,
+          resultOrder:
+          {
+            columnId: 0,
+            by: 'name',
+            asc: true
+          }
+        });
+      });
+  };
+
+  getResults = (order, filePaths = this.state.selectedFilesPaths, indices = this.state.selectedIndices) => {
     this.state.ipc.send('get-results', {
       filePaths: filePaths,
       indices: indices,
@@ -378,7 +384,7 @@ class Main extends Component {
                 resultList={this.state.resultList}
                 executeAll={this.executeAll}
                 logMessage={this.state.logMessage}
-                />}
+              />}
             </div>
             <Console
               setDistantState={this.setDistantState}
