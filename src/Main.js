@@ -55,11 +55,12 @@ const styles = theme => ({
   toolbar: theme.mixins.toolbar,
   content: {
     flexGrow: 1,
-    padding: theme.spacing(3),
+    margin: theme.spacing(3),
+    position: "relative"
   },
   main: {
     display: "flex",
-    height: "100vh"
+    height: "100vh",
   }
 });
 
@@ -103,10 +104,7 @@ class Main extends Component {
         by: 'name',
         asc: true
       },
-      logMessage: {
-        message: "",
-        type: ""
-      }
+      logMessage: () => {}
     };
     this.state.ipc.on('receive-results', (event, arg) => {
       this.setDistantState({ resultList: arg });
@@ -166,7 +164,7 @@ class Main extends Component {
       
       // Call callback on exit (to resolve promise)
       process.on('exit', (code) => {
-        this.logMessage(`Finished execution of ${scriptPath} ${code === 0 ? 'successfully': 'unsuccessfully'}`, 'info');
+        this.state.logMessage(`Finished execution of ${scriptPath} ${code === 0 ? 'successfully': 'unsuccessfully'}`, 'info');
       console.log(`child process exited with code ${code}`);
       if (callback !== undefined) {
         callback();
@@ -186,7 +184,7 @@ class Main extends Component {
     this.setState({ processing: true });
     const createAsync = execObj => {
       return new Promise((resolve, reject) => {
-      this.logMessage(`Start execution of ${execObj.scriptPath}`, 'info');
+      this.state.logMessage(`Start execution of ${execObj.scriptPath}`, 'info');
       this.executeScript(execObj.env, execObj.scriptPath, execObj.args, () => resolve());
       });
     };
@@ -225,7 +223,7 @@ class Main extends Component {
          Promise.all(promises)
          .then(() => {
            this.getResults(this.state.resultOrder);
-           this.logMessage(`Get results`, 'info');
+           this.state.logMessage(`Get results`, 'info');
            this.setState({
              processing: false,
              resultOrder:
@@ -273,17 +271,6 @@ class Main extends Component {
       toExecute[type] = { env: env, scriptPath: scriptPath, args: args }
       this.setState({ toExecute: toExecute });
     }
-  };
-
-  logMessage = (message, type) => {
-    console.log('what1', message)
-    this.setState({
-      logMessage:
-      {
-        message: message,
-        type: type
-      }
-    }, console.log('what2', message))
   };
 
   render() {
@@ -363,7 +350,7 @@ class Main extends Component {
                 platform={this.props.platform}
                 isDev={this.props.isDev}
                 setDistantState={this.setDistantState}
-                logMessage={this.logMessage}
+                logMessage={this.state.logMessage}
               />}
               {this.state.tabIndex === 1 && <ScriptsTab
                 fs={this.state.fs}
@@ -377,7 +364,7 @@ class Main extends Component {
                 selectedIndices={this.state.selectedIndices}
                 settings={this.state.settings}
                 setScriptParameters={this.setScriptParameters}
-                logMessage={this.logMessage}
+                logMessage={this.state.logMessage}
               />}
               {this.state.tabIndex === 2 && <ResultsTab
                 getResults={this.getResults}
@@ -390,10 +377,11 @@ class Main extends Component {
                 electron={this.props.electron}
                 resultList={this.state.resultList}
                 executeAll={this.executeAll}
-                logMessage={this.logMessage}
-              />}
+                logMessage={this.state.logMessage}
+                />}
             </div>
             <Console
+              setDistantState={this.setDistantState}
               logMessage={this.state.logMessage} />
           </div>
         </main>

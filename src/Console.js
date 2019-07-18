@@ -23,32 +23,32 @@ class Console extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            logArray: []
         };
-    }
-
-    componentDidUpdate(prevProps) {
-        if (this.props.logMessage !== prevProps.logMessage) {
-            let logMessage = this.props.logMessage;
+        // Cannot be put in state because of rapid addition which would not get caught by setState
+        this.logArray = []
+        const logMessage = (message, type) => {
+            let logMessage = { message: message, type: type };
             const date = new Date();
             logMessage = date.toTimeString().split(' ')[0] + ' ' + logMessage.message;
-            this.setState({
-                logArray: [...this.state.logArray, {
-                    dateInstance: date,
-                    message: logMessage
-                }],
-            }, () => {
-                const consoleDiv = document.getElementById("console");
-                consoleDiv.scrollTop = consoleDiv.scrollHeight;
-            })
-        }
+            console.log(logMessage)
+            this.logArray.push({
+                dateInstance: date,
+                message: logMessage
+            });
+        };
+        props.setDistantState({logMessage: logMessage});
+    }
+
+    componentDidUpdate() {
+        const consoleDiv = document.getElementById("console");
+        consoleDiv.scrollTop = consoleDiv.scrollHeight;
     }
 
     render() {
         const classes = this.props.classes;
         return (
             <Paper id="console" classes={{ root: classes.footer }}>
-                {this.state.logArray.map((logObj, id) => (
+                {this.logArray.map((logObj, id) => (
                     <Typography key={id}>{logObj.message}</Typography>
                 ))}
             </Paper>
