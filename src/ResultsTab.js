@@ -154,7 +154,11 @@ class ResultsTab extends Component {
         dialog.showSaveDialog(this.props.electron.remote.getCurrentWindow(),
             {
                 title: 'Select file to save',
-                defaultPath: `${path.join(__dirname, '../data')}`
+                defaultPath: `${path.join(__dirname, '../data')}`,
+                filters: [{
+                    name: 'Comma-separated values',
+                    extensions: ['csv']
+                }]
             },
             (filePath) => {
                 if (filePath !== undefined) {
@@ -173,7 +177,7 @@ class ResultsTab extends Component {
                             exportString = JSON.stringify(exportData);
                             break;
                     }
-                    this.props.fs.writeFileSync(filePath + `.${type}`, exportString)
+                    this.props.fs.writeFileSync(filePath, exportString)
                 }
             });
     };
@@ -199,10 +203,12 @@ class ResultsTab extends Component {
     render() {
         const classes = this.props.classes;
 
-        for (var i = 0; i <= this.props.resultList.length; i++) {
-            this.resultTable.push([]);
+        try {
+            for (var i = 0; i <= this.props.resultList.length; i++) {
+                this.resultTable.push([]);
+            }
         }
-
+        catch (e) { };
         return (
             <div>
                 <Button variant="contained" disabled={this.props.processing} className={clsx(classes.execute, { [classes.disabled]: this.props.processing })} onClick={this.props.executeAll}>Execute</Button>

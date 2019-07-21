@@ -52,7 +52,11 @@ class FilesTab extends Component {
             {
                 title: 'Add files to process',
                 defaultPath: `${path.join(__dirname, '../data')}`,
-                properties: ['openFile', 'multiSelections']
+                properties: ['openFile', 'multiSelections'],
+                filters: [{
+                    name: 'Text files',
+                    extensions: ['txt']
+                }]
             },
             (filePaths) => {
                 if (filePaths !== undefined) {
