@@ -66,26 +66,35 @@ class ResultsTab extends Component {
         };
         this.resultTable = [];
     }
+
+    componentDidMount() {
+        this.setResults();
+    }
+
     // pass by value
     // TODO : find better way?
     componentDidUpdate(prevProps) {
         if (prevProps.resultList !== this.props.resultList) {
-            let resultList = [];
-            this.props.resultList.forEach(elem => {
-                resultList.push(Object.assign([], elem));
-            });
-            resultList.forEach(bookObj => {
-                const indices = bookObj.indices;
-                delete bookObj.indices;
-                Object.keys(indices).map(index => {
-                    if (indices[index].length !== 0)
-                        bookObj[index] = indices[index];
-                });
-                return bookObj
-            });
-            this.setState({ resultList: resultList })
+            this.setResults();
             this.props.setDistantState({ selectedResultRows: [...Array(this.props.resultList.length).keys()] });
         }
+    }
+
+    setResults = () => {
+        let resultList = [];
+        this.props.resultList.forEach(elem => {
+            resultList.push(Object.assign([], elem));
+        });
+        resultList.forEach(bookObj => {
+            const indices = bookObj.indices;
+            delete bookObj.indices;
+            Object.keys(indices).map(index => {
+                if (indices[index].length !== 0)
+                    bookObj[index] = indices[index];
+            });
+            return bookObj
+        });
+        this.setState({ resultList: resultList })
     }
 
     sortByColumn = (indexName, columnId) => {
