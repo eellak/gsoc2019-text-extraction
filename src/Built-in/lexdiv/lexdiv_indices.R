@@ -14,6 +14,7 @@ filePaths <- unlist(strsplit(args[["filePaths"]], split=','));
 fileNames <- basename(filePaths)
 resultFilePath <- "results.json"
 books <- c()
+temp <- data.frame()
 for (i in 1:length(filePaths)) {
     books <- c(books, readtext(filePaths[i])$text)
 }
@@ -25,7 +26,7 @@ result <- list()
 result[["filePaths"]] <- filePaths
 if(!is.null(args[["index"]])) {
     lexdivIndex <- unlist(strsplit(args[["index"]], split=','))
-    temp <- textstat_lexdiv(toks, measure=lexdivIndex)
+    temp <- textstat_lexdiv(toks, measure=lexdivIndex, MSTTR_segment=min(ntoken(toks), 100L), MATTR_window=min(ntoken(toks), 100L))
     temp[["document"]] <- NULL 
     result[["lexdiv"]] <- temp
 }
