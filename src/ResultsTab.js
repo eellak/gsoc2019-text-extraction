@@ -14,7 +14,7 @@ import ButtonGroup from '@material-ui/core/ButtonGroup';
 import Button from '@material-ui/core/Button';
 import MenuList from '@material-ui/core/MenuList';
 import MenuItem from '@material-ui/core/MenuItem';
-import { Checkbox, Typography, Tabs, Tab } from '@material-ui/core';
+import { Checkbox, Typography, Tabs, Tab, List, ListItem, ListItemText, IconButton } from '@material-ui/core';
 
 const styles = theme => ({
 
@@ -213,7 +213,16 @@ class ResultsTab extends Component {
     };
 
     generateWordListElement = (wordList) => {
-        return <div>{wordList.length}</div>
+        return (
+            <List key={wordList}>
+            {wordList.map((value, index) => (
+                <ListItem key={index} dense>
+                  <ListItemText primary={index + ' ' + value} />
+                </ListItem>
+            )
+        )}
+          </List>
+        );
     }
 
     getWordList = (bookRow, type) => {
@@ -384,7 +393,25 @@ class ResultsTab extends Component {
                 <Button variant="contained" disabled={this.props.processing} className={clsx(classes.execute, { [classes.disabled]: this.props.processing })} onClick={this.props.executeAll}>Execute</Button>
                 <Tabs value={this.state.tabIndex} onChange={(event, tabIndex) => this.changeTab(tabIndex)}>
                     <Tab label="Results" />
-                    {this.props.additionalResults.map((resultObj, index) => <Tab key={index} label={<div>{`${resultObj.name} ${resultObj.wordListType}`}</div>} />)}
+                    {this.props.additionalResults.map((resultObj, index) => (
+                        <Tab key={index} label={
+                            <div>
+                                {`${resultObj.name} ${resultObj.wordListType}`}
+                                <IconButton
+                                    onClick={(event) => {
+                                        event.stopPropagation();
+                                        let additionalResults = [...this.props.additionalResults];
+                                        additionalResults.splice(index, 1);
+                                        this.props.setDistantState({ additionalResults: additionalResults });
+                                        let tabs = [...this.state.tabs];
+                                        tabs.splice(index, 1);
+                                        this.setState({ tabs: tabs, tabIndex: 0 });
+                                    }}
+                                    >
+                                    <i className="material-icons">close</i>
+                                </IconButton>
+                            </div>} />)
+                    )}
                 </Tabs>
                 {this.state.tabIndex === 0 && resultsTab}
                 {this.state.tabs.map((component, index) => {
