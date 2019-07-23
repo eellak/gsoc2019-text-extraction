@@ -94,6 +94,7 @@ class Main extends Component {
       selectedIndices: {},
       toExecute: {},
       resultList: [],
+      additionalResults: [],
       resultOrder: {
         columnId: 0,
         by: 'name',
@@ -379,6 +380,7 @@ class Main extends Component {
                 order={this.state.resultOrder}
                 processing={this.state.processing}
                 fs={this.state.fs}
+                additionalResults={this.state.additionalResults}
                 ipc={this.state.ipc}
                 electron={this.props.electron}
                 resultList={this.state.resultList}

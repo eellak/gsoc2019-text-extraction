@@ -14,7 +14,7 @@ import ButtonGroup from '@material-ui/core/ButtonGroup';
 import Button from '@material-ui/core/Button';
 import MenuList from '@material-ui/core/MenuList';
 import MenuItem from '@material-ui/core/MenuItem';
-import { Checkbox, Typography } from '@material-ui/core';
+import { Checkbox, Typography, Tabs, Tab } from '@material-ui/core';
 
 const styles = theme => ({
 
@@ -66,7 +66,9 @@ class ResultsTab extends Component {
             selectedExportType: {
                 type: 'csv',
                 displayName: 'CSV'
-            }
+            },
+            tabIndex: 0,
+            tabs: props.additionalResults.map(resultObj => this.generateWordListElement(resultObj.wordList))
         };
         this.resultTable = [];
     }
@@ -92,6 +94,7 @@ class ResultsTab extends Component {
         resultList.forEach(bookObj => {
             const indices = bookObj.indices;
             delete bookObj.indices;
+            delete bookObj.path
             Object.keys(indices).map(index => {
                 if (indices[index].length !== 0)
                     bookObj[index] = indices[index];
@@ -100,6 +103,11 @@ class ResultsTab extends Component {
         });
         this.setState({ resultList: resultList })
     }
+
+    // Change view tab according to user's selection
+    changeTab = (tabIndex) => {
+        this.setState({ tabIndex: Number(tabIndex) })
+    };
 
     sortByColumn = (indexName, columnId) => {
         if (indexName !== 'name') {
@@ -204,9 +212,37 @@ class ResultsTab extends Component {
         this.setState({ open: !this.state.open });
     };
 
+    generateWordListElement = (wordList) => {
+        return <div>{wordList.length}</div>
+    }
+
+    getWordList = (bookRow, type) => {
+        const filePath = this.props.resultList[bookRow].path;
+        const fileName = this.props.resultList[bookRow].name;
+        const index = this.props.additionalResults.filter(resultObj => resultObj.wordListType === type).map(resultObj => resultObj.path).indexOf(filePath);
+        if (index === -1) {
+            const wordList = this.props.ipc.sendSync('get-wordList', {
+                filePath: filePath,
+                wordListType: type
+            })[0].indices[type];
+            this.props.setDistantState({
+                additionalResults: [...this.props.additionalResults, {
+                    path: filePath,
+                    name: fileName,
+                    wordListType: type,
+                    wordList: wordList
+                }]
+            });
+            this.setState({ tabs: [...this.state.tabs, this.generateWordListElement(wordList)] });
+        }
+
+        // TODO:: find way to change to correct tab
+        return index === -1 ? this.state.tabs.length + 1 : 0;
+    }
+
     showWordList = (event, bookRow, type) => {
         event.stopPropagation();
-        console.log(this.resultTable[bookRow], type)
+        this.setState({ tabIndex: this.getWordList(bookRow, type) });
     }
 
     render() {
@@ -218,131 +254,144 @@ class ResultsTab extends Component {
             }
         }
         catch (e) { };
-        return (
-            <div>
-                <Button variant="contained" disabled={this.props.processing} className={clsx(classes.execute, { [classes.disabled]: this.props.processing })} onClick={this.props.executeAll}>Execute</Button>
-                <Table className={clsx(classes.table)}>
-                    {(() => {
-                        try {
-                            let columnId = 0;
-                            return (<TableHead>
-                                <TableRow>
-                                    <TableCell>
-                                        <Checkbox
-                                            onClick={this.handleToggleAll}
-                                            checked={this.props.selectedResultRows.length === this.props.resultList.length}
-                                            indeterminate={this.props.selectedResultRows.length !== this.props.resultList.length && this.props.selectedResultRows.length !== 0} />
-                                    </TableCell>
-                                    {Object.keys(this.state.resultList[0]).map((indexName, i) => {
-                                        if (typeof (this.state.resultList[0][indexName]) !== typeof ({}) || Array.isArray(this.state.resultList[0][indexName])) {
-                                            return <TableCell key={i} />
-                                        }
-                                        return <TableCell colSpan={Object.keys(Object.keys(this.state.resultList[0][indexName])).length} key={i}>{indexName}</TableCell>
 
-                                    })}
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell />
-                                    {Object.keys(this.state.resultList[0]).map((indexName, i) => {
-                                        if (typeof (this.state.resultList[0][indexName]) !== typeof ({}) || Array.isArray(this.state.resultList[0][indexName])) {
-                                            const id = columnId++;
-                                            this.resultTable[0][id] = indexName;
-                                            if (indexName === 'tokensNum') {
-                                                tokensColumnId = id;
-                                            }
-                                            else if (indexName === 'vocabularyNum') {
-                                                vocabularyColumnId = id;
-                                            }
-                                            return (<TableCell rowSpan="2" key={i}>
+        const resultsTab = (
+            <Table className={clsx(classes.table)}>
+                {(() => {
+                    try {
+                        let columnId = 0;
+                        return (<TableHead>
+                            <TableRow>
+                                <TableCell>
+                                    <Checkbox
+                                        onClick={this.handleToggleAll}
+                                        checked={this.props.selectedResultRows.length === this.props.resultList.length}
+                                        indeterminate={this.props.selectedResultRows.length !== this.props.resultList.length && this.props.selectedResultRows.length !== 0} />
+                                </TableCell>
+                                {Object.keys(this.state.resultList[0]).map((indexName, i) => {
+                                    if (typeof (this.state.resultList[0][indexName]) !== typeof ({}) || Array.isArray(this.state.resultList[0][indexName])) {
+                                        return <TableCell key={i} />
+                                    }
+                                    return <TableCell colSpan={Object.keys(Object.keys(this.state.resultList[0][indexName])).length} key={i}>{indexName}</TableCell>
+
+                                })}
+                            </TableRow>
+                            <TableRow>
+                                <TableCell />
+                                {Object.keys(this.state.resultList[0]).map((indexName, i) => {
+                                    if (typeof (this.state.resultList[0][indexName]) !== typeof ({}) || Array.isArray(this.state.resultList[0][indexName])) {
+                                        const id = columnId++;
+                                        this.resultTable[0][id] = indexName;
+                                        if (indexName === 'tokensNum') {
+                                            tokensColumnId = id;
+                                        }
+                                        else if (indexName === 'vocabularyNum') {
+                                            vocabularyColumnId = id;
+                                        }
+                                        return (<TableCell rowSpan="2" key={i}>
+                                            <TableSortLabel
+                                                active={this.props.order.columnId === id}
+                                                direction={this.props.order.asc ? 'asc' : 'desc'}
+                                                onClick={() => this.sortByColumn(`${indexName}`, id)} >
+                                                {indexName}
+                                            </TableSortLabel>
+                                        </TableCell>)
+                                    }
+                                    return Object.keys(this.state.resultList[0][indexName]).map((el, idx) => {
+                                        const id = columnId++;
+                                        this.resultTable[0][id] = el;
+                                        return (
+                                            <TableCell key={idx}>
                                                 <TableSortLabel
                                                     active={this.props.order.columnId === id}
                                                     direction={this.props.order.asc ? 'asc' : 'desc'}
-                                                    onClick={() => this.sortByColumn(`${indexName}`, id)} >
-                                                    {indexName}
+                                                    onClick={() => this.sortByColumn(`${indexName}.${el}`, id)}
+                                                >
+                                                    {el}
                                                 </TableSortLabel>
-                                            </TableCell>)
-                                        }
-                                        return Object.keys(this.state.resultList[0][indexName]).map((el, idx) => {
-                                            const id = columnId++;
-                                            this.resultTable[0][id] = el;
-                                            return (
-                                                <TableCell key={idx}>
-                                                    <TableSortLabel
-                                                        active={this.props.order.columnId === id}
-                                                        direction={this.props.order.asc ? 'asc' : 'desc'}
-                                                        onClick={() => this.sortByColumn(`${indexName}.${el}`, id)}
-                                                    >
-                                                        {el}
-                                                    </TableSortLabel>
-                                                </TableCell>
-                                            )
-                                        })
-                                    })}
+                                            </TableCell>
+                                        )
+                                    })
+                                })}
+                            </TableRow>
+                        </TableHead>
+                        )
+                    }
+                    catch (e) {
+                        return (
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>No results</TableCell>
                                 </TableRow>
                             </TableHead>
-                            )
+                        )
+                    }
+                })()}
+                <TableBody>
+                    {(() => {
+                        try {
+                            return this.state.resultList.map((elem, i) => {
+                                let columnId = 0;
+                                return (<TableRow key={i} onClick={() => this.handleToggle(i)}>
+                                    <TableCell>
+                                        <Checkbox
+                                            checked={this.props.selectedResultRows.indexOf(i) !== -1} />
+                                    </TableCell>
+                                    {Object.values(elem).map((value, id) => {
+                                        if (typeof (value) === typeof ({})) {
+                                            return Object.values(value).map((val, idx) => {
+                                                const id = columnId++;
+                                                this.resultTable[i + 1][id] = val;
+                                                if (id === tokensColumnId) {
+                                                    return (
+                                                        <TableCell key={id}>
+                                                            <Typography classes={{ root: classes.link }} onClick={e => this.showWordList(e, i, 'tokens')}>{value}</Typography>
+                                                        </TableCell>
+                                                    )
+                                                }
+                                                else if (id === vocabularyColumnId) {
+                                                    return (
+                                                        <TableCell key={id}>
+                                                            <Typography classes={{ root: classes.link }} onClick={e => this.showWordList(e, i, 'vocabulary')}>{value}</Typography>
+                                                        </TableCell>
+                                                    )
+                                                }
+                                                return (
+                                                    <TableCell key={idx}>{val}</TableCell>)
+                                            })
+                                        }
+                                        else {
+                                            const id = columnId++;
+                                            this.resultTable[i + 1][id] = value;
+                                            return <TableCell key={id}>{value}</TableCell>
+                                        }
+                                    })
+                                    }
+                                </TableRow>)
+                            })
                         }
                         catch (e) {
                             return (
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell>No results</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                            )
+                                <TableRow>
+                                </TableRow>)
                         }
                     })()}
-                    <TableBody>
-                        {(() => {
-                            try {
-                                return this.state.resultList.map((elem, i) => {
-                                    let columnId = 0;
-                                    return (<TableRow key={i} onClick={() => this.handleToggle(i)}>
-                                        <TableCell>
-                                            <Checkbox
-                                                checked={this.props.selectedResultRows.indexOf(i) !== -1} />
-                                        </TableCell>
-                                        {Object.values(elem).map((value, id) => {
-                                            if (typeof (value) === typeof ({})) {
-                                                return Object.values(value).map((val, idx) => {
-                                                    const id = columnId++;
-                                                    this.resultTable[i + 1][id] = val;
-                                                    if (id === tokensColumnId) {
-                                                        return (
-                                                            <TableCell key={id}>
-                                                                <Typography classes={{root: classes.link}} onClick={e => this.showWordList(e, i, 'tokens')}>{value}</Typography>
-                                                            </TableCell>
-                                                        )
-                                                    }
-                                                    else if (id === vocabularyColumnId) {
-                                                        return (
-                                                            <TableCell key={id}>
-                                                                <Typography classes={{root: classes.link}} onClick={e => this.showWordList(e, i, 'vocabulary')}>{value}</Typography>
-                                                            </TableCell>
-                                                        )
-                                                    }
-                                                    return (
-                                                        <TableCell key={idx}>{val}</TableCell>)
-                                                })
-                                            }
-                                            else {
-                                                const id = columnId++;
-                                                this.resultTable[i + 1][id] = value;
-                                                return <TableCell key={id}>{value}</TableCell>
-                                            }
-                                        })
-                                        }
-                                    </TableRow>)
-                                })
-                            }
-                            catch (e) {
-                                return (
-                                    <TableRow>
-                                    </TableRow>)
-                            }
-                        })()}
-                    </TableBody>
-                </Table>
+                </TableBody>
+            </Table>
+        );
+        return (
+            <div>
+                <Button variant="contained" disabled={this.props.processing} className={clsx(classes.execute, { [classes.disabled]: this.props.processing })} onClick={this.props.executeAll}>Execute</Button>
+                <Tabs value={this.state.tabIndex} onChange={(event, tabIndex) => this.changeTab(tabIndex)}>
+                    <Tab label="Results" />
+                    {this.props.additionalResults.map((resultObj, index) => <Tab key={index} label={<div>{`${resultObj.name} ${resultObj.wordListType}`}</div>} />)}
+                </Tabs>
+                {this.state.tabIndex === 0 && resultsTab}
+                {this.state.tabs.map((component, index) => {
+                    if (index + 1 === this.state.tabIndex) {
+                        return component;
+                    }
+                })}
                 <ButtonGroup variant="contained" color="primary" ref={this.state.anchorRef} aria-label="Split button">
                     <Button variant="contained" disabled={this.props.selectedResultRows.length === 0} className={clsx(classes.execute, { [classes.disabled]: this.props.selectedResultRows.length === 0 })} onClick={this.exportResultsDialog}>Export selected as {this.state.selectedExportType.displayName}</Button>
                     <Button

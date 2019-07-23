@@ -176,6 +176,7 @@ ipcMain.on('get-results', (event, parameters) => {
   let direction = parameters.order.asc ? 1 : -1;
   let projection = {
     name: 1,
+    path: 1,
     "indices.tokensNum": 1,
     "indices.vocabularyNum": 1,
     _id: 0
@@ -200,6 +201,29 @@ ipcMain.on('get-results', (event, parameters) => {
     }], (e, result) => {
       // Send returned data through main - renderer channel
       event.sender.send('receive-results', result)
+    })
+});
+
+/* Create a channel between main and rendered process
+* for tokens or vocabulary return.
+* Returns an array of strings
+*/
+ipcMain.on('get-wordList', (event, parameters) => {
+  let projection = {
+    name: 1,
+    [`indices.${parameters.wordListType}`]: 1,
+    _id: 0
+  };
+  Corpus.aggregate([
+    {
+      $match: {
+        path: parameters.filePath
+      }
+    }, {
+      $project: projection,
+    }], (e, result) => {
+      // Send returned data through main - renderer channel
+      event.returnValue = result;
     })
 });
 
