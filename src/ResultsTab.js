@@ -14,7 +14,7 @@ import ButtonGroup from '@material-ui/core/ButtonGroup';
 import Button from '@material-ui/core/Button';
 import MenuList from '@material-ui/core/MenuList';
 import MenuItem from '@material-ui/core/MenuItem';
-import { Checkbox } from '@material-ui/core';
+import { Checkbox, Typography } from '@material-ui/core';
 
 const styles = theme => ({
 
@@ -41,6 +41,10 @@ const styles = theme => ({
         "background-color": "black",
         cursor: "default",
         "background- color": "#148340"
+    },
+    link: {
+        cursor: 'pointer',
+        'text-decoration': 'underline'
     }
 
 });
@@ -200,9 +204,14 @@ class ResultsTab extends Component {
         this.setState({ open: !this.state.open });
     };
 
+    showWordList = (event, bookRow, type) => {
+        event.stopPropagation();
+        console.log(this.resultTable[bookRow], type)
+    }
+
     render() {
         const classes = this.props.classes;
-
+        let tokensColumnId, vocabularyColumnId;
         try {
             for (var i = 0; i <= this.props.resultList.length; i++) {
                 this.resultTable.push([]);
@@ -238,6 +247,12 @@ class ResultsTab extends Component {
                                         if (typeof (this.state.resultList[0][indexName]) !== typeof ({}) || Array.isArray(this.state.resultList[0][indexName])) {
                                             const id = columnId++;
                                             this.resultTable[0][id] = indexName;
+                                            if (indexName === 'tokensNum') {
+                                                tokensColumnId = id;
+                                            }
+                                            else if (indexName === 'vocabularyNum') {
+                                                vocabularyColumnId = id;
+                                            }
                                             return (<TableCell rowSpan="2" key={i}>
                                                 <TableSortLabel
                                                     active={this.props.order.columnId === id}
@@ -292,6 +307,20 @@ class ResultsTab extends Component {
                                                 return Object.values(value).map((val, idx) => {
                                                     const id = columnId++;
                                                     this.resultTable[i + 1][id] = val;
+                                                    if (id === tokensColumnId) {
+                                                        return (
+                                                            <TableCell key={id}>
+                                                                <Typography classes={{root: classes.link}} onClick={e => this.showWordList(e, i, 'tokens')}>{value}</Typography>
+                                                            </TableCell>
+                                                        )
+                                                    }
+                                                    else if (id === vocabularyColumnId) {
+                                                        return (
+                                                            <TableCell key={id}>
+                                                                <Typography classes={{root: classes.link}} onClick={e => this.showWordList(e, i, 'vocabulary')}>{value}</Typography>
+                                                            </TableCell>
+                                                        )
+                                                    }
                                                     return (
                                                         <TableCell key={idx}>{val}</TableCell>)
                                                 })
