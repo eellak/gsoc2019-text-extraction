@@ -14,7 +14,8 @@ import ButtonGroup from '@material-ui/core/ButtonGroup';
 import Button from '@material-ui/core/Button';
 import MenuList from '@material-ui/core/MenuList';
 import MenuItem from '@material-ui/core/MenuItem';
-import { Checkbox, Typography, Tabs, Tab, List, ListItem, ListItemText, IconButton } from '@material-ui/core';
+import { Checkbox, Typography, Tabs, Tab, ListItem, ListItemText, IconButton } from '@material-ui/core';
+import { List, AutoSizer } from 'react-virtualized'
 
 const styles = theme => ({
 
@@ -45,6 +46,9 @@ const styles = theme => ({
     link: {
         cursor: 'pointer',
         'text-decoration': 'underline'
+    },
+    listBox: {
+        height: '200px'
     }
 
 });
@@ -212,16 +216,29 @@ class ResultsTab extends Component {
         this.setState({ open: !this.state.open });
     };
 
-    generateWordListElement = (wordList) => {
+    rowRenderer = ({ key, index, isScrolling, isVisible, style }, wordList) => {
         return (
-            <List key={wordList}>
-            {wordList.map((value, index) => (
-                <ListItem key={index} dense>
-                  <ListItemText primary={index + ' ' + value} />
-                </ListItem>
-            )
-        )}
-          </List>
+            <ListItem key={index} style={style} dense>
+                <ListItemText primary={index + ' ' + wordList[index]} />
+            </ListItem>
+        )
+    }
+
+    generateWordListElement = wordList => {
+        return (
+            <Paper classes={{ root: this.props.classes.listBox }}>
+                <AutoSizer>
+                    {({ height, width }) => (
+                        <List
+                            width={width}
+                            height={height}
+                            rowCount={wordList.length}
+                            rowHeight={20}
+                            rowRenderer={(defaultParams) => this.rowRenderer(defaultParams, wordList)}
+                        />
+                    )}
+                </AutoSizer>
+            </Paper>
         );
     }
 
@@ -407,7 +424,7 @@ class ResultsTab extends Component {
                                         tabs.splice(index, 1);
                                         this.setState({ tabs: tabs, tabIndex: 0 });
                                     }}
-                                    >
+                                >
                                     <i className="material-icons">close</i>
                                 </IconButton>
                             </div>} />)

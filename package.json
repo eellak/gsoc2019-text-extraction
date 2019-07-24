@@ -15,7 +15,8 @@
     "react-dom": "^16.8.6",
     "react-router-dom": "^5.0.0",
     "react-scripts": "0.9.5",
-    "react-tabs": "^3.0.0"
+    "react-tabs": "^3.0.0",
+    "react-virtualized": "^9.21.1"
   },
   "devDependencies": {
     "concurrently": "^4.1.0",
