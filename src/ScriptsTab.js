@@ -32,9 +32,10 @@ class ScriptsTab extends Component {
         })();
 
         const customScriptTab = (
-            <CustomOptions platform={this.props.platform} settings={this.props.settings} electron={this.props.electron} isDev={this.props.isDev} type="custom" setScriptParameters={this.props.setScriptParameters} />
+            <CustomOptions platform={this.props.platform} ipc={this.props.ipc} savedScripts={this.props.savedScripts} settings={this.props.settings} electron={this.props.electron} isDev={this.props.isDev} type="custom" setScriptParameters={this.props.setScriptParameters} />
+
         );
-        
+
         const tabs = this.props.indices.map((obj, index) => {
             return <ScriptOptions
                 key={index}

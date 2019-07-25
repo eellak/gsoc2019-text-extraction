@@ -2,6 +2,8 @@
 const corpusSchema = require('../public/corpus.js');
 // Contains the MongoDB schema of indices
 const indicesSchema = require('../public/indices.js');
+// Contains the MongoDB schema of script
+const scriptSchema = require('../public/script.js');
 // Modules to control application life and create native browser window
 const electron = require('electron');
 // Module to control application life (app)
@@ -28,6 +30,7 @@ mongoose.connect('mongodb://localhost:27017/text_extraction_db', {
 
 let Corpus = mongoose.model('corpus', corpusSchema);
 let Indices = mongoose.model('indices', indicesSchema);
+let Script = mongoose.model('script', scriptSchema);
 
 // Keep a global reference of the window objects, if you don't, the windows will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -250,6 +253,42 @@ ipcMain.on('get-book', (event, parameters) => {
       // Send returned data through main - renderer channel
       event.sender.send('receive-book', result)
     })
+});
+
+/* Create a channel between main and rendered process
+* for custom script insertion.
+*/
+ipcMain.on('add-script', (event, parameters) => {
+  Script.updateOne({ name: parameters.name }, {
+  name: parameters.name,
+  env: parameters.env,
+  path: parameters.path,
+  args: parameters.args
+  },
+  {
+    upsert: true
+  },
+  (error, res) => event.returnValue = res);
+});
+
+/* Create a channel between main and rendered process
+* for custom script deletion.
+*/
+ipcMain.on('delete-script', (event, parameters) => {
+  Script.deleteOne({ name: parameters.name }, err => {
+    if (err) return handleError(err);
+    event.returnValue = 'done';
+  });
+});
+
+/* Create a channel between main and rendered process
+* to fetch custom scripts.
+*/
+ipcMain.on('get-script', event => {
+  Script.find({}, (error, result) => {
+    // Send found indices through main - renderer channel
+    event.sender.send('receive-script', result.map(obj => obj._doc));
+  });
 });
 
 /* Create a channel between main and rendered process

@@ -105,6 +105,7 @@ class Main extends Component {
         by: 'name',
         asc: true
       },
+      savedScripts: [],
       logMessage: () => { }
     };
     this.state.ipc.on('receive-results', (event, arg) => {
@@ -117,6 +118,10 @@ class Main extends Component {
 
     this.state.ipc.on('receive-book', (event, arg) => {
       this.setDistantState({ files: arg });
+    });
+
+    this.state.ipc.on('receive-script', (event, arg) => {
+      this.setDistantState({ savedScripts: arg });
     });
   }
 
@@ -372,6 +377,7 @@ class Main extends Component {
                 settings={this.state.settings}
                 setScriptParameters={this.setScriptParameters}
                 logMessage={this.state.logMessage}
+                savedScripts={this.state.savedScripts}
               />}
               {this.state.tabIndex === 2 && <ResultsTab
                 getResults={this.getResults}

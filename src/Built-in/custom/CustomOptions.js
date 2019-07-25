@@ -1,7 +1,26 @@
 import React, { Component } from 'react';
 import './CustomOptions.css';
+import clsx from 'clsx';
+import { withStyles } from '@material-ui/styles';
 import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
+import { TextField, Input, DialogActions, Button, Dialog, DialogTitle, DialogContent, FormControl, InputLabel, Select, MenuItem, InputBase } from '@material-ui/core';
+
+const styles = theme => ({
+  container: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    'flex-direction': 'column'
+  },
+  formControl: {
+    margin: theme.spacing(1),
+    minWidth: 120,
+  },
+  textField: {
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1),
+    width: 200,
+  },
+});
 
 class CustomOptions extends Component {
 
@@ -14,14 +33,19 @@ class CustomOptions extends Component {
         { displayName: "python3", path: `${props.settings.get("python3Path", "")}\\python3` },
         { displayName: "python", path: `${props.settings.get("python", "")}\\python` }
       ],
-      scriptPaths: {},
-      id: 0,
-      displayData: {}
+      scriptPath: {},
+      scriptId: 0,
+      displayData: {},
+      open: false,
+      name: '',
+      env: '',
+      scriptPath: '',
+      args: ''
     };
   }
 
   componentDidMount() {
-    this.spawnCustomOption();
+    this.getScript();
   }
 
   checkAll = () => {
@@ -33,8 +57,6 @@ class CustomOptions extends Component {
   }
 
   addScriptDialog = (e) => {
-    const button = e.target;
-    const id = button.parentNode.getAttribute("id").split('-').slice(-1);
     const path = require('path');
     const dialog = this.props.electron.remote.dialog;
     dialog.showOpenDialog(this.props.electron.remote.getCurrentWindow(),
@@ -47,9 +69,7 @@ class CustomOptions extends Component {
         let scriptName = ""
         if (scriptPath !== undefined) {
           scriptPath = scriptPath[0];
-          let scriptPaths = this.state.scriptPaths;
-          scriptPaths.id = scriptPath;
-          this.setState({ scriptPaths: scriptPaths });
+          this.setState({ scriptPath: scriptPath });
           scriptName = (() => {
             switch (this.props.platform) {
               case "win32":
@@ -60,56 +80,172 @@ class CustomOptions extends Component {
             }
           })();
         }
-        scriptPath === undefined ? {} : document.querySelector(`#display-script-${id}`).innerHTML = scriptName;
+        scriptPath === undefined ? {} : document.querySelector(`#script-path`).value = scriptName;
       }
     );
   }
 
+  // addScript = (e) => {
+  //   let [env, , , args] = e.target.parentNode.children;
+  //   const id = e.target.parentNode.getAttribute("id").split('-').slice(-1);
+  //   if (document.querySelector(`#add-script-${id}`).innerText === "add") this.spawnCustomOption();
+  //   this.props.setScriptParameters(false, `${this.props.type}${id}`, env.value, this.state.scriptPaths.id, args.value.split(' '));
+  //   document.querySelector(`#add-script-${id}`).innerText = "update";
+  //   document.querySelector(`#remove-script-${id}`).style.display = "inline"
+  // }
+
+  getScript = () => {
+    this.props.ipc.send("get-script");
+  };
+
   addScript = (e) => {
-    let [env, , , args] = e.target.parentNode.children;
-    const id = e.target.parentNode.getAttribute("id").split('-').slice(-1);
-    if (document.querySelector(`#add-script-${id}`).innerText === "add") this.spawnCustomOption();
-    this.props.setScriptParameters(false, `${this.props.type}${id}`, env.value, this.state.scriptPaths.id, args.value.split(' '));
-    document.querySelector(`#add-script-${id}`).innerText = "update";
-    document.querySelector(`#remove-script-${id}`).style.display = "inline"
+    const args = this.state.args === undefined ? '' : this.state.args;
+    const newScript = {
+      name: this.state.name,
+      env: this.state.env,
+      path: this.state.scriptPath,
+      args: args,
+    }
+this.props.ipc.sendSync('add-script', newScript);
+this.getScript();
+
+this.handleClose();
   }
 
   removeScript = (e) => {
     const id = e.target.parentNode.getAttribute("id").split('-').slice(-1);
     this.props.setScriptParameters(true, `${this.props.type}${id}`);
-    let displayData = this.state.displayData;
+    let displayData = { ...this.state.displayData };
     delete displayData[id];
     this.setState({ displayData: displayData });
   }
 
-  spawnCustomOption = () => {
-    const envSelect =
-      <select defaultValue="Choose environment">
-        {this.state.environments.map((envObj, i) =>
-          <option key={i} value={envObj.path}>{envObj.displayName}</option>
-        )}
-      </select>
-    const child = (
-      <div key={this.state.id} id={`custom-options-${String(this.state.id)}`}>
-        {envSelect}
-        <Button size="small"  variant="contained" onClick={this.addScriptDialog}>Select script</Button>
-        <div id={`display-script-${String(this.state.id)}`}></div>
-        <input type="text" placeholder="Insert necessary arguments" />
-        <Button size="small" variant="contained" id={`add-script-${String(this.state.id)}`} onClick={this.addScript}>add</Button>
-        <Button size="small" variant="contained" className="remove-script" id={`remove-script-${String(this.state.id)}`} onClick={this.removeScript}>remove</Button>
-      </div>);
-    let displayData = this.state.displayData;
-    displayData[String(this.state.id)] = child;
-    this.setState({ id: this.state.id + 1, displayData: displayData });
+  // spawnCustomOption = () => {
+  //   const envSelect =
+  //     <select defaultValue="Choose environment">
+  //       {this.state.environments.map((envObj, i) =>
+  //         <option key={i} value={envObj.path}>{envObj.displayName}</option>
+  //       )}
+  //     </select>
+  //   const child = (
+  //     <div key={this.state.scriptId} value={this.state.scriptId}>
+  //       {envSelect}
+  //       <Button size="small" variant="contained" onClick={this.addScriptDialog}>Select script</Button>
+  //       <div id={`display-script-${String(this.state.scriptId)}`}></div>
+  //       <input type="text" placeholder="Insert necessary arguments" />
+  //       <Button size="small" variant="contained" id={`add-script-${String(this.state.scriptId)}`} onClick={this.addScript}>add</Button>
+  //       <Button size="small" variant="contained" className="remove-script" id={`remove-script-${String(this.state.scriptId)}`} onClick={this.removeScript}>remove</Button>
+  //     </div>);
+  //   let displayData = this.state.displayData;
+  //   displayData[String(this.state.scriptId)] = child;
+  //   this.setState({ id: this.state.scriptId + 1, displayData: displayData });
+  // }
+
+  handleChange = (name, event) => {
+    this.setState({ [name]: event.target.value });
+  };
+
+  handleClickOpen = () => {
+    this.setState({ open: true });
+  }
+
+  handleClose = () => {
+    this.setState({ 
+      open: false,
+      name: '',
+      env: '',
+      scriptPath: '',
+      args: ''
+    });
   }
 
   render() {
+    console.log(this.props.savedScripts)
+    const classes = this.props.classes;
     return (
       <div id="custom-scripts">
         <Typography variant="subtitle1" align="center">{"Select options (access selected filepaths in commandArgs using {filepaths})"}</Typography>
-        {Object.values(this.state.displayData)}
+        {(() => {
+          if (this.props.savedScripts.length !== 0) {
+            return (
+              <div>
+                <Typography>Saved scripts</Typography>
+                {this.props.savedScripts.map(scriptObj => (
+                  <div key={scriptObj.name}>
+                    <Typography>{scriptObj.name}</Typography>
+                    <Typography>Environment: {scriptObj.env}</Typography>
+                    <Typography>Script: {scriptObj.path}</Typography>
+                    <Typography>Arguments: {scriptObj.args}</Typography>
+                  </div>
+                ))}
+              </div>
+            )
+          }
+        })()
+        }
+        <Button onClick={this.handleClickOpen}>New script</Button>
+        <Dialog disableBackdropClick disableEscapeKeyDown open={this.state.open} onClose={this.handleClose}>
+          <DialogTitle>Fill every field</DialogTitle>
+          <DialogContent>
+            <form className={classes.container}>
+              <FormControl className={classes.formControl} error={this.props.savedScripts.map(scriptObj => scriptObj.name).indexOf(this.state.name) !== -1}>
+                <TextField
+                  id="script-name"
+                  label="Name"
+                  error={this.props.savedScripts.map(scriptObj => scriptObj.name).indexOf(this.state.name) !== -1}
+                  className={classes.textField}
+                  onChange={(event) => this.handleChange('name', event)}
+                  margin="normal"
+                />
+              </FormControl>
+              <FormControl className={classes.formControl}>
+                <InputLabel htmlFor="script-environment">Environment</InputLabel>
+                <Select
+                  value={this.state.env}
+                  onChange={(event) => this.handleChange('env', event)}
+                  input={<Input id="script-environment" />}
+                >
+                  {this.state.environments.map((envObj, i) =>
+                    <MenuItem key={i} value={envObj.path}>{envObj.displayName}</MenuItem >
+                  )}
+                </Select>
+              </FormControl>
+              <FormControl className={classes.formControl}>
+                <Button onClick={this.addScriptDialog}>
+                  <TextField
+                    id="script-path"
+                    label="Script Path"
+                    className={classes.textField}
+                    margin="normal"
+                    InputProps={{
+                      readOnly: true,
+                    }}
+                  />               
+                </Button>
+              </FormControl>
+              <FormControl className={classes.formControl}>
+                <TextField
+                  id="script-args"
+                  label="Script Arguments"
+                  className={classes.textField}
+                  onChange={(event) => this.handleChange('args', event)}
+                  margin="normal"
+                />
+              </FormControl>
+            </form>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.handleClose} color="primary">
+              Cancel
+          </Button>
+            <Button onClick={this.addScript} disabled={!(this.state.name && this.state.env && this.state.scriptPath && this.props.savedScripts.map(scriptObj => scriptObj.name).indexOf(this.state.name) === -1)} color="primary">
+              Add
+          </Button>
+          </DialogActions>
+        </Dialog>
+        {/* {Object.values(this.state.displayData)} */}
       </div>);
   }
 }
 
-export default CustomOptions;
+export default withStyles(styles)(CustomOptions);
