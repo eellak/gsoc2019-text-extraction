@@ -32,7 +32,16 @@ class ScriptsTab extends Component {
         })();
 
         const customScriptTab = (
-            <CustomOptions platform={this.props.platform} ipc={this.props.ipc} savedScripts={this.props.savedScripts} settings={this.props.settings} electron={this.props.electron} isDev={this.props.isDev} type="custom" setScriptParameters={this.props.setScriptParameters} />
+            <CustomOptions
+                platform={this.props.platform}
+                selectedCustomScripts={this.props.selectedCustomScripts}
+                ipc={this.props.ipc} savedScripts={this.props.savedScripts}
+                settings={this.props.settings} electron={this.props.electron}
+                setDistantState={this.props.setDistantState}
+                isDev={this.props.isDev}
+                type="custom"
+                setScriptParameters={this.props.setScriptParameters}
+            />
 
         );
 

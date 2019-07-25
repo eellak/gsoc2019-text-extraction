@@ -3,7 +3,7 @@ import './CustomOptions.css';
 import clsx from 'clsx';
 import { withStyles } from '@material-ui/styles';
 import Typography from '@material-ui/core/Typography';
-import { TextField, Input, DialogActions, Button, Dialog, DialogTitle, DialogContent, FormControl, InputLabel, Select, MenuItem, InputBase } from '@material-ui/core';
+import { IconButton, Checkbox, ExpansionPanel, ExpansionPanelSummary, ExpansionPanelDetails, TextField, Input, DialogActions, Button, Dialog, DialogTitle, DialogContent, FormControl, InputLabel, Select, MenuItem, InputBase } from '@material-ui/core';
 
 const styles = theme => ({
   container: {
@@ -20,6 +20,11 @@ const styles = theme => ({
     marginRight: theme.spacing(1),
     width: 200,
   },
+  expansionPanel: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    'flex-direction': 'column'
+  }
 });
 
 class CustomOptions extends Component {
@@ -106,10 +111,10 @@ class CustomOptions extends Component {
       path: this.state.scriptPath,
       args: args,
     }
-this.props.ipc.sendSync('add-script', newScript);
-this.getScript();
+    this.props.ipc.sendSync('add-script', newScript);
+    this.getScript();
 
-this.handleClose();
+    this.handleClose();
   }
 
   removeScript = (e) => {
@@ -150,36 +155,92 @@ this.handleClose();
   }
 
   handleClose = () => {
-    this.setState({ 
+    this.setState({
       open: false,
       name: '',
       env: '',
       scriptPath: '',
       args: ''
     });
-  }
+  };
+
+  handleToggleAll = () => {
+    if (this.props.selectedCustomScripts.length === this.props.savedScripts.length) {
+      this.props.setDistantState({ selectedCustomScripts: [] });
+    } else {
+      this.props.setDistantState({ selectedCustomScripts: this.props.savedScripts.map(scriptObj => scriptObj.name) });
+    }
+  };
+
+  handleToggle = (event, value) => {
+    event.stopPropagation();
+    const currentIndex = this.props.selectedCustomScripts.indexOf(value);
+    const newChecked = [...this.props.selectedCustomScripts];
+
+    if (currentIndex === -1) {
+      newChecked.push(value);
+    } else {
+      newChecked.splice(currentIndex, 1);
+    }
+
+    this.props.setDistantState({ selectedCustomScripts: newChecked });
+  };
 
   render() {
     console.log(this.props.savedScripts)
+    console.log(this.props.selectedCustomScripts, this.props.savedScripts)
     const classes = this.props.classes;
     return (
       <div id="custom-scripts">
         <Typography variant="subtitle1" align="center">{"Select options (access selected filepaths in commandArgs using {filepaths})"}</Typography>
+        <div>
+          <Checkbox
+            onClick={this.handleToggleAll}
+            checked={this.props.selectedCustomScripts.length === this.props.savedScripts.length && this.props.selectedCustomScripts.length !== 0}
+            indeterminate={this.props.selectedCustomScripts.length !== this.props.savedScripts.length && this.props.selectedCustomScripts.length !== 0} />
+          <Typography display='inline'>Saved scripts</Typography>
+        </div>
         {(() => {
           if (this.props.savedScripts.length !== 0) {
-            return (
-              <div>
-                <Typography>Saved scripts</Typography>
-                {this.props.savedScripts.map(scriptObj => (
-                  <div key={scriptObj.name}>
-                    <Typography>{scriptObj.name}</Typography>
+            return this.props.savedScripts.map((scriptObj, index) => (
+              <div key={scriptObj.name}>
+                <ExpansionPanel>
+                  <ExpansionPanelSummary
+                    expandIcon={<i className="material-icons">expand_more</i>}
+                  >
+                    <div>
+                      <Checkbox onClick={(e) => this.handleToggle(e, scriptObj.name)} checked={this.props.selectedCustomScripts.indexOf(scriptObj.name) !== -1} />
+                      <IconButton
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          // Send sync message in order to avoid sync errors when fetching books
+                          this.props.ipc.sendSync('delete-script', {
+                            name: scriptObj.name
+                          })
+                          this.getScript();
+                          // if (this.props.isDev) {
+                          //   this.props.logMessage(`Delete ${fileObj.path}`, 'info');
+                          // }
+                          let selectedCustomScripts = Object.assign([], this.props.selectedCustomScripts);
+                          if (selectedCustomScripts.indexOf(scriptObj.name) !== -1) {
+                            selectedCustomScripts.splice(selectedCustomScripts.indexOf(scriptObj.name), 1);
+                          }
+                          this.props.setDistantState({ selectedCustomScripts: selectedCustomScripts });
+                        }}
+                        className={classes.button}>
+                        <i className="material-icons">delete</i>
+                      </IconButton>
+                      <Typography display='inline' className={classes.heading}>{scriptObj.name}</Typography>
+                    </div>
+                  </ExpansionPanelSummary>
+                  <ExpansionPanelDetails className={classes.expansionPanel}>
                     <Typography>Environment: {scriptObj.env}</Typography>
                     <Typography>Script: {scriptObj.path}</Typography>
                     <Typography>Arguments: {scriptObj.args}</Typography>
-                  </div>
-                ))}
+                  </ExpansionPanelDetails>
+                </ExpansionPanel>
               </div>
-            )
+            ))
           }
         })()
         }
@@ -220,7 +281,7 @@ this.handleClose();
                     InputProps={{
                       readOnly: true,
                     }}
-                  />               
+                  />
                 </Button>
               </FormControl>
               <FormControl className={classes.formControl}>

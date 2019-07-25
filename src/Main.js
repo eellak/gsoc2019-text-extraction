@@ -92,6 +92,7 @@ class Main extends Component {
       selectedFilesPaths: [],
       selectedResultRows: [],
       selectedIndices: {},
+      selectedCustomScripts: [],
       toExecute: {},
       resultList: [],
       additionalResults: [],
@@ -140,6 +141,8 @@ class Main extends Component {
     })()
     this.executeScript(`${this.state.settings.get("rPath", "")}\\Rscript`, scriptPath, [this.state.settings.get("rlibPath", "Rlibrary")]);
     this.state.ipc.send('get-indices');
+    this.state.ipc.send('get-book', { order: this.state.fileOrder});
+    this.state.ipc.send('get-script');
   }
 
   /* executeScript:
@@ -372,6 +375,7 @@ class Main extends Component {
                 isDev={this.props.isDev}
                 setDistantState={this.setDistantState}
                 selectedFilesPaths={this.state.selectedFilesPaths}
+                selectedCustomScripts={this.state.selectedCustomScripts}
                 indices={this.state.indices}
                 selectedIndices={this.state.selectedIndices}
                 settings={this.state.settings}
