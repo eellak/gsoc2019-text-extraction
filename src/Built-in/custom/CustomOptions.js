@@ -114,6 +114,7 @@ class CustomOptions extends Component {
     this.props.ipc.sendSync('add-script', newScript);
     this.getScript();
 
+    this.props.setDistantState({ selectedCustomScripts: [...this.props.selectedCustomScripts, this.state.name] });
     this.handleClose();
   }
 
@@ -187,7 +188,6 @@ class CustomOptions extends Component {
   };
 
   render() {
-    console.log(this.props.savedScripts)
     console.log(this.props.selectedCustomScripts, this.props.savedScripts)
     const classes = this.props.classes;
     return (
