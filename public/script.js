@@ -8,7 +8,7 @@ const scriptSchema = new Schema({
     },
     env: String,
     path: String,
-    args: String
+    args: Array
 });
 
 module.exports = scriptSchema;

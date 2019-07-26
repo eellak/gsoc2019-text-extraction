@@ -104,7 +104,7 @@ class CustomOptions extends Component {
   };
 
   addScript = (e) => {
-    const args = this.state.args === undefined ? '' : this.state.args;
+    const args = this.state.args === undefined ? [] : this.state.args.split(' ');
     const newScript = {
       name: this.state.name,
       env: this.state.env,

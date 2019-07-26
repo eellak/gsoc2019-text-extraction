@@ -204,6 +204,16 @@ class Main extends Component {
       });
     };
 
+    this.state.selectedCustomScripts.map(scriptName => {
+      // Maybe do a database call. Too silly
+      const script = this.state.savedScripts.filter(scriptObj => scriptObj.name === scriptName)[0];
+      promises.push(createAsync({
+        env: script.env,
+        scriptPath: script.path,
+        args: script.args
+      }))
+    })
+
     let addFreqAnalysis = true;
     Object.keys(this.state.toExecute).map((execKey) => {
       if (execKey === "misc") {
