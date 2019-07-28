@@ -18,6 +18,9 @@ const styles = theme => ({
         width: "100%",
         margin: "0 10px 0 10px"
     },
+    flexContainer: {
+        display: 'flex'
+    }
 
 });
 
@@ -139,7 +142,6 @@ class FilesTab extends Component {
     };
 
     sortByColumn = (field, columnId) => {
-        console.log(field)
         let newOrder = {};
         if (this.props.order.columnId === columnId) {
             if (this.props.isDev) {
@@ -170,29 +172,32 @@ class FilesTab extends Component {
             <div>
                 <Typography variant="subtitle1" align="center">Select one or more files to be processed</Typography>
                 <div id="add-files">
-                    <Button id="add-files-btn" onClick={this.addFilesDialog} variant="contained">Add files</Button>
                     {this.props.files.length === 0 ? <Typography id="selected-files">No files selected</Typography> :
                         <Table className={clsx(classes.table)}>
                             <TableHead>
                                 <TableRow>
-                                    <TableCell>
-                                        <Checkbox
-                                            checked={this.props.selectedFilesPaths.length === this.props.files.length}
-                                            indeterminate={this.props.selectedFilesPaths.length !== this.props.files.length && this.props.selectedFilesPaths.length !== 0}
-                                            onClick={this.handleToggleAll} />
-
-                                    </TableCell>
+                                    <StyledTableCell padding='checkbox'>
+                                        <div className={classes.flexContainer}>
+                                            <Checkbox
+                                                checked={this.props.selectedFilesPaths.length === this.props.files.length && this.props.selectedFilesPaths.length !== 0}
+                                                indeterminate={this.props.selectedFilesPaths.length !== this.props.files.length && this.props.selectedFilesPaths.length !== 0}
+                                                onClick={this.handleToggleAll} />
+                                            <IconButton onClick={this.addFilesDialog}>
+                                                <i className="material-icons">add_circle</i>
+                                            </IconButton>
+                                        </div>
+                                    </StyledTableCell>
                                     {Object.keys(this.props.files[0]).map(field => {
                                         const id = columnId++;
                                         return (
-                                            <TableCell key={field}>
+                                            <StyledTableCell key={field}>
                                                 <TableSortLabel
                                                     active={this.props.order.columnId === id}
                                                     direction={this.props.order.asc ? 'asc' : 'desc'}
                                                     onClick={() => this.sortByColumn(`${field}`, id)} >
                                                     {field}
                                                 </TableSortLabel>
-                                            </TableCell>
+                                            </StyledTableCell>
                                         )
                                     }
                                     )}
@@ -201,32 +206,34 @@ class FilesTab extends Component {
                             <TableBody>
                                 {this.props.files.map((fileObj, index) => (
                                     <TableRow key={index} onClick={() => this.handleToggle(fileObj.path)} >
-                                        <TableCell>
-                                            <Checkbox
-                                                checked={this.props.selectedFilesPaths.indexOf(fileObj.path) !== -1} />
-                                            <IconButton
-                                                onClick={(event) => {
-                                                    event.stopPropagation();
-                                                    // Send sync message in order to avoid sync errors when fetching books
-                                                    this.props.ipc.sendSync('delete-book', {
-                                                        path: fileObj.path
-                                                    })
-                                                    this.getBook();
-                                                    if (this.props.isDev) {
-                                                        this.props.logMessage(`Delete ${fileObj.path}`, 'info');
-                                                    }
-                                                    let selectedFilesPaths = Object.assign([], this.props.selectedFilesPaths);
-                                                    if (selectedFilesPaths.indexOf(fileObj.path) !== -1) {
-                                                        selectedFilesPaths.splice(selectedFilesPaths.indexOf(fileObj.path), 1);
-                                                    }
-                                                    this.props.setDistantState({ selectedFilesPaths: selectedFilesPaths });
-                                                }}
-                                                className={classes.button}>
-                                                <i className="material-icons">delete</i>
-                                            </IconButton>
-                                        </TableCell>
+                                        <StyledTableCell padding='checkbox'>
+                                            <div className={classes.flexContainer}>
+                                                <Checkbox
+                                                    checked={this.props.selectedFilesPaths.indexOf(fileObj.path) !== -1} />
+                                                <IconButton
+                                                    onClick={(event) => {
+                                                        event.stopPropagation();
+                                                        // Send sync message in order to avoid sync errors when fetching books
+                                                        this.props.ipc.sendSync('delete-book', {
+                                                            path: fileObj.path
+                                                        })
+                                                        this.getBook();
+                                                        if (this.props.isDev) {
+                                                            this.props.logMessage(`Delete ${fileObj.path}`, 'info');
+                                                        }
+                                                        let selectedFilesPaths = Object.assign([], this.props.selectedFilesPaths);
+                                                        if (selectedFilesPaths.indexOf(fileObj.path) !== -1) {
+                                                            selectedFilesPaths.splice(selectedFilesPaths.indexOf(fileObj.path), 1);
+                                                        }
+                                                        this.props.setDistantState({ selectedFilesPaths: selectedFilesPaths });
+                                                    }}
+                                                    className={classes.button}>
+                                                    <i className="material-icons">delete</i>
+                                                </IconButton>
+                                            </div>
+                                        </StyledTableCell>
                                         {Object.values(fileObj).map((value, id) => (
-                                            <TableCell key={id}>{value}</TableCell>
+                                            <StyledTableCell key={id}>{value}</StyledTableCell>
                                         ))}
                                     </TableRow>
                                 ))}
@@ -238,4 +245,18 @@ class FilesTab extends Component {
         );
     };
 }
+
+
+const StyledTableCell = withStyles(theme => {
+    console.log(theme.palette)
+    return ({
+    head: {
+      "background-color": theme.palette.grey[50],
+      color: theme.palette.common.white,
+    },
+    body: {
+      fontSize: 14,
+    },
+  })})(TableCell);
+
 export default withStyles(styles)(FilesTab);
