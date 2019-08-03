@@ -3,9 +3,17 @@ import './CustomOptions.css';
 import clsx from 'clsx';
 import { withStyles } from '@material-ui/styles';
 import Typography from '@material-ui/core/Typography';
-import { IconButton, Checkbox, ExpansionPanel, ExpansionPanelSummary, ExpansionPanelDetails, TextField, Input, DialogActions, Button, Dialog, DialogTitle, DialogContent, FormControl, InputLabel, Select, MenuItem, InputBase } from '@material-ui/core';
+import { Paper, Container, IconButton, Checkbox, ExpansionPanel, ExpansionPanelSummary, ExpansionPanelDetails, TextField, Input, DialogActions, Button, Dialog, DialogTitle, DialogContent, FormControl, InputLabel, Select, MenuItem, InputBase } from '@material-ui/core';
+import { textAlign } from '@material-ui/system';
 
 const styles = theme => ({
+  paper: {
+    width: '100%',
+    position: 'relative',
+    overflow: 'auto',
+    maxHeight: '550px',
+    height: '50%'
+  },
   container: {
     display: 'flex',
     flexWrap: 'wrap',
@@ -16,14 +24,25 @@ const styles = theme => ({
     minWidth: 120,
   },
   textField: {
-    marginLeft: theme.spacing(1),
+    marginLeft: 0,
     marginRight: theme.spacing(1),
-    width: 200,
+    width: '200px',
+    'text-transform': 'none'
+  },
+  customWidth: {
+    width: '200px'
+  },
+  customButton: {
+    paddingLeft: 0,
+    justifyContent: 'left'
   },
   expansionPanel: {
     display: 'flex',
     flexWrap: 'wrap',
     'flex-direction': 'column'
+  },
+  root: {
+    padding: '0 24px 0 24px'
   }
 });
 
@@ -191,60 +210,67 @@ class CustomOptions extends Component {
     console.log(this.props.selectedCustomScripts, this.props.savedScripts)
     const classes = this.props.classes;
     return (
-      <div id="custom-scripts">
-        <Typography variant="subtitle1" align="center">{"Select options (access selected filepaths in commandArgs using {filepaths})"}</Typography>
-        <div>
+      <Container maxWidth='sm'>
+        {/* <Typography variant="subtitle1" align="center">{"Create and select custom scripts (access selected filepaths in commandArgs using {filepaths})"}</Typography> */}
+        <div className={classes.root}>
           <Checkbox
             onClick={this.handleToggleAll}
             checked={this.props.selectedCustomScripts.length === this.props.savedScripts.length && this.props.selectedCustomScripts.length !== 0}
             indeterminate={this.props.selectedCustomScripts.length !== this.props.savedScripts.length && this.props.selectedCustomScripts.length !== 0} />
+          <IconButton
+            onClick={this.handleClickOpen}
+            className={classes.button}>
+            <i className="material-icons">add_circle</i>
+          </IconButton>
           <Typography display='inline'>Saved scripts</Typography>
         </div>
         {(() => {
           if (this.props.savedScripts.length !== 0) {
-            return this.props.savedScripts.map((scriptObj, index) => (
-              <div key={scriptObj.name}>
-                <ExpansionPanel>
-                  <ExpansionPanelSummary
-                    expandIcon={<i className="material-icons">expand_more</i>}
-                  >
-                    <div>
-                      <Checkbox onClick={(e) => this.handleToggle(e, scriptObj.name)} checked={this.props.selectedCustomScripts.indexOf(scriptObj.name) !== -1} />
-                      <IconButton
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          // Send sync message in order to avoid sync errors when fetching books
-                          this.props.ipc.sendSync('delete-script', {
-                            name: scriptObj.name
-                          })
-                          this.getScript();
-                          // if (this.props.isDev) {
-                          //   this.props.logMessage(`Delete ${fileObj.path}`, 'info');
-                          // }
-                          let selectedCustomScripts = Object.assign([], this.props.selectedCustomScripts);
-                          if (selectedCustomScripts.indexOf(scriptObj.name) !== -1) {
-                            selectedCustomScripts.splice(selectedCustomScripts.indexOf(scriptObj.name), 1);
-                          }
-                          this.props.setDistantState({ selectedCustomScripts: selectedCustomScripts });
-                        }}
-                        className={classes.button}>
-                        <i className="material-icons">delete</i>
-                      </IconButton>
-                      <Typography display='inline' className={classes.heading}>{scriptObj.name}</Typography>
-                    </div>
-                  </ExpansionPanelSummary>
-                  <ExpansionPanelDetails className={classes.expansionPanel}>
-                    <Typography>Environment: {scriptObj.env}</Typography>
-                    <Typography>Script: {scriptObj.path}</Typography>
-                    <Typography>Arguments: {scriptObj.args}</Typography>
-                  </ExpansionPanelDetails>
-                </ExpansionPanel>
-              </div>
-            ))
+            return (
+              <Paper classes={{ root: classes.paper }}>
+                {this.props.savedScripts.map((scriptObj, index) => (
+                    <ExpansionPanel key={scriptObj.name}>
+                      <ExpansionPanelSummary
+                        expandIcon={<i className="material-icons">expand_more</i>}
+                      >
+                        <div>
+                          <Checkbox onClick={(e) => this.handleToggle(e, scriptObj.name)} checked={this.props.selectedCustomScripts.indexOf(scriptObj.name) !== -1} />
+                          <IconButton
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              // Send sync message in order to avoid sync errors when fetching books
+                              this.props.ipc.sendSync('delete-script', {
+                                name: scriptObj.name
+                              })
+                              this.getScript();
+                              // if (this.props.isDev) {
+                              //   this.props.logMessage(`Delete ${fileObj.path}`, 'info');
+                              // }
+                              let selectedCustomScripts = Object.assign([], this.props.selectedCustomScripts);
+                              if (selectedCustomScripts.indexOf(scriptObj.name) !== -1) {
+                                selectedCustomScripts.splice(selectedCustomScripts.indexOf(scriptObj.name), 1);
+                              }
+                              this.props.setDistantState({ selectedCustomScripts: selectedCustomScripts });
+                            }}
+                            className={classes.button}>
+                            <i className="material-icons">delete</i>
+                          </IconButton>
+                          <Typography display='inline' className={classes.heading}>{scriptObj.name}</Typography>
+                        </div>
+                      </ExpansionPanelSummary>
+                      <ExpansionPanelDetails className={classes.expansionPanel}>
+                        <Typography>Environment: {scriptObj.env}</Typography>
+                        <Typography>Script: {scriptObj.path}</Typography>
+                        <Typography>Arguments: {scriptObj.args}</Typography>
+                      </ExpansionPanelDetails>
+                    </ExpansionPanel>
+                ))}
+              </Paper>
+            )
           }
         })()
         }
-        <Button onClick={this.handleClickOpen}>New script</Button>
+
         <Dialog disableBackdropClick disableEscapeKeyDown open={this.state.open} onClose={this.handleClose}>
           <DialogTitle>Fill every field</DialogTitle>
           <DialogContent>
@@ -256,12 +282,12 @@ class CustomOptions extends Component {
                   error={this.props.savedScripts.map(scriptObj => scriptObj.name).indexOf(this.state.name) !== -1}
                   className={classes.textField}
                   onChange={(event) => this.handleChange('name', event)}
-                  margin="normal"
                 />
               </FormControl>
-              <FormControl className={classes.formControl}>
+              <FormControl className={clsx(classes.formControl)}>
                 <InputLabel htmlFor="script-environment">Environment</InputLabel>
                 <Select
+                  className={classes.customWidth}
                   value={this.state.env}
                   onChange={(event) => this.handleChange('env', event)}
                   input={<Input id="script-environment" />}
@@ -272,12 +298,11 @@ class CustomOptions extends Component {
                 </Select>
               </FormControl>
               <FormControl className={classes.formControl}>
-                <Button onClick={this.addScriptDialog}>
+                <Button className={classes.customButton} onClick={this.addScriptDialog}>
                   <TextField
                     id="script-path"
                     label="Script Path"
                     className={classes.textField}
-                    margin="normal"
                     InputProps={{
                       readOnly: true,
                     }}
@@ -290,7 +315,6 @@ class CustomOptions extends Component {
                   label="Script Arguments"
                   className={classes.textField}
                   onChange={(event) => this.handleChange('args', event)}
-                  margin="normal"
                 />
               </FormControl>
             </form>
@@ -304,8 +328,7 @@ class CustomOptions extends Component {
           </Button>
           </DialogActions>
         </Dialog>
-        {/* {Object.values(this.state.displayData)} */}
-      </div>);
+      </Container>);
   }
 }
 

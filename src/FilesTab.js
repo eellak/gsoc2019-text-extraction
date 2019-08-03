@@ -11,13 +11,13 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
 import Checkbox from '@material-ui/core/Checkbox';
+import Paper from '@material-ui/core/Paper';
 
 const styles = theme => ({
-
-    table: {
-        width: "100%",
-        margin: "0 10px 0 10px"
-    },
+    root: {
+        width: '100%',
+        marginTop: theme.spacing(3),
+      },
     flexContainer: {
         display: 'flex'
     }
@@ -170,27 +170,30 @@ class FilesTab extends Component {
         const classes = this.props.classes;
         return (
             <div>
-                <Typography variant="subtitle1" align="center">Select one or more files to be processed</Typography>
+                <Typography variant="h5" align="center">Select one or more files to be processed</Typography>
                 <div id="add-files">
-                    {this.props.files.length === 0 ? <Typography id="selected-files">No files selected</Typography> :
-                        <Table className={clsx(classes.table)}>
+                    {<Paper className={classes.root}>
+                    <Table padding='checkbox'>
                             <TableHead>
                                 <TableRow>
-                                    <StyledTableCell padding='checkbox'>
+                                    <StyledTableCell>
                                         <div className={classes.flexContainer}>
                                             <Checkbox
                                                 checked={this.props.selectedFilesPaths.length === this.props.files.length && this.props.selectedFilesPaths.length !== 0}
                                                 indeterminate={this.props.selectedFilesPaths.length !== this.props.files.length && this.props.selectedFilesPaths.length !== 0}
                                                 onClick={this.handleToggleAll} />
-                                            <IconButton onClick={this.addFilesDialog}>
+                                            <IconButton 
+                                            onClick={this.addFilesDialog}>
                                                 <i className="material-icons">add_circle</i>
                                             </IconButton>
                                         </div>
                                     </StyledTableCell>
-                                    {Object.keys(this.props.files[0]).map(field => {
-                                        const id = columnId++;
+                                    {(() => {try {
                                         return (
-                                            <StyledTableCell key={field}>
+                                            Object.keys(this.props.files[0]).map(field => {
+                                                const id = columnId++;
+                                                return (
+                                                    <StyledTableCell key={field}>
                                                 <TableSortLabel
                                                     active={this.props.order.columnId === id}
                                                     direction={this.props.order.asc ? 'asc' : 'desc'}
@@ -199,8 +202,11 @@ class FilesTab extends Component {
                                                 </TableSortLabel>
                                             </StyledTableCell>
                                         )
-                                    }
-                                    )}
+                                    })
+                                    )
+                                }
+                                catch (e) {}
+                            })()}
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -234,25 +240,26 @@ class FilesTab extends Component {
                                         </StyledTableCell>
                                         {Object.values(fileObj).map((value, id) => (
                                             <StyledTableCell key={id}>{value}</StyledTableCell>
-                                        ))}
+                                            ))}
                                     </TableRow>
                                 ))}
                             </TableBody>
                         </Table>
+                    </Paper>
                     }
                 </div>
             </div >
-        );
-    };
+            );
+        };
 }
 
 
 const StyledTableCell = withStyles(theme => {
-    console.log(theme.palette)
+    console.log(theme)
     return ({
-    head: {
-      "background-color": theme.palette.grey[50],
-      color: theme.palette.common.white,
+        head: {
+            // "background-color": theme.palette.secondary.main,
+    //   color: theme.palette.text.primary,
     },
     body: {
       fontSize: 14,

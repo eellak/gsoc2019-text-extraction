@@ -1,11 +1,31 @@
 import React, { Component } from 'react';
 import clsx from 'clsx';
-import GridList from '@material-ui/core/GridList';
+import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import Checkbox from '@material-ui/core/Checkbox';
 import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
+import Paper from '@material-ui/core/Paper';
+import Divider from '@material-ui/core/Divider';
+import ListSubheader from '@material-ui/core/ListSubheader';
+import Container from '@material-ui/core/Container';
+import { withStyles } from '@material-ui/styles';
+
+
+const styles = theme => ({
+  root: {
+    width: '100%',
+    position: 'relative',
+    overflow: 'auto',
+    maxHeight: '550px',
+    height: '50%'
+  },
+  ul: {
+    backgroundColor: theme.palette.common.white,
+    padding: 0,
+  },
+});
+
 
 class ScriptOptions extends Component {
 
@@ -73,29 +93,37 @@ class ScriptOptions extends Component {
   };
 
   render() {
+    const classes = this.props.classes;
     return (
-      <div>
+    <Container maxWidth='sm'>
         <Typography variant="subtitle1" align="center">Select one or more indices to extract</Typography>
-        <GridList cols={5} cellHeight="auto">
-          <ListItem button onClick={this.handleToggleAll}>
-            <Checkbox
-              checked={this.state.selectedIndices.length === this.state.indices.length}
-              indeterminate={this.state.selectedIndices.length !== this.state.indices.length && this.state.selectedIndices.length !== 0}
-            />
-            <ListItemText primary="All" />
-          </ListItem>
-          {this.state.indices.map((indexObj, i) => (
-            <ListItem key={i} button onClick={() => this.handleToggle(indexObj.indexName)}>
-              <Checkbox
-                checked={this.state.selectedIndices.indexOf(indexObj.indexName) !== -1}
-              />
-              <ListItemText primary={indexObj.displayName} />
-            </ListItem>)
-          )}
-        </GridList>
+          <Paper classes={{ root: classes.root }}>
+            <List dense>
+              <ul className={classes.ul}>
+                <ListSubheader disableGutters={true}>
+                  <ListItem button onClick={this.handleToggleAll}>
+                    <Checkbox
+                      checked={this.state.selectedIndices.length === this.state.indices.length}
+                      indeterminate={this.state.selectedIndices.length !== this.state.indices.length && this.state.selectedIndices.length !== 0}
+                    />
+                    <ListItemText primary="All" />
+                  </ListItem>
+                </ListSubheader>
+            {this.state.indices.map((indexObj, i) => (
+              <ListItem key={i} button onClick={() => this.handleToggle(indexObj.indexName)}>
+                <Checkbox
+                  checked={this.state.selectedIndices.indexOf(indexObj.indexName) !== -1}
+                  />
+                <ListItemText primary={indexObj.displayName} />
+              </ListItem>)
+            )}
+            </ul>
+          </List>
+        </Paper>
         {/* <Button size="small" variant="contained" onClick={this.changeArgs}>add</Button> */}
-      </div>);
+        </Container>
+    );
   }
 }
 
-export default ScriptOptions;
+export default withStyles(styles)(ScriptOptions);

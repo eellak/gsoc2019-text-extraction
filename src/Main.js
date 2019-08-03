@@ -16,7 +16,7 @@ import ListItemText from "@material-ui/core/ListItemText";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 
 // Basic styles for this component
-const drawerWidth = 240;
+const drawerWidth = 180;
 
 const styles = theme => ({
   appBar: {
@@ -44,9 +44,6 @@ const styles = theme => ({
     }),
     overflowX: 'hidden',
     width: theme.spacing(7) + 1,
-    [theme.breakpoints.up('sm')]: {
-      width: theme.spacing(9) + 1,
-    },
   },
   tabs: {
     width: '100%',
@@ -57,6 +54,12 @@ const styles = theme => ({
     flexGrow: 1,
     margin: theme.spacing(3),
     position: "relative"
+  },
+  contentWidthDrawerClosed: {
+    width: `calc(100vw - ${theme.spacing(6)}px - ${theme.spacing(7)}px - 1px)`
+  },
+  contentWidthDrawerOpen: {
+    width: `calc(100vw - ${theme.spacing(6)}px - ${drawerWidth}px)`
   },
   main: {
     display: "flex",
@@ -173,6 +176,7 @@ class Main extends Component {
 
     // Send message to main process to add new book to database
     process.stdout.on('data', (data) => {
+      console.log(`${data}`)
       this.state.ipc.send('add-results');
     });
 
@@ -301,6 +305,7 @@ class Main extends Component {
   render() {
     const classes = this.props.classes;
     const theme = this.props.theme;
+
     return (
       <div>
         <AppBar
@@ -330,12 +335,15 @@ class Main extends Component {
           >
             <div className={classes.toolbar} />
             <IconButton
+              color='primary'
               onClick={this.handleDrawerToggle}
               className={clsx({ [classes.hide]: !this.state.openDrawer })}
             >
               <i className="material-icons">chevron_left</i>
             </IconButton>
-            <IconButton onClick={this.handleDrawerToggle}
+            <IconButton 
+            color='primary'
+            onClick={this.handleDrawerToggle}
               className={clsx({ [classes.hide]: this.state.openDrawer })}
             >
               <i className="material-icons">chevron_right</i>
@@ -352,17 +360,19 @@ class Main extends Component {
                   key={text}
                   selected={this.state.tabIndex === index}
                   onClick={() => this.changeTab(index)}
-                >
+                  >
                   <ListItemIcon>
                     {iconstList[index]}
                   </ListItemIcon>
-                  <ListItemText primary={text} />
+                  <ListItemText
+                  primary={text}
+                  />
                 </ListItem>
                 )
               })}
             </List>
           </Drawer>
-          <div className={clsx(classes.content)}>
+            <div className={clsx(classes.content, {[classes.contentWidthDrawerClosed] : !this.state.openDrawer, [classes.contentWidthDrawerOpen] : this.state.openDrawer })}>
             <div className={classes.toolbar} />
             <div className={clsx(classes.tabs)}>
               {this.state.tabIndex === 0 && <FilesTab

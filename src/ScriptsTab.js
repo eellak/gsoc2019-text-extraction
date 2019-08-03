@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
-import ReadabilityOptions from './Built-in/readability/ReadabilityOptions'
-import LexdivOptions from './Built-in/lexdiv/LexdivOptions'
-import MiscOptions from './Built-in/misc/MiscOptions'
-import ScriptOptions from './Built-in/ScriptOptions'
-import CustomOptions from './Built-in/custom/CustomOptions'
+import { withStyles } from '@material-ui/styles';
+import ScriptOptions from './Built-in/ScriptOptions';
+import CustomOptions from './Built-in/custom/CustomOptions';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 
+const styles = theme => ({})
 /* ScriptsTab is a component, which renders a script selection tab.
 */
 class ScriptsTab extends Component {
@@ -23,14 +22,7 @@ class ScriptsTab extends Component {
     };
 
     render() {
-        const dummyTab = (() => {
-            if (this.props.selectedFilesPaths.length !== 0) {
-                // console.log(this.props.fs.statSync(this.props.selectedFilesPaths[0], {encoding: "utf8"}));
-                // <Typography variant="subtitle1">Dummy method which pastes the contents of the first selected file. {data}</Typography>));
-            }
-            else return <Typography variant="subtitle1">No file selected.</Typography>;
-        })();
-
+        
         const customScriptTab = (
             <CustomOptions
                 platform={this.props.platform}
@@ -60,13 +52,13 @@ class ScriptsTab extends Component {
                 setScriptParameters={this.props.setScriptParameters}
                 platform={this.props.platform} />
         });
+        const classes = this.props.classes;
         return (
-            <div className={this.props.className}>
-                <Typography variant="subtitle1" align="center">Select processing script</Typography>
-                <Tabs value={this.state.tabIndex} onChange={(event, tabIndex) => this.changeTab(tabIndex)}>
+            <div>
+                {/* <Typography variant="subtitle1" align="center">Select processing script</Typography> */}
+                <Tabs value={this.state.tabIndex} textColor="secondary" onChange={(event, tabIndex) => this.changeTab(tabIndex)}>
                     {this.props.indices.map((obj, index) => <Tab key={index} label={obj.indexTypeDisplayName} />)}
                     <Tab label="CustomScript" />
-                    <Tab label="DummyScript" />
                 </Tabs>
                 {tabs.map((component, index) => {
                     if (index === this.state.tabIndex) {
@@ -74,9 +66,8 @@ class ScriptsTab extends Component {
                     }
                 })}
                 {this.state.tabIndex === this.props.indices.length && customScriptTab}
-                {this.state.tabIndex === this.props.indices.length + 1 && dummyTab}
             </div>
         );
     }
 };
-export default ScriptsTab;
+export default withStyles(styles)(ScriptsTab);
