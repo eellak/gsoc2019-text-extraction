@@ -13,7 +13,7 @@ const styles = theme => ({
         right: '0',
         width: '100%',
         height: '20%',
-        overflow: 'scroll',
+        'overflow-y': 'scroll',
     },
 
 });
