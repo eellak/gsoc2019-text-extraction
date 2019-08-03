@@ -77,6 +77,13 @@ createMainWindow = (paramObj) => {
           }
         },
         {
+          label: "Toggle Dev Tools",
+          click() {
+            mainWindow.webContents.toggleDevTools();
+          },
+          accelerator: "CmdOrCtrl+Shift+I"
+        },
+        {
           label: "Exit",
           role: "quit",
           accelerator: "CmdOrCtrl+Q"
@@ -104,7 +111,7 @@ createMainWindow = (paramObj) => {
   mainWindow.loadURL(isDev ? 'http://localhost:3000/main' : `file://${path.join(__dirname, '../build/index.html')}`);
   if (isDev) {
     // Open the DevTools.
-    mainWindow.webContents.openDevTools();
+    mainWindow.webContents.toggleDevTools();
   }
 
   // Store the window dimensions on resize to use them on the next execution of the tool
