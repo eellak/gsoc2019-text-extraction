@@ -63,6 +63,9 @@ class ResultsTab extends Component {
                 }, {
                     type: 'json',
                     displayName: 'JSON'
+                }, {
+                    type: 'txt',
+                    displayName: 'Text'
                 }],
             selectedExportType: {
                 type: 'csv',
@@ -164,14 +167,32 @@ class ResultsTab extends Component {
         exportArray = exportArray.concat(this.props.selectedResultRows.sort().map(index => this.resultTable[index + 1]))
         const path = require('path');
         const dialog = this.props.electron.remote.dialog;
+        let filter;
+        switch (type) {
+            case 'csv':
+                filter = {
+                    name: 'Comma-separated values',
+                    extensions: ['csv']
+                };
+                break;
+            case 'txt':
+                filter = {
+                    name: 'Text file',
+                    extensions: ['txt']
+                };
+                break;
+            case 'json':
+                filter = {
+                    name: 'JSON file',
+                    extensions: ['json']
+                };
+                break;
+        }
         dialog.showSaveDialog(this.props.electron.remote.getCurrentWindow(),
             {
                 title: 'Select file to save',
                 defaultPath: `${path.join(__dirname, '../data')}`,
-                filters: [{
-                    name: 'Comma-separated values',
-                    extensions: ['csv']
-                }]
+                filters: [filter]
             },
             (filePath) => {
                 if (filePath !== undefined) {
@@ -179,6 +200,9 @@ class ResultsTab extends Component {
                     switch (type) {
                         case 'csv':
                             exportString = (exportArray.map(exportList => exportList.join(','))).join('\n');
+                            break;
+                        case 'txt':
+                            exportString = (exportArray.map(exportList => exportList.join(' '))).join('\n');
                             break;
                         case 'json':
                             let exportTitles = exportArray[0];
