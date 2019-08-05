@@ -12,11 +12,13 @@ import TableRow from '@material-ui/core/TableRow';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import Paper from '@material-ui/core/Paper';
+import Container from '@material-ui/core/Container';
 
 const styles = theme => ({
     root: {
         width: '100%',
         marginTop: theme.spacing(3),
+        overflow: 'auto'
       },
     flexContainer: {
         display: 'flex'
@@ -169,7 +171,7 @@ class FilesTab extends Component {
         let columnId = 0;
         const classes = this.props.classes;
         return (
-            <div>
+            <Container maxWidth='md'>
                 <Typography variant="h5" align="center">Select one or more files to be processed</Typography>
                 <div id="add-files">
                     {<Paper className={classes.root}>
@@ -248,7 +250,7 @@ class FilesTab extends Component {
                     </Paper>
                     }
                 </div>
-            </div >
+            </Container >
             );
         };
 }

@@ -431,7 +431,7 @@ class ResultsTab extends Component {
         return (
             <div>
                 <Button variant="contained" disabled={this.props.processing} className={clsx({ [classes.disabled]: this.props.processing })} onClick={this.props.executeAll}>Execute</Button>
-                <Tabs textColor="secondary" value={this.state.tabIndex} onChange={(event, tabIndex) => this.changeTab(tabIndex)}>
+                <Tabs textColor="secondary" value={this.state.tabIndex} variant="scrollable" scrollButtons="auto" onChange={(event, tabIndex) => this.changeTab(tabIndex)}>
                     <Tab label="Results" />
                     {this.props.additionalResults.map((resultObj, index) => (
                         <Tab key={index} label={
