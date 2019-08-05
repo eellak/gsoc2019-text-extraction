@@ -138,7 +138,7 @@ createMainWindow = (paramObj) => {
 /* Create a channel between main and rendered process
 * for book insertion
 */
-ipcMain.on('add-results', e => {
+ipcMain.on('add-results', event => {
   // Read data from certain json file
   fs.readFile('results.json', 'utf8', (err, jsonString) => {
     if (err) {
@@ -154,27 +154,59 @@ ipcMain.on('add-results', e => {
     // const fileNames = data.fileNames;
     // delete data.fileNames;
     // Update or insert database with new data
-    for (var i = 0; i < booksNum; i++) {
+    const operations = filePaths.map((filePath, index) => {
       let indices = {};
       // Replace '.' with '_' in index names in order to avoid problem with
       // MongoDB indices retrieval
       Object.keys(data).forEach(key => {
         // Check for indices that store objects (readability, lexdiv, misc etc)
-        if (data[key][i].length === undefined) {
+        if (data[key][index].length === undefined) {
           let indicesObject = {};
-          Object.keys(data[key][i]).forEach(indexName => {
-            indicesObject[indexName.replace(/[.]/g, '_')] = data[key][i][indexName];
+          Object.keys(data[key][index]).forEach(indexName => {
+            indicesObject[indexName.replace(/[.]/g, '_')] = data[key][index][indexName];
           })
-          data[key][i] = indicesObject;
+          data[key][index] = indicesObject;
         }
-        indices[`indices.${key}`] = data[key][i];
+        indices[`indices.${key}`] = data[key][index];
       });
-      Corpus.findOneAndUpdate({ path: filePaths[i] }, {
-        path: filePaths[i],
-        $set: indices
-      }, { upsert: true }, () => {
-      })
-    }
+
+      return {
+        updateOne:
+        {
+          filter: { path: filePath },
+          upsert: true,
+          update: {
+            $set: indices
+          }
+        }
+      }
+    });
+    Corpus.bulkWrite(operations, (error, res) => event.returnValue = res);
+
+
+    //   for (var i = 0; i < booksNum; i++) {
+    //     let indices = {};
+    //     // Replace '.' with '_' in index names in order to avoid problem with
+    //     // MongoDB indices retrieval
+    //     Object.keys(data).forEach(key => {
+    //       // Check for indices that store objects (readability, lexdiv, misc etc)
+    //       if (data[key][i].length === undefined) {
+    //         let indicesObject = {};
+    //         Object.keys(data[key][i]).forEach(indexName => {
+    //           indicesObject[indexName.replace(/[.]/g, '_')] = data[key][i][indexName];
+    //         })
+    //         data[key][i] = indicesObject;
+    //       }
+    //       indices[`indices.${key}`] = data[key][i];
+    //     });
+    //     Corpus.findOneAndUpdate({ path: filePaths[i] }, {
+    //       path: filePaths[i],
+    //       $set: indices
+    //     }, { upsert: true }, () => {
+    //     })
+    //   }
+    // });
+    // event.returnValue = 1;
   });
 });
 
@@ -267,15 +299,15 @@ ipcMain.on('get-book', (event, parameters) => {
 */
 ipcMain.on('add-script', (event, parameters) => {
   Script.updateOne({ name: parameters.name }, {
-  name: parameters.name,
-  env: parameters.env,
-  path: parameters.path,
-  args: parameters.args
+    name: parameters.name,
+    env: parameters.env,
+    path: parameters.path,
+    args: parameters.args
   },
-  {
-    upsert: true
-  },
-  (error, res) => event.returnValue = res);
+    {
+      upsert: true
+    },
+    (error, res) => event.returnValue = res);
 });
 
 /* Create a channel between main and rendered process
