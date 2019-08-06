@@ -17,13 +17,17 @@ const styles = theme => ({
     width: '100%',
     position: 'relative',
     overflow: 'auto',
-    maxHeight: '550px',
-    height: '50%'
+    maxHeight: '100%'
   },
   ul: {
     backgroundColor: theme.palette.common.white,
     padding: 0,
   },
+  container: {
+    height: 'calc(100% - 48px)',
+    paddingBottom: `${theme.spacing(1)}px`,
+    paddingTop: `${theme.spacing(1)}px`,
+  }
 });
 
 
@@ -95,8 +99,8 @@ class ScriptOptions extends Component {
   render() {
     const classes = this.props.classes;
     return (
-    <Container maxWidth='sm'>
-        <Typography variant="subtitle1" align="center">Select one or more indices to extract</Typography>
+    <Container maxWidth='sm' classes={{root: classes.container}}>
+        {/* <Typography variant="subtitle1" align="center">Select one or more indices to extract</Typography> */}
           <Paper classes={{ root: classes.root }}>
             <List dense>
               <ul className={classes.ul}>

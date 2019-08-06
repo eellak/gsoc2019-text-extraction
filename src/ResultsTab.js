@@ -14,7 +14,7 @@ import ButtonGroup from '@material-ui/core/ButtonGroup';
 import Button from '@material-ui/core/Button';
 import MenuList from '@material-ui/core/MenuList';
 import MenuItem from '@material-ui/core/MenuItem';
-import { Checkbox, Typography, Tabs, Tab, ListItem, ListItemText, IconButton } from '@material-ui/core';
+import { Container, Checkbox, Typography, Tabs, Tab, ListItem, ListItemText, IconButton } from '@material-ui/core';
 import { List, AutoSizer } from 'react-virtualized'
 
 const styles = theme => ({
@@ -22,7 +22,8 @@ const styles = theme => ({
         'border-bottom': '1px solid rgba(224, 224, 224, 1)'
     },
     paper: {
-        overflowX: 'auto'
+        overflowX: 'auto',
+        height: `calc(100% - 36px - ${theme.spacing(1)}px)`
     },
     table: {
         width: "100%",
@@ -42,12 +43,25 @@ const styles = theme => ({
         width: 'fit-content'
     },
     listBox: {
-        height: '200px'
+        height: 'calc(100% - 36px)'
     },
-    export: {
-        marginTop: '24px'
+    container: {
+        paddingBottom: `${theme.spacing(1)}px`,
+        paddingTop: `${theme.spacing(1)}px`,
+        height: 'calc(100% - 48px)'
+    },
+    outerContainer: {
+        height: '100%'
+    },
+    buttonContainer: {
+        marginTop: `${theme.spacing(1)}px`,
+        display: 'flex',
+        justifyContent: 'space-around'
+    },
+    flexContainer: {
+        display: 'flex',
+        alignItems: 'center'
     }
-
 });
 
 class ResultsTab extends Component {
@@ -239,7 +253,7 @@ class ResultsTab extends Component {
 
     rowRenderer = ({ key, index, isScrolling, isVisible, style }, wordList) => {
         return (
-            <ListItem key={index} classes={{root: this.props.classes.listRow}}style={style} dense>
+            <ListItem key={index} classes={{ root: this.props.classes.listRow }} style={style} dense>
                 <ListItemText primary={index + ' ' + wordList[index]} />
             </ListItem>
         )
@@ -304,7 +318,7 @@ class ResultsTab extends Component {
 
         const resultsTab = (
             <Paper className={classes.paper}>
-                <Table className={clsx(classes.table)} padding='checkbox'>
+                <Table className={clsx(classes.table)}>
                     {(() => {
                         try {
                             let columnId = 0;
@@ -388,7 +402,7 @@ class ResultsTab extends Component {
                                         {Object.values(elem).map((value, id) => {
                                             if (typeof (value) === typeof ({})) {
                                                 return Object.values(value).map((val, idx) => {
-                                                    if(val === null) {
+                                                    if (val === null) {
                                                         val = 'null'
                                                     }
                                                     const id = columnId++;
@@ -432,13 +446,12 @@ class ResultsTab extends Component {
             </Paper>
         );
         return (
-            <div>
-                <Button variant="contained" disabled={this.props.processing} className={clsx({ [classes.disabled]: this.props.processing })} onClick={this.props.executeAll}>Execute</Button>
+            <div className={classes.outerContainer}>
                 <Tabs textColor="secondary" value={this.state.tabIndex} variant="scrollable" scrollButtons="auto" onChange={(event, tabIndex) => this.changeTab(tabIndex)}>
                     <Tab label="Results" />
                     {this.props.additionalResults.map((resultObj, index) => (
                         <Tab key={index} label={
-                            <div>
+                            <div className={classes.flexContainer}>
                                 {`${resultObj.name} ${resultObj.wordListType}`}
                                 <IconButton
                                     onClick={(event) => {
@@ -456,42 +469,49 @@ class ResultsTab extends Component {
                             </div>} />)
                     )}
                 </Tabs>
-                {this.state.tabIndex === 0 && resultsTab}
-                {this.state.tabs.map((component, index) => {
-                    if (index + 1 === this.state.tabIndex) {
-                        return component;
-                    }
-                })}
-                <ButtonGroup variant="contained" color="primary" className={classes.export} ref={this.state.anchorRef} aria-label="Split button">
-                    <Button variant="contained" disabled={this.props.selectedResultRows.length === 0} className={clsx({ [classes.disabled]: this.props.selectedResultRows.length === 0 })} onClick={this.exportResultsDialog}>Export selected as {this.state.selectedExportType.displayName}</Button>
-                    <Button
-                        color="primary"
-                        variant="contained"
-                        size="small"
-                        onClick={this.handleMenuToggle}
-                    >
-                        <i className="material-icons">arrow_drop_down</i>
-                    </Button>
-                </ButtonGroup>
-                <Popper open={this.state.open} anchorEl={this.state.anchorRef.current} transition disablePortal>
-                    {() => (
-                        <Paper>
-                            <ClickAwayListener onClickAway={this.handleClose}>
-                                <MenuList>
-                                    {this.state.exportTypes.map((typeObj, index) => (
-                                        <MenuItem
-                                            key={index}
-                                            selected={typeObj.type === this.state.selectedExportType}
-                                            onClick={() => this.handleMenuItemClick(typeObj)}
-                                        >
-                                            {typeObj.displayName}
-                                        </MenuItem>
-                                    ))}
-                                </MenuList>
-                            </ClickAwayListener>
-                        </Paper>
-                    )}
-                </Popper>
+                <Container maxWidth='lg' classes={{ root: classes.container }}>
+
+                    {this.state.tabIndex === 0 && resultsTab}
+                    {this.state.tabs.map((component, index) => {
+                        if (index + 1 === this.state.tabIndex) {
+                            return component;
+                        }
+                    })}
+                    <div className={classes.buttonContainer}>
+                        <Button variant="contained" color="primary" disabled={this.props.processing} className={clsx({ [classes.disabled]: this.props.processing })} onClick={this.props.executeAll}>Execute</Button>
+                        <ButtonGroup variant="contained" color="primary" ref={this.state.anchorRef} aria-label="Split button">
+                            <Button variant="contained" disabled={this.props.selectedResultRows.length === 0} className={clsx({ [classes.disabled]: this.props.selectedResultRows.length === 0 })} onClick={this.exportResultsDialog}>Export selected as {this.state.selectedExportType.displayName}</Button>
+                            <Button
+                                color="primary"
+                                variant="contained"
+                                size="small"
+                                onClick={this.handleMenuToggle}
+                            >
+                                <i className="material-icons">arrow_drop_down</i>
+                            </Button>
+                        </ButtonGroup>
+                    </div>
+                    <Popper open={this.state.open} anchorEl={this.state.anchorRef.current} transition disablePortal>
+                        {() => (
+                            <Paper>
+                                <ClickAwayListener onClickAway={this.handleClose}>
+                                    <MenuList>
+                                        {this.state.exportTypes.map((typeObj, index) => (
+                                            <MenuItem
+                                                key={index}
+                                                selected={typeObj.type === this.state.selectedExportType}
+                                                onClick={() => this.handleMenuItemClick(typeObj)}
+                                            >
+                                                {typeObj.displayName}
+                                            </MenuItem>
+                                        ))}
+                                    </MenuList>
+                                </ClickAwayListener>
+                            </Paper>
+                        )}
+                    </Popper>
+                </Container>
+
             </div >
         );
     };

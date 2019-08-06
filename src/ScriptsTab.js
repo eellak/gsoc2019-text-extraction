@@ -6,7 +6,11 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 
-const styles = theme => ({})
+const styles = theme => ({
+    container: {
+        height: '100%'
+    }
+})
 /* ScriptsTab is a component, which renders a script selection tab.
 */
 class ScriptsTab extends Component {
@@ -22,7 +26,7 @@ class ScriptsTab extends Component {
     };
 
     render() {
-        
+
         const customScriptTab = (
             <CustomOptions
                 platform={this.props.platform}
@@ -54,10 +58,10 @@ class ScriptsTab extends Component {
         });
         const classes = this.props.classes;
         return (
-            <div>
+            <div className={classes.container}>
                 {/* <Typography variant="subtitle1" align="center">Select processing script</Typography> */}
                 <Tabs value={this.state.tabIndex} textColor="secondary" onChange={(event, tabIndex) => this.changeTab(tabIndex)}>
-                    {this.props.indices.map((obj, index) => <Tab key={index} label={obj.indexTypeDisplayName} />)}
+                    {this.props.indices.map(obj => <Tab key={obj.indexTypeDisplayName} label={obj.indexTypeDisplayName} />)}
                     <Tab label="CustomScript" />
                 </Tabs>
                 {tabs.map((component, index) => {

@@ -17,13 +17,19 @@ import Container from '@material-ui/core/Container';
 const styles = theme => ({
     root: {
         width: '100%',
-        marginTop: theme.spacing(3),
-        overflow: 'auto'
-      },
+        marginTop: theme.spacing(1),
+        overflow: 'auto',
+        height: `calc(100% - ${theme.spacing(1)}px - 31px)`
+    },
+    container: {
+        height: '100%',
+        paddingBottom: `${theme.spacing(1)}px`,
+        paddingTop: `${theme.spacing(1)}px`,
+    },
     flexContainer: {
-        display: 'flex'
+        display: 'flex',
+        alignItems: 'center'
     }
-
 });
 
 /* FilesTab is a stateless component, which renders
@@ -147,7 +153,7 @@ class FilesTab extends Component {
         let newOrder = {};
         if (this.props.order.columnId === columnId) {
             if (this.props.isDev) {
-                this.props.logMessage(`Sort by ${field}, ${this.props.order.asc ? 'ascending' : 'descending'}`, 'info');
+                // this.props.logMessage(`Sort by ${field}, ${this.props.order.asc ? 'ascending' : 'descending'}`, 'info');
             }
             newOrder = {
                 columnId: columnId,
@@ -171,11 +177,11 @@ class FilesTab extends Component {
         let columnId = 0;
         const classes = this.props.classes;
         return (
-            <Container maxWidth='md'>
+            <Container maxWidth='md' classes={{root: classes.container}}>
                 <Typography variant="h5" align="center">Select one or more files to be processed</Typography>
-                <div id="add-files">
                     {<Paper className={classes.root}>
-                    <Table padding='checkbox'>
+                    {/* <Table padding='checkbox'> */}
+                    <Table>
                             <TableHead>
                                 <TableRow>
                                     <StyledTableCell>
@@ -249,7 +255,6 @@ class FilesTab extends Component {
                         </Table>
                     </Paper>
                     }
-                </div>
             </Container >
             );
         };
@@ -257,7 +262,6 @@ class FilesTab extends Component {
 
 
 const StyledTableCell = withStyles(theme => {
-    console.log(theme)
     return ({
         head: {
             // "background-color": theme.palette.secondary.main,

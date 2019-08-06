@@ -11,8 +11,7 @@ const styles = theme => ({
     width: '100%',
     position: 'relative',
     overflow: 'auto',
-    maxHeight: '550px',
-    height: '50%'
+    maxHeight: '100%',
   },
   container: {
     display: 'flex',
@@ -43,6 +42,11 @@ const styles = theme => ({
   },
   root: {
     padding: '0 24px 0 24px'
+  },
+  container: {
+    height: 'calc(100% - 48px)',
+    paddingBottom: `${theme.spacing(1)}px`,
+    paddingTop: `${theme.spacing(1)}px`,
   }
 });
 
@@ -207,11 +211,11 @@ class CustomOptions extends Component {
   };
 
   render() {
-    console.log(this.props.selectedCustomScripts, this.props.savedScripts)
     const classes = this.props.classes;
     return (
-      <Container maxWidth='sm'>
+      <Container maxWidth='sm' classes={{root: classes.container}}>
         {/* <Typography variant="subtitle1" align="center">{"Create and select custom scripts (access selected filepaths in commandArgs using {filepaths})"}</Typography> */}
+              <Paper classes={{ root: classes.paper }}>
         <div className={classes.root}>
           <Checkbox
             onClick={this.handleToggleAll}
@@ -222,55 +226,51 @@ class CustomOptions extends Component {
             className={classes.button}>
             <i className="material-icons">add_circle</i>
           </IconButton>
-          <Typography display='inline'>Saved scripts</Typography>
-        </div>
-        {(() => {
-          if (this.props.savedScripts.length !== 0) {
-            return (
-              <Paper classes={{ root: classes.paper }}>
-                {this.props.savedScripts.map((scriptObj, index) => (
-                    <ExpansionPanel key={scriptObj.name}>
-                      <ExpansionPanelSummary
-                        expandIcon={<i className="material-icons">expand_more</i>}
-                      >
-                        <div>
-                          <Checkbox onClick={(e) => this.handleToggle(e, scriptObj.name)} checked={this.props.selectedCustomScripts.indexOf(scriptObj.name) !== -1} />
-                          <IconButton
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              // Send sync message in order to avoid sync errors when fetching books
-                              this.props.ipc.sendSync('delete-script', {
-                                name: scriptObj.name
-                              })
-                              this.getScript();
-                              // if (this.props.isDev) {
-                              //   this.props.logMessage(`Delete ${fileObj.path}`, 'info');
-                              // }
-                              let selectedCustomScripts = Object.assign([], this.props.selectedCustomScripts);
-                              if (selectedCustomScripts.indexOf(scriptObj.name) !== -1) {
-                                selectedCustomScripts.splice(selectedCustomScripts.indexOf(scriptObj.name), 1);
-                              }
-                              this.props.setDistantState({ selectedCustomScripts: selectedCustomScripts });
-                            }}
-                            className={classes.button}>
-                            <i className="material-icons">delete</i>
-                          </IconButton>
-                          <Typography display='inline' className={classes.heading}>{scriptObj.name}</Typography>
-                        </div>
-                      </ExpansionPanelSummary>
-                      <ExpansionPanelDetails className={classes.expansionPanel}>
-                        <Typography>Environment: {scriptObj.env}</Typography>
-                        <Typography>Script: {scriptObj.path}</Typography>
-                        <Typography>Arguments: {scriptObj.args}</Typography>
-                      </ExpansionPanelDetails>
-                    </ExpansionPanel>
-                ))}
-              </Paper>
-            )
-          }
-        })()
-        }
-
+            <Typography display='inline'>Saved scripts</Typography>
+          </div>
+          {(() => {
+            if (this.props.savedScripts.length !== 0) {
+              return this.props.savedScripts.map((scriptObj, index) => (
+                <ExpansionPanel key={scriptObj.name}>
+                  <ExpansionPanelSummary
+                    expandIcon={<i className="material-icons">expand_more</i>}
+                  >
+                    <div>
+                      <Checkbox onClick={(e) => this.handleToggle(e, scriptObj.name)} checked={this.props.selectedCustomScripts.indexOf(scriptObj.name) !== -1} />
+                      <IconButton
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          // Send sync message in order to avoid sync errors when fetching books
+                          this.props.ipc.sendSync('delete-script', {
+                            name: scriptObj.name
+                          })
+                          this.getScript();
+                          // if (this.props.isDev) {
+                          //   this.props.logMessage(`Delete ${fileObj.path}`, 'info');
+                          // }
+                          let selectedCustomScripts = Object.assign([], this.props.selectedCustomScripts);
+                          if (selectedCustomScripts.indexOf(scriptObj.name) !== -1) {
+                            selectedCustomScripts.splice(selectedCustomScripts.indexOf(scriptObj.name), 1);
+                          }
+                          this.props.setDistantState({ selectedCustomScripts: selectedCustomScripts });
+                        }}
+                        className={classes.button}>
+                        <i className="material-icons">delete</i>
+                      </IconButton>
+                      <Typography display='inline' className={classes.heading}>{scriptObj.name}</Typography>
+                    </div>
+                  </ExpansionPanelSummary>
+                  <ExpansionPanelDetails className={classes.expansionPanel}>
+                    <Typography>Environment: {scriptObj.env}</Typography>
+                    <Typography>Script: {scriptObj.path}</Typography>
+                    <Typography>Arguments: {scriptObj.args}</Typography>
+                  </ExpansionPanelDetails>
+                </ExpansionPanel>
+              ))
+            }
+    })()
+    }
+        </Paper>
         <Dialog disableBackdropClick disableEscapeKeyDown open={this.state.open} onClose={this.handleClose}>
           <DialogTitle>Fill every field</DialogTitle>
           <DialogContent>
