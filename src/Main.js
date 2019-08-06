@@ -17,6 +17,10 @@ import ListItemIcon from "@material-ui/core/ListItemIcon";
 
 // Basic styles for this component
 const drawerWidth = 180;
+const consoleHeight = 200;
+
+// Export for Console style prop
+export { consoleHeight };
 
 const styles = theme => ({
   appBar: {
@@ -47,12 +51,15 @@ const styles = theme => ({
   },
   tabs: {
     width: '100%',
-    margin: '15px 0 15px 0'
+    margin: `${theme.spacing(1)}px 0 0 0`,
+    height: `calc(100% - 64px - ${theme.spacing(1)}px)`
   },
   toolbar: theme.mixins.toolbar,
   content: {
     flexGrow: 1,
-    margin: theme.spacing(3),
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
     position: "relative"
   },
   contentWidthDrawerClosed: {
@@ -64,6 +71,11 @@ const styles = theme => ({
   main: {
     display: "flex",
     height: "100vh",
+  },
+
+  container: {
+    maxHeight: `calc(100% - ${consoleHeight}px)`,
+    height: 'fit-content'
   }
 });
 
@@ -144,7 +156,7 @@ class Main extends Component {
     })()
     this.executeScript(`${this.state.settings.get("rPath", "")}\\Rscript`, scriptPath, [this.state.settings.get("rlibPath", "Rlibrary")]);
     this.state.ipc.send('get-indices');
-    this.state.ipc.send('get-book', { order: this.state.fileOrder});
+    this.state.ipc.send('get-book', { order: this.state.fileOrder });
     this.state.ipc.send('get-script');
   }
 
@@ -341,9 +353,9 @@ class Main extends Component {
             >
               <i className="material-icons">chevron_left</i>
             </IconButton>
-            <IconButton 
-            color='primary'
-            onClick={this.handleDrawerToggle}
+            <IconButton
+              color='primary'
+              onClick={this.handleDrawerToggle}
               className={clsx({ [classes.hide]: this.state.openDrawer })}
             >
               <i className="material-icons">chevron_right</i>
@@ -360,12 +372,12 @@ class Main extends Component {
                   key={text}
                   selected={this.state.tabIndex === index}
                   onClick={() => this.changeTab(index)}
-                  >
+                >
                   <ListItemIcon>
                     {iconstList[index]}
                   </ListItemIcon>
                   <ListItemText
-                  primary={text}
+                    primary={text}
                   />
                 </ListItem>
                 )
@@ -373,52 +385,55 @@ class Main extends Component {
             </List>
           </Drawer>
           <div className={clsx(classes.content, { [classes.contentWidthDrawerClosed]: !this.state.openDrawer, [classes.contentWidthDrawerOpen]: this.state.openDrawer })}>
-            <div className={classes.toolbar} />
-            <div className={clsx(classes.tabs)}>
-              {this.state.tabIndex === 0 && <FilesTab
-                fs={this.state.fs}
-                ipc={this.state.ipc}
-                files={this.state.files}
-                order={this.state.fileOrder}
-                selectedFilesPaths={this.state.selectedFilesPaths}
-                electron={this.props.electron}
-                platform={this.props.platform}
-                isDev={this.props.isDev}
-                setDistantState={this.setDistantState}
-                logMessage={this.state.logMessage}
-              />}
-              {this.state.tabIndex === 1 && <ScriptsTab
-                fs={this.state.fs}
-                ipc={this.state.ipc}
-                electron={this.props.electron}
-                platform={this.props.platform}
-                isDev={this.props.isDev}
-                setDistantState={this.setDistantState}
-                selectedFilesPaths={this.state.selectedFilesPaths}
-                selectedCustomScripts={this.state.selectedCustomScripts}
-                indices={this.state.indices}
-                selectedIndices={this.state.selectedIndices}
-                settings={this.state.settings}
-                setScriptParameters={this.setScriptParameters}
-                logMessage={this.state.logMessage}
-                savedScripts={this.state.savedScripts}
-              />}
-              {this.state.tabIndex === 2 && <ResultsTab
-                getResults={this.getResults}
-                setDistantState={this.setDistantState}
-                selectedResultRows={this.state.selectedResultRows}
-                order={this.state.resultOrder}
-                processing={this.state.processing}
-                fs={this.state.fs}
-                additionalResults={this.state.additionalResults}
-                ipc={this.state.ipc}
-                electron={this.props.electron}
-                resultList={this.state.resultList}
-                executeAll={this.executeAll}
-                logMessage={this.state.logMessage}
-              />}
+            <div className={classes.container}>
+              <div className={classes.toolbar} />
+              <div className={clsx(classes.tabs, classes.correctHeight)}>
+                {this.state.tabIndex === 0 && <FilesTab
+                  fs={this.state.fs}
+                  ipc={this.state.ipc}
+                  files={this.state.files}
+                  order={this.state.fileOrder}
+                  selectedFilesPaths={this.state.selectedFilesPaths}
+                  electron={this.props.electron}
+                  platform={this.props.platform}
+                  isDev={this.props.isDev}
+                  setDistantState={this.setDistantState}
+                  logMessage={this.state.logMessage}
+                />}
+                {this.state.tabIndex === 1 && <ScriptsTab
+                  fs={this.state.fs}
+                  ipc={this.state.ipc}
+                  electron={this.props.electron}
+                  platform={this.props.platform}
+                  isDev={this.props.isDev}
+                  setDistantState={this.setDistantState}
+                  selectedFilesPaths={this.state.selectedFilesPaths}
+                  selectedCustomScripts={this.state.selectedCustomScripts}
+                  indices={this.state.indices}
+                  selectedIndices={this.state.selectedIndices}
+                  settings={this.state.settings}
+                  setScriptParameters={this.setScriptParameters}
+                  logMessage={this.state.logMessage}
+                  savedScripts={this.state.savedScripts}
+                />}
+                {this.state.tabIndex === 2 && <ResultsTab
+                  getResults={this.getResults}
+                  setDistantState={this.setDistantState}
+                  selectedResultRows={this.state.selectedResultRows}
+                  order={this.state.resultOrder}
+                  processing={this.state.processing}
+                  fs={this.state.fs}
+                  additionalResults={this.state.additionalResults}
+                  ipc={this.state.ipc}
+                  electron={this.props.electron}
+                  resultList={this.state.resultList}
+                  executeAll={this.executeAll}
+                  logMessage={this.state.logMessage}
+                />}
+              </div>
             </div>
             <Console
+            consoleHeight={consoleHeight}
               setDistantState={this.setDistantState}
               logMessage={this.state.logMessage} />
           </div>

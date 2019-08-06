@@ -3,19 +3,17 @@ import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/styles';
 import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
+import { consoleHeight } from './Main';
 
 const styles = theme => ({
 
     footer: {
-        position: 'absolute',
-        bottom: '0',
-        left: '0',
-        right: '0',
-        width: '100%',
-        height: '20%',
+        height: `${consoleHeight}px`,
         'overflow-y': 'scroll',
     },
-
+    padding: {
+        paddingLeft: '10px'
+    }
 });
 
 class Console extends Component {
@@ -50,7 +48,7 @@ class Console extends Component {
         return (
             <Paper id="console" classes={{ root: classes.footer }}>
                 {this.logArray.map((logObj, id) => (
-                    <Typography key={id}>{logObj.message}</Typography>
+                    <Typography key={id} classes={{root: classes.padding}}>{logObj.message}</Typography>
                 ))}
             </Paper>
         )
