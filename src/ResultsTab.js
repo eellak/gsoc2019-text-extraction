@@ -388,6 +388,9 @@ class ResultsTab extends Component {
                                         {Object.values(elem).map((value, id) => {
                                             if (typeof (value) === typeof ({})) {
                                                 return Object.values(value).map((val, idx) => {
+                                                    if(val === null) {
+                                                        val = 'null'
+                                                    }
                                                     const id = columnId++;
                                                     this.resultTable[i + 1][id] = val;
                                                     if (id === tokensColumnId) {

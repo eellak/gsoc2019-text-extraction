@@ -372,7 +372,7 @@ class Main extends Component {
               })}
             </List>
           </Drawer>
-            <div className={clsx(classes.content, {[classes.contentWidthDrawerClosed] : !this.state.openDrawer, [classes.contentWidthDrawerOpen] : this.state.openDrawer })}>
+          <div className={clsx(classes.content, { [classes.contentWidthDrawerClosed]: !this.state.openDrawer, [classes.contentWidthDrawerOpen]: this.state.openDrawer })}>
             <div className={classes.toolbar} />
             <div className={clsx(classes.tabs)}>
               {this.state.tabIndex === 0 && <FilesTab

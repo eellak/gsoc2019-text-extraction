@@ -212,7 +212,7 @@ ipcMain.on('add-results', event => {
 
 /* Create a channel between main and rendered process
 * for result search and return.
-* Returns user specified fields
+* Returns every user specified fields (null for missing fields)
 */
 ipcMain.on('get-results', (event, parameters) => {
   let direction = parameters.order.asc ? 1 : -1;
@@ -223,9 +223,9 @@ ipcMain.on('get-results', (event, parameters) => {
     "indices.vocabularyNum": 1,
     _id: 0
   }
-  Object.keys(parameters.indices).map(indexType => {
-    return (parameters.indices[indexType]).map(indexName => projection[`indices.${indexType}.${indexName.replace(/[.]/g, '_')}`] = 1)
-  });
+  Object.keys(parameters.indices).forEach(indexType =>
+    (parameters.indices[indexType]).map(indexName => projection[`indices.${indexType}.${indexName.replace(/[.]/g, '_')}`] = [`$indices.${indexType}.${indexName.replace(/[.]/g, '_')}`])
+  );
   Corpus.aggregate([
     {
       $match: {
@@ -241,6 +241,11 @@ ipcMain.on('get-results', (event, parameters) => {
         [parameters.order.by]: direction
       }
     }], (e, result) => {
+      result.forEach(resultObj =>
+        Object.keys(parameters.indices).forEach(indexType =>
+          (parameters.indices[indexType]).forEach(indexName => resultObj['indices'][indexType][indexName.replace(/[.]/g, '_')] = resultObj['indices'][indexType][indexName.replace(/[.]/g, '_')][0])
+          )
+          )
       // Send returned data through main - renderer channel
       event.sender.send('receive-results', result)
     })
