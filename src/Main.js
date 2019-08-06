@@ -74,8 +74,8 @@ const styles = theme => ({
   },
 
   container: {
-    maxHeight: `calc(100% - ${consoleHeight}px)`,
-    height: 'fit-content'
+    height: `calc(100% - ${consoleHeight}px)`,
+    overflow: 'hidden'
   }
 });
 

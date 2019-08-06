@@ -48,7 +48,9 @@ const styles = theme => ({
     container: {
         paddingBottom: `${theme.spacing(1)}px`,
         paddingTop: `${theme.spacing(1)}px`,
-        height: 'calc(100% - 48px)'
+        height: 'calc(100% - 60px)',
+        display: 'flex',
+        flexDirection: 'column'
     },
     outerContainer: {
         height: '100%'
@@ -261,7 +263,7 @@ class ResultsTab extends Component {
 
     generateWordListElement = wordList => {
         return (
-            <Paper key={wordList} classes={{ root: this.props.classes.listBox }}>
+            <div key={wordList} style={{ flex: '1 1 auto' }}>
                 <AutoSizer>
                     {({ height, width }) => (
                         <List
@@ -273,7 +275,7 @@ class ResultsTab extends Component {
                         />
                     )}
                 </AutoSizer>
-            </Paper>
+            </div>
         );
     }
 
@@ -307,6 +309,7 @@ class ResultsTab extends Component {
     }
 
     render() {
+        console.log(this.state.resultList)
         const classes = this.props.classes;
         let tokensColumnId, vocabularyColumnId;
         try {

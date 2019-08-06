@@ -19,7 +19,7 @@ const styles = theme => ({
         width: '100%',
         marginTop: theme.spacing(1),
         overflow: 'auto',
-        height: `calc(100% - ${theme.spacing(1)}px - 31px)`
+        maxHeight: `calc(100% - ${theme.spacing(1)}px - 31px)`
     },
     container: {
         height: '100%',
