@@ -46,7 +46,6 @@ class ScriptsTab extends Component {
                 key={index}
                 ipc={this.props.ipc}
                 setDistantState={this.props.setDistantState}
-                filePaths={this.props.selectedFilesPaths}
                 settings={this.props.settings}
                 type={obj.indexType}
                 env={obj.env}

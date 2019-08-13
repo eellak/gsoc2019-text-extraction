@@ -58,7 +58,7 @@ class ScriptOptions extends Component {
       const selectedIndices = this.props.selectedIndices[this.props.type] === undefined ? [] : this.props.selectedIndices[this.props.type];
       this.setState({ selectedIndices: selectedIndices });
 
-      if (selectedIndices.length === 0 || this.props.filePaths.length === 0) {
+      if (selectedIndices.length === 0) {
         console.log("Please select at least one file");
         this.props.setScriptParameters(true, this.props.type);
       }
@@ -99,33 +99,33 @@ class ScriptOptions extends Component {
   render() {
     const classes = this.props.classes;
     return (
-    <Container maxWidth='sm' classes={{root: classes.container}}>
+      <Container maxWidth='sm' classes={{ root: classes.container }}>
         {/* <Typography variant="subtitle1" align="center">Select one or more indices to extract</Typography> */}
-          <Paper classes={{ root: classes.root }}>
-            <List dense>
-              <ul className={classes.ul}>
-                <ListSubheader disableGutters={true}>
-                  <ListItem button onClick={this.handleToggleAll}>
-                    <Checkbox
-                      checked={this.state.selectedIndices.length === this.state.indices.length}
-                      indeterminate={this.state.selectedIndices.length !== this.state.indices.length && this.state.selectedIndices.length !== 0}
-                    />
-                    <ListItemText primary="All" />
-                  </ListItem>
-                </ListSubheader>
-            {this.state.indices.map((indexObj, i) => (
-              <ListItem key={i} button onClick={() => this.handleToggle(indexObj.indexName)}>
-                <Checkbox
-                  checked={this.state.selectedIndices.indexOf(indexObj.indexName) !== -1}
+        <Paper classes={{ root: classes.root }}>
+          <List dense>
+            <ul className={classes.ul}>
+              <ListSubheader disableGutters={true}>
+                <ListItem button onClick={this.handleToggleAll}>
+                  <Checkbox
+                    checked={this.state.selectedIndices.length === this.state.indices.length}
+                    indeterminate={this.state.selectedIndices.length !== this.state.indices.length && this.state.selectedIndices.length !== 0}
                   />
-                <ListItemText primary={indexObj.displayName} />
-              </ListItem>)
-            )}
+                  <ListItemText primary="All" />
+                </ListItem>
+              </ListSubheader>
+              {this.state.indices.map((indexObj, i) => (
+                <ListItem key={indexObj.indexName} button onClick={() => this.handleToggle(indexObj.indexName)}>
+                  <Checkbox
+                    checked={this.state.selectedIndices.indexOf(indexObj.indexName) !== -1}
+                  />
+                  <ListItemText primary={indexObj.displayName} />
+                </ListItem>)
+              )}
             </ul>
           </List>
         </Paper>
         {/* <Button size="small" variant="contained" onClick={this.changeArgs}>add</Button> */}
-        </Container>
+      </Container>
     );
   }
 }

@@ -165,7 +165,6 @@ class Main extends Component {
   */
 
   executeScript = (type, env, scriptPath, args = [], callback = undefined) => {
-    console.log(env,scriptPath, args)
     if (env[0] === '\\') env = env.slice(1);
 
     // Copy args
@@ -252,6 +251,7 @@ class Main extends Component {
     // Make tokens and types calculation compulsory
     if (addFreqAnalysis === true) {
       promises.push(createAsync({
+        type: 'misc',
         env: `${this.state.settings.get("rPath", "")}\\Rscript`,
         scriptPath: (() => {
           switch (this.state.platform) {
@@ -399,13 +399,13 @@ class Main extends Component {
                 {this.state.tabIndex === 0 && <FilesTab
                   fs={this.state.fs}
                   ipc={this.state.ipc}
-                  files={this.state.files}
-                  order={this.state.fileOrder}
-                  selectedFilesPaths={this.state.selectedFilesPaths}
                   electron={this.props.electron}
                   platform={this.props.platform}
                   isDev={this.props.isDev}
                   setDistantState={this.setDistantState}
+                  files={this.state.files}
+                  selectedFilesPaths={this.state.selectedFilesPaths}
+                  order={this.state.fileOrder}
                   logMessage={this.state.logMessage}
                 />}
                 {this.state.tabIndex === 1 && <ScriptsTab
@@ -415,27 +415,26 @@ class Main extends Component {
                   platform={this.props.platform}
                   isDev={this.props.isDev}
                   setDistantState={this.setDistantState}
-                  selectedFilesPaths={this.state.selectedFilesPaths}
                   selectedCustomScripts={this.state.selectedCustomScripts}
                   indices={this.state.indices}
                   selectedIndices={this.state.selectedIndices}
                   settings={this.state.settings}
                   setScriptParameters={this.setScriptParameters}
-                  logMessage={this.state.logMessage}
                   savedScripts={this.state.savedScripts}
+                  logMessage={this.state.logMessage}
                 />}
                 {this.state.tabIndex === 2 && <ResultsTab
-                  getResults={this.getResults}
+                  fs={this.state.fs}
+                  ipc={this.state.ipc}
+                  electron={this.props.electron}
                   setDistantState={this.setDistantState}
+                  executeAll={this.executeAll}
                   selectedResultRows={this.state.selectedResultRows}
                   order={this.state.resultOrder}
                   processing={this.state.processing}
-                  fs={this.state.fs}
+                  getResults={this.getResults}
                   additionalResults={this.state.additionalResults}
-                  ipc={this.state.ipc}
-                  electron={this.props.electron}
                   resultList={this.state.resultList}
-                  executeAll={this.executeAll}
                   logMessage={this.state.logMessage}
                 />}
               </div>
