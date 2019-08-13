@@ -18,7 +18,7 @@ args <- commandArgs(trailingOnly=T, asValues=T)
 filePaths <- unlist(strsplit(args[["filePaths"]], split=','));
 indices <- unlist(strsplit(args[["index"]], split=','));
 fileNames <- basename(filePaths)
-resultFilePath <- "results.json"
+resultFilePath <- "temp\\results_misc.json"
 
 result <- list()
 # result[["fileNames"]] <- fileNames

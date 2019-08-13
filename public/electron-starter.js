@@ -138,9 +138,9 @@ createMainWindow = (paramObj) => {
 /* Create a channel between main and rendered process
 * for book insertion
 */
-ipcMain.on('add-results', event => {
+ipcMain.on('add-results', (event, parameters) => {
   // Read data from certain json file
-  fs.readFile('results.json', 'utf8', (err, jsonString) => {
+  fs.readFile(`temp\\results_${parameters.resultType}.json`, 'utf8', (err, jsonString) => {
     if (err) {
       console.log("File read failed:", err)
       return;
@@ -151,8 +151,6 @@ ipcMain.on('add-results', event => {
     const booksNum = data.filePaths.length
     const filePaths = data.filePaths;
     delete data.filePaths;
-    // const fileNames = data.fileNames;
-    // delete data.fileNames;
     // Update or insert database with new data
     const operations = filePaths.map((filePath, index) => {
       let indices = {};
@@ -182,31 +180,6 @@ ipcMain.on('add-results', event => {
       }
     });
     Corpus.bulkWrite(operations, (error, res) => event.returnValue = res);
-
-
-    //   for (var i = 0; i < booksNum; i++) {
-    //     let indices = {};
-    //     // Replace '.' with '_' in index names in order to avoid problem with
-    //     // MongoDB indices retrieval
-    //     Object.keys(data).forEach(key => {
-    //       // Check for indices that store objects (readability, lexdiv, misc etc)
-    //       if (data[key][i].length === undefined) {
-    //         let indicesObject = {};
-    //         Object.keys(data[key][i]).forEach(indexName => {
-    //           indicesObject[indexName.replace(/[.]/g, '_')] = data[key][i][indexName];
-    //         })
-    //         data[key][i] = indicesObject;
-    //       }
-    //       indices[`indices.${key}`] = data[key][i];
-    //     });
-    //     Corpus.findOneAndUpdate({ path: filePaths[i] }, {
-    //       path: filePaths[i],
-    //       $set: indices
-    //     }, { upsert: true }, () => {
-    //     })
-    //   }
-    // });
-    // event.returnValue = 1;
   });
 });
 

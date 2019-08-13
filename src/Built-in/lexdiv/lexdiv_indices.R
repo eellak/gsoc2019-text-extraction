@@ -12,7 +12,7 @@ args <- commandArgs(trailingOnly=T, asValues=T)
 filePaths <- unlist(strsplit(args[["filePaths"]], split=','));
 
 fileNames <- basename(filePaths)
-resultFilePath <- "results.json"
+resultFilePath <- "temp\\results_lexdiv.json"
 books <- c()
 temp <- data.frame()
 for (i in 1:length(filePaths)) {

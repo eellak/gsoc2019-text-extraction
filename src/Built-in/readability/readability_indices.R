@@ -12,7 +12,7 @@ args <- commandArgs(trailingOnly=T, asValues=T)
 filePaths <- unlist(strsplit(args[["filePaths"]], split=','));
 
 fileNames <- basename(filePaths)
-resultFilePath <- "results.json"
+resultFilePath <- "temp\\results_readability.json"
 books <- c()
 for (i in 1:length(filePaths)) {
     books <- c(books, readtext(filePaths[i])$text)

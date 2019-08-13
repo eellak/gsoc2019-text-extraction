@@ -154,7 +154,7 @@ class Main extends Component {
           return './src/initializeR.R';
       }
     })()
-    this.executeScript(`${this.state.settings.get("rPath", "")}\\Rscript`, scriptPath, [this.state.settings.get("rlibPath", "Rlibrary")]);
+    this.executeScript('built-in', `${this.state.settings.get("rPath", "")}\\Rscript`, scriptPath, [this.state.settings.get("rlibPath", "Rlibrary")]);
     this.state.ipc.send('get-indices');
     this.state.ipc.send('get-book', { order: this.state.fileOrder });
     this.state.ipc.send('get-script');
@@ -164,7 +164,8 @@ class Main extends Component {
   * call a script using the npm's child_process module
   */
 
-  executeScript = (env, scriptPath, args = [], callback = undefined) => {
+  executeScript = (type, env, scriptPath, args = [], callback = undefined) => {
+    console.log(env,scriptPath, args)
     if (env[0] === '\\') env = env.slice(1);
 
     // Copy args
@@ -189,7 +190,9 @@ class Main extends Component {
     // Send message to main process to add new book to database
     process.stdout.on('data', (data) => {
       console.log(`${data}`)
-      this.state.ipc.send('add-results');
+      if (['readability', 'lexdiv', 'misc'].indexOf(type) !== -1) {
+        this.state.ipc.send('add-results', { resultType: type });
+      }
     });
 
 
@@ -211,12 +214,16 @@ class Main extends Component {
   * asynchronous manner.
   */
   executeAll = () => {
+    if (!this.state.fs.existsSync('temp')) {
+      this.state.fs.mkdirSync('temp');
+    }
+
     let promises = [];
     this.setState({ processing: true });
     const createAsync = execObj => {
       return new Promise((resolve, reject) => {
         this.state.logMessage(`Start execution of ${execObj.scriptPath}`, 'info');
-        this.executeScript(execObj.env, execObj.scriptPath, execObj.args, () => resolve());
+        this.executeScript(execObj.type, execObj.env, execObj.scriptPath, execObj.args, () => resolve());
       });
     };
 
@@ -224,6 +231,7 @@ class Main extends Component {
       // Maybe do a database call. Too silly
       const script = this.state.savedScripts.filter(scriptObj => scriptObj.name === scriptName)[0];
       promises.push(createAsync({
+        type: 'custom',
         env: script.env,
         scriptPath: script.path,
         args: script.args
@@ -309,7 +317,7 @@ class Main extends Component {
     let toExecute = this.state.toExecute;
     if (remove) delete toExecute[type];
     else {
-      toExecute[type] = { env: env, scriptPath: scriptPath, args: args }
+      toExecute[type] = { type: type, env: env, scriptPath: scriptPath, args: args }
       this.setState({ toExecute: toExecute });
     }
   };
