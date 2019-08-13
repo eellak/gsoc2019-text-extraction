@@ -190,7 +190,10 @@ class Main extends Component {
     process.stdout.on('data', (data) => {
       console.log(`${data}`)
       if (['readability', 'lexdiv', 'misc'].indexOf(type) !== -1) {
-        this.state.ipc.send('add-results', { resultType: type });
+        this.state.ipc.sendSync('add-results', { resultType: type });
+        if (callback !== undefined) {
+            callback();
+          }
       }
     });
 
@@ -199,12 +202,8 @@ class Main extends Component {
     process.on('exit', (code) => {
       this.state.logMessage(`Finished execution of ${scriptPath} ${code === 0 ? 'successfully' : 'unsuccessfully'}`, 'info');
       console.log(`child process exited with code ${code}`);
-      if (callback !== undefined) {
-        callback();
-      }
     });
-  };
-
+  }
   /* executeAll:
   * execute every script that currently is in the state's
   * toExecute object and in addition, calculates tokens and types of selected
