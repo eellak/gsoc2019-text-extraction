@@ -14,7 +14,7 @@ import ButtonGroup from '@material-ui/core/ButtonGroup';
 import Button from '@material-ui/core/Button';
 import MenuList from '@material-ui/core/MenuList';
 import MenuItem from '@material-ui/core/MenuItem';
-import { Container, Checkbox, Typography, Tabs, Tab, ListItem, ListItemText, IconButton } from '@material-ui/core';
+import { Snackbar, SnackbarContent, Container, Checkbox, Typography, Tabs, Tab, ListItem, ListItemText, IconButton } from '@material-ui/core';
 import { List, AutoSizer } from 'react-virtualized'
 
 const styles = theme => ({
@@ -63,6 +63,9 @@ const styles = theme => ({
     flexContainer: {
         display: 'flex',
         alignItems: 'center'
+    },
+    errorTitle: {
+        "text-align": "center"
     }
 });
 
@@ -72,6 +75,7 @@ class ResultsTab extends Component {
         this.state = {
             anchorRef: React.createRef(null),
             open: false,
+            snackbarOpen: false,
             exportTypes: [
                 {
                     type: 'csv',
@@ -101,6 +105,7 @@ class ResultsTab extends Component {
     // TODO : find better way?
     componentDidUpdate(prevProps) {
         if (prevProps.resultList !== this.props.resultList) {
+            this.setState({snackbarOpen: true})
             this.setResults();
             this.props.setDistantState({ selectedResultRows: [...Array(this.props.resultList.length).keys()] });
         }
@@ -111,15 +116,20 @@ class ResultsTab extends Component {
         this.props.resultList.forEach(elem => {
             resultList.push(Object.assign([], elem));
         });
+        console.log(resultList)
         resultList.forEach(bookObj => {
             const indices = bookObj.indices;
             delete bookObj.indices;
             delete bookObj.path
+            try{
             Object.keys(indices).map(index => {
                 if (indices[index].length !== 0)
                     bookObj[index] = indices[index];
             });
-            return bookObj
+        }
+        catch(e) {
+        }
+        return bookObj
         });
         this.setState({ resultList: resultList })
     }
@@ -245,6 +255,10 @@ class ResultsTab extends Component {
             selectedExportType: typeObj
         });
     };
+
+    closeSnackbar = () => {
+        this.setState({snackbarOpen: false})
+    }
 
     handleClose = event => {
         if (this.state.anchorRef.current && this.state.anchorRef.current.contains(event.target)) {
@@ -448,8 +462,34 @@ class ResultsTab extends Component {
                 </Table>
             </Paper>
         );
-        return (
+        const snackbar = (
+            <Snackbar
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'left',
+            }}
+            open={this.state.snackbarOpen}
+            autoHideDuration={10000}
+            onClose={this.closeSnackbar}
+          >
+            <SnackbarContent
+                message={
+                    <Typography classes={{ root: classes.errorTitle }}>There were errors during execution. Showing stored results for selected files, which might be partial, outdated and/or wrong.</Typography>
+                }
+                action={[
+                    <IconButton
+                    key="close"
+                    color="inherit"
+                    onClick={this.closeSnackbar}
+                  >
+                        <i className="material-icons">close</i>
+                  </IconButton>,
+                ]}
+            />
+           </Snackbar>       )
+                  return (
             <div className={classes.outerContainer}>
+                {this.props.error && snackbar}
                 <Tabs textColor="secondary" value={this.state.tabIndex} variant="scrollable" scrollButtons="auto" onChange={(event, tabIndex) => this.changeTab(tabIndex)}>
                     <Tab label="Results" />
                     {this.props.additionalResults.map((resultObj, index) => (

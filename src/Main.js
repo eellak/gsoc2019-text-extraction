@@ -182,9 +182,13 @@ class Main extends Component {
     const { spawn } = window.require('child_process');
     const process = spawn(env, [scriptPath].concat(newArgs));
 
-    // process.stderr.on('data', (data) => {
-    //   console.log(`${data}`);
-    //   });
+    process.on('error', (error) => {
+      this.setState({ error: true })
+      this.state.logMessage(`Process could not be spawned or killed. Error message:\n ${error}`, 'error');
+      if (callback !== undefined) {
+        callback();
+      }
+    });
 
     // Send message to main process to add new book to database
     process.stdout.on('data', (data) => {
@@ -192,16 +196,22 @@ class Main extends Component {
       if (['readability', 'lexdiv', 'misc'].indexOf(type) !== -1) {
         this.state.ipc.sendSync('add-results', { resultType: type });
         if (callback !== undefined) {
-            callback();
-          }
+          callback();
+        }
       }
     });
 
 
     // Call callback on exit (to resolve promise)
     process.on('exit', (code) => {
-      this.state.logMessage(`Finished execution of ${scriptPath} ${code === 0 ? 'successfully' : 'unsuccessfully'}`, 'info');
+      if (code !== 0) {
+        this.setState({ error: true })
+      }
+      this.state.logMessage(`Finished execution of ${scriptPath} ${code === 0 ? 'successfully' : 'unsuccessfully'}`, 'error');
       console.log(`child process exited with code ${code}`);
+      if (callback !== undefined) {
+        callback();
+      }
     });
   }
   /* executeAll:
@@ -217,7 +227,7 @@ class Main extends Component {
     }
 
     let promises = [];
-    this.setState({ processing: true });
+    this.setState({ processing: true, error: false });
     const createAsync = execObj => {
       return new Promise((resolve, reject) => {
         this.state.logMessage(`Start execution of ${execObj.scriptPath}`, 'info');
@@ -423,6 +433,7 @@ class Main extends Component {
                   logMessage={this.state.logMessage}
                 />}
                 {this.state.tabIndex === 2 && <ResultsTab
+                  error={this.state.error}
                   fs={this.state.fs}
                   ipc={this.state.ipc}
                   electron={this.props.electron}
@@ -439,7 +450,7 @@ class Main extends Component {
               </div>
             </div>
             <Console
-            consoleHeight={consoleHeight}
+              consoleHeight={consoleHeight}
               setDistantState={this.setDistantState}
               logMessage={this.state.logMessage} />
           </div>
