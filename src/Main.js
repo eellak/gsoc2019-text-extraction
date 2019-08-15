@@ -343,7 +343,7 @@ class Main extends Component {
         >
           <Toolbar>
             <Typography variant="h6" noWrap>
-              Testing grounds!
+              Text Extraction Tool
           </Typography>
           </Toolbar>
         </AppBar>
