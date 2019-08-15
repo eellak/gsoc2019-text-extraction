@@ -28,12 +28,12 @@
   font-family: 'Material Icons';
   font-style: normal;
   font-weight: 400;
-  src: url(../data/iconfont/MaterialIcons-Regular.eot); /* For IE6-8 */
+  src: url(../essentials/iconfont/MaterialIcons-Regular.eot); /* For IE6-8 */
   src: local('Material Icons'),
        local('MaterialIcons-Regular'),
-       url(../data/iconfont/MaterialIcons-Regular.woff2) format('woff2'),
-       url(../data/iconfont/MaterialIcons-Regular.woff) format('woff'),
-       url(../data/iconfont/MaterialIcons-Regular.ttf) format('truetype');
+       url(../essentials/iconfont/MaterialIcons-Regular.woff2) format('woff2'),
+       url(../essentials/iconfont/MaterialIcons-Regular.woff) format('woff'),
+       url(../essentials/iconfont/MaterialIcons-Regular.ttf) format('truetype');
 }
 
 .material-icons {

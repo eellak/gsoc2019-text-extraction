@@ -1,9 +1,10 @@
-// Contains the MongoDB schema of corpora
-const corpusSchema = require('../public/corpus.js');
+const path = require('path');
+  // Contains the MongoDB schema of corpora
+const corpusSchema = require(path.join(__dirname, '..\\essentials\\corpus.js'));
 // Contains the MongoDB schema of indices
-const indicesSchema = require('../public/indices.js');
+const indicesSchema = require(path.join(__dirname, '..\\essentials\\indices.js'));
 // Contains the MongoDB schema of script
-const scriptSchema = require('../public/script.js');
+const scriptSchema = require(path.join(__dirname, '..\\essentials\\script.js'));
 // Modules to control application life and create native browser window
 const electron = require('electron');
 // Module to control application life (app)
@@ -13,7 +14,6 @@ const electron = require('electron');
 const { app, BrowserWindow, Menu, ipcMain } = electron;
 // Package to determine run mode
 const isDev = require('electron-is-dev');
-const path = require('path');
 const settings = require('electron-settings');
 // Package to connect to database
 // Package to connect to database
@@ -52,7 +52,7 @@ createSettingsWindow = () => {
   });
 
   // and load the html using the appropriate path
-  settingsWindow.loadURL(isDev ? 'http://localhost:3000/settings' : /*TODO ??????????????????????*/ `file://${path.join(__dirname, '../build/index.html')}`);
+  settingsWindow.loadURL(isDev ? 'http://localhost:3000/settings' : /*TODO ??????????????????????*/ `file://${path.join(__dirname, 'index.html')}`);
   if (isDev) {
     // Open the DevTools.
     //BrowserWindow.addDevToolsExtension('<location to your react chrome extension>');
@@ -107,8 +107,10 @@ createMainWindow = (paramObj) => {
     }
   })
 
+  // BrowserWindow.addDevToolsExtension('C:\\Users\\panos\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions\\fmkadmapgofadopljbjfkapdkoienihi\\3.6.0_0')
+
   // and load the index.html of the app.
-  mainWindow.loadURL(isDev ? 'http://localhost:3000/main' : `file://${path.join(__dirname, '../build/index.html')}`);
+  mainWindow.loadURL(isDev ? 'http://localhost:3000/main' : `file://${path.join(__dirname, 'index.html')}`);
   if (isDev) {
     // Open the DevTools.
     mainWindow.webContents.toggleDevTools();
@@ -357,7 +359,7 @@ app.on('ready', () => {
   let { x, y } = settings.get('windowPosition', { x: 40, y: 60 });
   const firstTime = settings.get("firstTime", true);
   if (firstTime) {
-    fs.readFile('data\\indices\\indices.json', 'utf8', (err, jsonString) => {
+    fs.readFile(path.join(__dirname, '..\\essentials\\indices\\indices.json'), 'utf8', (err, jsonString) => {
       if (err) {
         console.log("File read failed:", err)
         return;
