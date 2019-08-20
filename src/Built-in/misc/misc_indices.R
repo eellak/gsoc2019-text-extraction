@@ -4,13 +4,13 @@ args <- commandArgs(trailingOnly=T)
 .libPaths(args[1])
 libPath <- args[1]
 library("R.utils")
-library("koRpus")
-library("koRpus.lang.en")
+# library("koRpus")
+# library("koRpus.lang.en")
 library("quanteda")
 library("readtext")
 library("jsonlite")
 
-set.kRp.env(lang="en", TT.options=list(path="C:\\TreeTagger", preset="en"))
+# set.kRp.env(lang="en", TT.options=list(path="C:\\TreeTagger", preset="en"))
 
 
 # Get and split commandArgs (paths of the files to process and readability indices)
@@ -45,12 +45,12 @@ for (k in 1:length(filePaths)) {
     V <- length(TYPES_LIST)
 
     freq_analysis <- textstat_frequency(features)
-    a <- tokenize(TYPES_LIST, format="obj", tag=F, lang=get.kRp.env(lang=T), split="\\ ")
-    tagged_text <- treetag(TYPES_LIST, treetagger="manual", format="obj", lang=get.kRp.env(lang=T), TT.options=get.kRp.env(TT.options=T), doc_id=fileNames[k])
+    # a <- tokenize(TYPES_LIST, format="obj", tag=F, lang=get.kRp.env(lang=T), split="\\ ")
+    # tagged_text <- treetag(TYPES_LIST, treetagger="manual", format="obj", lang=get.kRp.env(lang=T), TT.options=get.kRp.env(TT.options=T), doc_id=fileNames[k])
 
     AvgRank = freq_analysis$rank
     TYPE = freq_analysis$feature
-    POS = tagged_text@TT.res$tag
+    # POS = tagged_text@TT.res$tag
     Frequency = freq_analysis$frequency
 
     F <- Frequency
