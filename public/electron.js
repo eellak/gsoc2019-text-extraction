@@ -37,32 +37,32 @@ let Script = mongoose.model('script', scriptSchema);
 let mainWindow;
 let settingsWindow;
 
-createSettingsWindow = () => {
-  if (settingsWindow) return;
+// createSettingsWindow = () => {
+//   if (settingsWindow) return;
 
-  settingsWindow = new BrowserWindow({
-    title: "Settings",
-    resizable: false,
-    width: 600,
-    height: 460,
-    backgournd: "#f3f3f3",
-    webPreferences: {
-      nodeIntegration: true
-    }
-  });
+//   settingsWindow = new BrowserWindow({
+//     title: "Settings",
+//     resizable: false,
+//     width: 600,
+//     height: 460,
+//     backgournd: "#f3f3f3",
+//     webPreferences: {
+//       nodeIntegration: true
+//     }
+//   });
 
-  // and load the html using the appropriate path
-  settingsWindow.loadURL(isDev ? 'http://localhost:3000/settings' : /*TODO ??????????????????????*/ `file://${path.join(__dirname, 'index.html')}`);
-  if (isDev) {
-    // Open the DevTools.
-    //BrowserWindow.addDevToolsExtension('<location to your react chrome extension>');
-    settingsWindow.webContents.openDevTools();
-  }
-  settingsWindow.on('closed', function () {
-    settingsWindow = null;
-  });
+//   // and load the html using the appropriate path
+//   settingsWindow.loadURL(isDev ? 'http://localhost:3000/settings' : /*TODO ??????????????????????*/ `file://${path.join(__dirname, 'index.html')}`);
+//   if (isDev) {
+//     // Open the DevTools.
+//     //BrowserWindow.addDevToolsExtension('<location to your react chrome extension>');
+//     settingsWindow.webContents.openDevTools();
+//   }
+//   settingsWindow.on('closed', function () {
+//     settingsWindow = null;
+//   });
 
-};
+// };
 
 createMainWindow = (paramObj) => {
   let menu = Menu.buildFromTemplate([
@@ -70,12 +70,12 @@ createMainWindow = (paramObj) => {
       label: "File",
       submenu: [
         { type: "separator" },
-        {
-          label: "Settings",
-          click() {
-            this.createSettingsWindow();
-          }
-        },
+        // {
+        //   label: "Settings",
+        //   click() {
+        //     this.createSettingsWindow();
+        //   }
+        // },
         {
           label: "Toggle Dev Tools",
           click() {

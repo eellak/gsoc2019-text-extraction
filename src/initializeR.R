@@ -11,6 +11,7 @@ args <- commandArgs(trailingOnly=T)
 .libPaths(args)
 libPath <- args
 if (!require("koRpus")) { install.packages('koRpus', lib=libPath) }
+library("koRpus")
 if(!require(koRpus.lang.en)) { install.koRpus.lang("en", lib=libPath) }
 if(!require("quanteda")) { install.packages("quanteda", lib=libPath) }
 if(!require("readtext")) { install.packages("readtext", lib=libPath) }

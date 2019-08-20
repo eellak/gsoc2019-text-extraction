@@ -14,6 +14,13 @@ import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import Button from "@material-ui/core/Button";
+import FormControl from "@material-ui/core/FormControl";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import TextField from "@material-ui/core/TextField";
 
 // Basic styles for this component
 const drawerWidth = 180;
@@ -101,6 +108,7 @@ class Main extends Component {
       fs: window.require('fs'),
       ipc: props.electron.ipcRenderer,
       openDrawer: false,
+      openSettings: false,
       tabIndex: 0,
       processing: false,
       files: [],
@@ -121,6 +129,7 @@ class Main extends Component {
         by: 'name',
         asc: true
       },
+      savedScripts: [],
       savedScripts: [],
       logMessage: () => { }
     };
@@ -145,20 +154,39 @@ class Main extends Component {
   */
 
   componentDidMount() {
-    const scriptPath = (() => {
-      switch (this.props.platform) {
-        case "win32":
-          return '.\\src\\initializeR.R';
-        case "linux":
-        default:
-          return './src/initializeR.R';
-      }
-    })()
-    this.executeScript('built-in', `${this.state.settings.get("rPath", "")}\\Rscript`, scriptPath, [this.state.settings.get("rlibPath", "Rlibrary")]);
+    this.setState({
+      rPath: this.state.settings.get("rPath", "e.g. C:\\Program Files\\R\\R-3.6.0\\bin"),
+      rlibPath: this.state.settings.get("rlibPath", "e.g. C:\\Users\\panos\\Documents\\R\\win-library\\3.6")
+    })
+    if (this.state.settings.get("firstTime") === false && 
+    this.state.fs.existsSync(`${this.state.settings.get('rPath')}\\Rscript.exe`) &&  
+    this.state.fs.existsSync(`${this.state.settings.get('rlibPath')}`)) {
+      this.initializeR();
+    }
+    else {
+      this.setState({ openSettings: true })
+    }
     this.state.ipc.send('get-indices');
     this.state.ipc.send('get-book', { order: this.state.fileOrder });
     this.state.ipc.send('get-script');
   }
+
+/*
+ *
+*/
+
+initializeR = () => {
+  const scriptPath = (() => {
+    switch (this.props.platform) {
+      case "win32":
+        return '.\\src\\initializeR.R';
+      case "linux":
+      default:
+        return './src/initializeR.R';
+    }
+  })()
+  this.executeScript('built-in', `${this.state.settings.get("rPath", "")}\\Rscript`, scriptPath, [this.state.settings.get("rlibPath", "Rlibrary")]);
+};
 
   /* executeScript:
   * call a script using the npm's child_process module
@@ -189,7 +217,7 @@ class Main extends Component {
         callback();
       }
     });
-
+    
     // Send message to main process to add new book to database
     process.stdout.on('data', (data) => {
       console.log(`${data}`)
@@ -331,12 +359,77 @@ class Main extends Component {
     }
   };
 
+  addPathDialog = (obj) => {
+    const { type, placeholder } = obj;
+    const path = require('path');
+    const dialog = this.props.electron.remote.dialog;
+    dialog.showOpenDialog(this.props.electron.remote.getCurrentWindow(),
+      {
+        title: `Select folder path e.g. ${placeholder}`,
+        properties: ['openDirectory']
+      },
+      (folderPath) => {
+        if (folderPath !== undefined) {
+          folderPath = folderPath[0];
+          this.state.settings.set(type, folderPath)
+          this.setState({[type]: folderPath})
+        }
+      }
+    );
+  };
+
+  handleClose = () => {
+    this.setState({ openSettings: false });
+    this.initializeR();
+  };
+
   render() {
     const classes = this.props.classes;
     const theme = this.props.theme;
-
     return (
       <div>
+        <Dialog disableBackdropClick disableEscapeKeyDown open={this.state.openSettings} onClose={this.handleClose}>
+          <DialogTitle>Fill every field</DialogTitle>
+          <DialogContent>
+           {/* <input type="text" value={this.state.settings.get('rPath', "")} readOnly /><button onClick={this.addFilesDialog} id="r-path">...</button> */}
+
+            <form className={classes.container}>
+                <Button className={classes.customButton} onClick={() => this.addPathDialog({type: 'rPath', placeholder: "C:\\Program Files\\R\\R-3.6.0\\bin"})}>
+                  <TextField
+                  required
+                  error={!this.state.fs.existsSync(`${this.state.settings.get('rPath')}\\Rscript.exe`)}
+                    label="R bin directory"
+                    value={this.state["rPath"]}
+                    className={classes.textField}
+                    InputProps={{
+                      readOnly: true,
+                    }}
+                  />
+                </Button>
+                <Button className={classes.customButton} onClick={() => this.addPathDialog({type: 'rlibPath', placeholder: "C:\\Users\\panos\\Documents\\R\\win-library\\3.6"})}>
+                  <TextField
+                  required
+                  error={!this.state.fs.existsSync(this.state.settings.get('rlibPath'))}
+                    label="R library directory"
+                    value={this.state["rlibPath"]}
+                    className={classes.textField}
+                    InputProps={{
+                      readOnly: true,
+                    }}
+                  />
+                </Button>
+            </form>
+          </DialogContent>
+          <DialogActions>
+            <Button 
+            onClick={this.handleClose} 
+            disabled={!this.state.fs.existsSync(`${this.state.settings.get('rPath')}\\Rscript.exe`) || !this.state.fs.existsSync(this.state.settings.get('rlibPath'))} 
+            color="primary">
+              Save
+          </Button>
+          </DialogActions>
+        </Dialog>
+
         <AppBar
           position="fixed"
           className={clsx(classes.appBar)}
