@@ -18,7 +18,6 @@ import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import Button from "@material-ui/core/Button";
-import FormControl from "@material-ui/core/FormControl";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import TextField from "@material-ui/core/TextField";
 
@@ -79,10 +78,15 @@ const styles = theme => ({
     display: "flex",
     height: "100vh",
   },
-
   container: {
     height: `calc(100% - ${consoleHeight}px)`,
     overflow: 'hidden'
+  },
+  customButton: {
+    width: "100%"
+  },
+  textField: {
+    width: "100%"
   }
 });
 
