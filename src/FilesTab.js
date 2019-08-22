@@ -178,7 +178,7 @@ class FilesTab extends Component {
         const classes = this.props.classes;
         return (
             <Container maxWidth='md' classes={{root: classes.container}}>
-                <Typography variant="h5" align="center">Select one or more files to be processed</Typography>
+                {/* <Typography variant="h5" align="center">Select one or more files to be processed</Typography> */}
                     {<Paper className={classes.root}>
                     {/* <Table padding='checkbox'> */}
                     <Table>

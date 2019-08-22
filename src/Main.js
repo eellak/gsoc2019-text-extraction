@@ -162,9 +162,9 @@ class Main extends Component {
       rPath: this.state.settings.get("rPath", "e.g. C:\\Program Files\\R\\R-3.6.0\\bin"),
       rlibPath: this.state.settings.get("rlibPath", "e.g. C:\\Users\\panos\\Documents\\R\\win-library\\3.6")
     })
-    if (this.state.settings.get("firstTime") === false && 
-    this.state.fs.existsSync(`${this.state.settings.get('rPath')}\\Rscript.exe`) &&  
-    this.state.fs.existsSync(`${this.state.settings.get('rlibPath')}`)) {
+    if (this.state.settings.get("firstTime") === false &&
+      this.state.fs.existsSync(`${this.state.settings.get('rPath')}\\Rscript.exe`) &&
+      this.state.fs.existsSync(`${this.state.settings.get('rlibPath')}`)) {
       this.initializeR();
     }
     else {
@@ -175,22 +175,22 @@ class Main extends Component {
     this.state.ipc.send('get-script');
   }
 
-/*
- *
-*/
+  /*
+   *
+  */
 
-initializeR = () => {
-  const scriptPath = (() => {
-    switch (this.props.platform) {
-      case "win32":
-        return '.\\src\\initializeR.R';
-      case "linux":
-      default:
-        return './src/initializeR.R';
-    }
-  })()
-  this.executeScript('built-in', `${this.state.settings.get("rPath", "")}\\Rscript`, scriptPath, [this.state.settings.get("rlibPath", "Rlibrary")]);
-};
+  initializeR = () => {
+    const scriptPath = (() => {
+      switch (this.props.platform) {
+        case "win32":
+          return '.\\src\\initializeR.R';
+        case "linux":
+        default:
+          return './src/initializeR.R';
+      }
+    })()
+    this.executeScript('built-in', `${this.state.settings.get("rPath", "")}\\Rscript`, scriptPath, [this.state.settings.get("rlibPath", "Rlibrary")]);
+  };
 
   /* executeScript:
   * call a script using the npm's child_process module
@@ -221,7 +221,7 @@ initializeR = () => {
         callback();
       }
     });
-    
+
     // Send message to main process to add new book to database
     process.stdout.on('data', (data) => {
       console.log(`${data}`)
@@ -313,7 +313,6 @@ initializeR = () => {
     Promise.all(promises)
       .then(() => {
         this.getResults(this.state.resultOrder);
-        this.state.logMessage(`Get results`, 'info');
         this.setState({
           processing: false,
           resultOrder:
@@ -322,7 +321,8 @@ initializeR = () => {
             by: 'name',
             asc: true
           }
-        });
+        }, this.state.logMessage(`Get results`, 'info')
+        );
       });
   };
 
@@ -376,7 +376,7 @@ initializeR = () => {
         if (folderPath !== undefined) {
           folderPath = folderPath[0];
           this.state.settings.set(type, folderPath)
-          this.setState({[type]: folderPath})
+          this.setState({ [type]: folderPath })
         }
       }
     );
@@ -393,42 +393,43 @@ initializeR = () => {
     return (
       <div>
         <Dialog disableBackdropClick disableEscapeKeyDown open={this.state.openSettings} onClose={this.handleClose}>
-          <DialogTitle>Fill every field</DialogTitle>
+          {this.state.settings.get("firstTime") && <DialogTitle>Fill the two fields with correct paths</DialogTitle>}
+          {!this.state.settings.get("firstTime") && <DialogTitle>Correct the invalid paths</DialogTitle>}
           <DialogContent>
-           {/* <input type="text" value={this.state.settings.get('rPath', "")} readOnly /><button onClick={this.addFilesDialog} id="r-path">...</button> */}
+            {/* <input type="text" value={this.state.settings.get('rPath', "")} readOnly /><button onClick={this.addFilesDialog} id="r-path">...</button> */}
 
             <form className={classes.container}>
-                <Button className={classes.customButton} onClick={() => this.addPathDialog({type: 'rPath', placeholder: "C:\\Program Files\\R\\R-3.6.0\\bin"})}>
-                  <TextField
+              <Button className={classes.customButton} onClick={() => this.addPathDialog({ type: 'rPath', placeholder: "C:\\Program Files\\R\\R-3.6.0\\bin" })}>
+                <TextField
                   required
                   error={!this.state.fs.existsSync(`${this.state.settings.get('rPath')}\\Rscript.exe`)}
-                    label="R bin directory"
-                    value={this.state["rPath"]}
-                    className={classes.textField}
-                    InputProps={{
-                      readOnly: true,
-                    }}
-                  />
-                </Button>
-                <Button className={classes.customButton} onClick={() => this.addPathDialog({type: 'rlibPath', placeholder: "C:\\Users\\panos\\Documents\\R\\win-library\\3.6"})}>
-                  <TextField
+                  label="R bin directory"
+                  value={this.state["rPath"]}
+                  className={classes.textField}
+                  InputProps={{
+                    readOnly: true,
+                  }}
+                />
+              </Button>
+              <Button className={classes.customButton} onClick={() => this.addPathDialog({ type: 'rlibPath', placeholder: "C:\\Users\\panos\\Documents\\R\\win-library\\3.6" })}>
+                <TextField
                   required
                   error={!this.state.fs.existsSync(this.state.settings.get('rlibPath'))}
-                    label="R library directory"
-                    value={this.state["rlibPath"]}
-                    className={classes.textField}
-                    InputProps={{
-                      readOnly: true,
-                    }}
-                  />
-                </Button>
+                  label="R library directory"
+                  value={this.state["rlibPath"]}
+                  className={classes.textField}
+                  InputProps={{
+                    readOnly: true,
+                  }}
+                />
+              </Button>
             </form>
           </DialogContent>
           <DialogActions>
-            <Button 
-            onClick={this.handleClose} 
-            disabled={!this.state.fs.existsSync(`${this.state.settings.get('rPath')}\\Rscript.exe`) || !this.state.fs.existsSync(this.state.settings.get('rlibPath'))} 
-            color="primary">
+            <Button
+              onClick={this.handleClose}
+              disabled={!this.state.fs.existsSync(`${this.state.settings.get('rPath')}\\Rscript.exe`) || !this.state.fs.existsSync(this.state.settings.get('rlibPath'))}
+              color="primary">
               Save
           </Button>
           </DialogActions>

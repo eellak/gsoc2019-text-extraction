@@ -61,7 +61,7 @@ class ScriptsTab extends Component {
                 {/* <Typography variant="subtitle1" align="center">Select processing script</Typography> */}
                 <Tabs value={this.state.tabIndex} textColor="secondary" onChange={(event, tabIndex) => this.changeTab(tabIndex)}>
                     {this.props.indices.map(obj => <Tab key={obj.indexTypeDisplayName} label={obj.indexTypeDisplayName} />)}
-                    <Tab label="CustomScript" />
+                    <Tab label="Custom Script" />
                 </Tabs>
                 {tabs.map((component, index) => {
                     if (index === this.state.tabIndex) {

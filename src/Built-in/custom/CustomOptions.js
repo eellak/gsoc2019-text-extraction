@@ -272,19 +272,20 @@ class CustomOptions extends Component {
     }
         </Paper>
         <Dialog disableBackdropClick disableEscapeKeyDown open={this.state.open} onClose={this.handleClose}>
-          <DialogTitle>Fill every field</DialogTitle>
+          <DialogTitle>Fill every required field</DialogTitle>
           <DialogContent>
             <form className={classes.container}>
               <FormControl className={classes.formControl} error={this.props.savedScripts.map(scriptObj => scriptObj.name).indexOf(this.state.name) !== -1}>
                 <TextField
                   id="script-name"
                   label="Name"
+                  required
                   error={this.props.savedScripts.map(scriptObj => scriptObj.name).indexOf(this.state.name) !== -1}
                   className={classes.textField}
                   onChange={(event) => this.handleChange('name', event)}
                 />
               </FormControl>
-              <FormControl className={clsx(classes.formControl)}>
+              <FormControl required className={clsx(classes.formControl)}>
                 <InputLabel htmlFor="script-environment">Environment</InputLabel>
                 <Select
                   className={classes.customWidth}
@@ -302,7 +303,8 @@ class CustomOptions extends Component {
                   <TextField
                     id="script-path"
                     label="Script Path"
-                    className={classes.textField}
+                  required
+                  className={classes.textField}
                     InputProps={{
                       readOnly: true,
                     }}
