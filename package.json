@@ -19,20 +19,21 @@
   },
   "devDependencies": {
     "concurrently": "^4.1.0",
-    "electron": "^5.0.2",
-    "electron-builder": "^19.54.0",
     "cross-env": "^5.2.0",
+    "electron": "^5.0.2",
+    "electron-builder": "^21.2.0",
     "react-scripts": "0.9.5",
     "wait-on": "^3.2.0"
   },
   "build": {
-    "appId": "gsoc2019-text-extraction-tool",
+    "appId": "text-extraction",
+    "extraResources": "scripts/*",
     "files": [
       "build/**/*",
       "node_modules/**/*",
-      "data"
+      "resources/**/*"
     ],
-    "directories":{
+    "directories": {
       "buildResources": "assets"
     }
   },
@@ -44,9 +45,8 @@
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
     "electron-dev": "concurrently \"cross-env BROWSER=none npm start\" \"wait-on http://localhost:3000 && electron .\"",
-    "prod": "build --em.main=build/electron.js",
-    "release": "build --em.main=build/electron.js --publish=always",
-    "preprod": "npm run build",
-    "prerelease": "npm run build"
+    "package-win": "electron-packager . --overwrite --asar=true --platform=win32 --arch=ia32 --icon=src/assets/icons/win/icon.ico --prune=true --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName='text-extraction'",
+    "electron-pack": "electron-builder",
+    "preelectron-pack": "npm run build"
   }
 }

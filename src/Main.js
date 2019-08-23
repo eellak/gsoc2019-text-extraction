@@ -137,6 +137,7 @@ class Main extends Component {
       savedScripts: [],
       logMessage: () => { }
     };
+
     this.state.ipc.on('receive-results', (event, arg) => {
       this.setDistantState({ resultList: arg });
     });
@@ -180,15 +181,7 @@ class Main extends Component {
   */
 
   initializeR = () => {
-    const scriptPath = (() => {
-      switch (this.props.platform) {
-        case "win32":
-          return '.\\src\\initializeR.R';
-        case "linux":
-        default:
-          return './src/initializeR.R';
-      }
-    })()
+    const scriptPath = this.props.isDev ? 'scripts\\initializeR.R' : 'resources\\scripts\\initializeR.R';
     this.executeScript('built-in', `${this.state.settings.get("rPath", "")}\\Rscript`, scriptPath, [this.state.settings.get("rlibPath", "Rlibrary")]);
   };
 
@@ -263,7 +256,19 @@ class Main extends Component {
     const createAsync = execObj => {
       return new Promise((resolve, reject) => {
         this.state.logMessage(`Start execution of ${execObj.scriptPath}`, 'info');
-        this.executeScript(execObj.type, execObj.env, execObj.scriptPath, execObj.args, () => resolve());
+        let scriptPath;
+        if (execObj.type === 'custom') {
+          scriptPath = execObj.scriptPath;
+        }
+        else {
+          if (this.props.isDev) {
+            scriptPath = `scripts\\${execObj.scriptPath}`;
+          }
+          else {
+            scriptPath = `resources\\scripts\\${execObj.scriptPath}`;
+          }
+        }
+        this.executeScript(execObj.type, execObj.env, scriptPath, execObj.args, () => resolve());
       });
     };
 
@@ -297,10 +302,10 @@ class Main extends Component {
         scriptPath: (() => {
           switch (this.state.platform) {
             case "win32":
-              return "src\\Built-in\\misc\\misc_indices.R";
+              return "misc_indices.R";
             case "linux":
             default:
-              return "src/Built-in/misc/misc_indices.R";
+              return "misc_indices.R";
           }
         })(),
         args: [`${this.state.settings.get("rlibPath")}`].concat(`-filePaths=${this.state.selectedFilesPaths.join(',')}`).concat(`-index=tokens,vocabulary`)
@@ -321,8 +326,7 @@ class Main extends Component {
             by: 'name',
             asc: true
           }
-        }, this.state.logMessage(`Get results`, 'info')
-        );
+        });
       });
   };
 
@@ -384,6 +388,7 @@ class Main extends Component {
 
   handleClose = () => {
     this.setState({ openSettings: false });
+    this.state.ipc.send('get-indices');
     this.initializeR();
   };
 

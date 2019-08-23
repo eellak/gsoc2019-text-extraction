@@ -1,10 +1,10 @@
 const path = require('path');
-  // Contains the MongoDB schema of corpora
-const corpusSchema = require(path.join(__dirname, '..\\essentials\\corpus.js'));
+// Contains the MongoDB schema of corpora
+const corpusSchema = require(path.join(__dirname, '..\\resources\\corpus.js'));
 // Contains the MongoDB schema of indices
-const indicesSchema = require(path.join(__dirname, '..\\essentials\\indices.js'));
+const indicesSchema = require(path.join(__dirname, '..\\resources\\indices.js'));
 // Contains the MongoDB schema of script
-const scriptSchema = require(path.join(__dirname, '..\\essentials\\script.js'));
+const scriptSchema = require(path.join(__dirname, '..\\resources\\script.js'));
 // Modules to control application life and create native browser window
 const electron = require('electron');
 // Module to control application life (app)
@@ -32,6 +32,17 @@ let Corpus = mongoose.model('corpus', corpusSchema);
 let Indices = mongoose.model('indices', indicesSchema);
 let Script = mongoose.model('script', scriptSchema);
 
+const firstTime = settings.get("firstTime", true);
+
+if (firstTime) {
+  fs.readFile(path.join(__dirname, '..\\resources\\indices\\indices.json'), 'utf8', (err, jsonString) => {
+    if (err) {
+      console.log("File read failed:", err)
+      return;
+    }
+    Indices.insertMany(JSON.parse(jsonString));
+  })
+}
 // Keep a global reference of the window objects, if you don't, the windows will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
@@ -107,10 +118,8 @@ createMainWindow = (paramObj) => {
     }
   })
 
-  // BrowserWindow.addDevToolsExtension('C:\\Users\\panos\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions\\fmkadmapgofadopljbjfkapdkoienihi\\3.6.0_0')
-
   // and load the index.html of the app.
-  mainWindow.loadURL(isDev ? 'http://localhost:3000/main' : `file://${path.join(__dirname, 'index.html')}`);
+  mainWindow.loadURL(isDev ? 'http://localhost:3000/' : `file://${path.join(__dirname, '../build/index.html')}`);
   if (isDev) {
     // Open the DevTools.
     mainWindow.webContents.toggleDevTools();
@@ -219,8 +228,8 @@ ipcMain.on('get-results', (event, parameters) => {
       result.forEach(resultObj =>
         Object.keys(parameters.indices).forEach(indexType =>
           (parameters.indices[indexType]).forEach(indexName => resultObj['indices'][indexType][indexName.replace(/[.]/g, '_')] = resultObj['indices'][indexType][indexName.replace(/[.]/g, '_')][0])
-          )
-          )
+        )
+      )
       // Send returned data through main - renderer channel
       event.sender.send('receive-results', result)
     })
@@ -357,16 +366,6 @@ ipcMain.on('get-indices', event => {
 app.on('ready', () => {
   let { width, height } = settings.get('windowBounds', { width: 1024, height: 800 });
   let { x, y } = settings.get('windowPosition', { x: 40, y: 60 });
-  const firstTime = settings.get("firstTime", true);
-  if (firstTime) {
-    fs.readFile(path.join(__dirname, '..\\essentials\\indices\\indices.json'), 'utf8', (err, jsonString) => {
-      if (err) {
-        console.log("File read failed:", err)
-        return;
-      }
-      Indices.insertMany(JSON.parse(jsonString));
-    })
-  }
   createMainWindow({
     width: width,
     height: height,

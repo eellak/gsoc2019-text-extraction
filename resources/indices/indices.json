@@ -3,7 +3,7 @@
         "indexType": "readability",
         "env": "rPath",
         "indexTypeDisplayName": "Readability",
-        "scriptPath": "src\\Built-in\\readability\\readability_indices.R",
+        "scriptPath": "readability_indices.R",
         "indicesDeclaration": [
             {
                 "indexName": "ARI",
@@ -195,7 +195,7 @@
         "indexType": "lexdiv",
         "env": "rPath",
         "indexTypeDisplayName": "Lexical Diversity",
-        "scriptPath": "src\\Built-in\\lexdiv\\lexdiv_indices.R",
+        "scriptPath": "lexdiv_indices.R",
         "indicesDeclaration": [
             {
                 "indexName": "TTR",
@@ -259,7 +259,7 @@
         "indexType": "misc",
         "env": "rPath",
         "indexTypeDisplayName": "Miscellaneous",
-        "scriptPath": "src\\Built-in\\misc\\misc_indices.R",
+        "scriptPath": "misc_indices.R",
         "indicesDeclaration": [
             {
                 "indexName": "entropy",

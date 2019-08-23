@@ -55,7 +55,7 @@ class App extends Component {
       <ThemeProvider theme={theme}>
         <Switch>
           {/* <Route path='/settings' render={() => <Settings platform={this.state.platform} electron={this.state.electron} isDev={this.state.isDev} />} /> */}
-          <Route path='/main' render={() => <Main platform={this.state.platform} electron={this.state.electron} isDev={this.state.isDev} />} />
+          <Route path='/' render={() => <Main platform={this.state.platform} electron={this.state.electron} isDev={this.state.isDev} />} />
         </Switch>
       </ThemeProvider>
     );
