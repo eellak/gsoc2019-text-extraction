@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
 import { withStyles } from '@material-ui/styles';
-import ScriptOptions from './Built-in/ScriptOptions';
-import CustomOptions from './Built-in/custom/CustomOptions';
+import BuiltinScriptOptions from './Built-in/BuiltinScriptOptions';
+import CustomScriptOptions from './Built-in/custom/CustomScriptOptions';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-import Typography from '@material-ui/core/Typography';
 
 const styles = theme => ({
     container: {
@@ -28,7 +27,7 @@ class ScriptsTab extends Component {
     render() {
 
         const customScriptTab = (
-            <CustomOptions
+            <CustomScriptOptions
                 platform={this.props.platform}
                 selectedCustomScripts={this.props.selectedCustomScripts}
                 ipc={this.props.ipc} savedScripts={this.props.savedScripts}
@@ -42,7 +41,7 @@ class ScriptsTab extends Component {
         );
 
         const tabs = this.props.indices.map((obj, index) => {
-            return <ScriptOptions
+            return <BuiltinScriptOptions
                 key={index}
                 ipc={this.props.ipc}
                 setDistantState={this.props.setDistantState}
