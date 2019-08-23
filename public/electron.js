@@ -81,18 +81,21 @@ createMainWindow = (paramObj) => {
       label: "File",
       submenu: [
         { type: "separator" },
-        // {
-        //   label: "Settings",
-        //   click() {
-        //     this.createSettingsWindow();
-        //   }
-        // },
+        {
+          label: "Settings",
+          click() {
+            mainWindow.webContents.send('open-settings');
+          }
+        },
         {
           label: "Toggle Dev Tools",
           click() {
             mainWindow.webContents.toggleDevTools();
           },
           accelerator: "CmdOrCtrl+Shift+I"
+        },
+        {
+          type: "separator"
         },
         {
           label: "Exit",

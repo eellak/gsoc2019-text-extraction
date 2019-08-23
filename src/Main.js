@@ -137,7 +137,9 @@ class Main extends Component {
       savedScripts: [],
       logMessage: () => { }
     };
-
+    this.state.ipc.on('open-settings', (event, arg) => {
+      this.setDistantState({ openSettings: true });
+    });
     this.state.ipc.on('receive-results', (event, arg) => {
       this.setDistantState({ resultList: arg });
     });
