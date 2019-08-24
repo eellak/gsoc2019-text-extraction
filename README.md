@@ -9,8 +9,9 @@ The text analysis will come from scripts that combine many existing NLP packages
 The tool is going to be modular and open source, in order to be easily accessible and adaptable to everyone's needs. 
 The project is going to boost and facilitate scientific research in NLP fields, as it will make text analysis available to people with little to none computer science knowledge (e.g. linguistics students).
 
+This project is one of the projects that got accepted for the 2019 session of the [Google Summer of Code](https://summerofcode.withgoogle.com/about/). The final report, which includes a summary of the work that was done during the program, can be found [here](https://gist.github.com/PanagiotisP/568c028e3ca53431aa852afe4cc7b2e9).
+
 ## Project Timeline
-This project is one of the projects that got accepted for the 2019 session of the [Google Summer of Code](https://summerofcode.withgoogle.com/about/).
 The timeline of the development must comply with the official GSoC [timeline](https://summerofcode.withgoogle.com/how-it-works/#timeline) and is the following:
 
 * Community Bonding (May 6 - May 26)
@@ -30,10 +31,26 @@ The timeline of the development must comply with the official GSoC [timeline](ht
 * Coding - 3rd Phase (July 27 - August 26)
   * Add export and visualization options.
   * Test the application with real users and adapt to the feedback
-  
-  ## Contributors
-  * Mentor: Leventis Sotiris ([sotirisleventis](https://github.com/sotirisleventis))
-  * Mentor: Mikros George ([gmikros](https://github.com/gmikros))
-  * Mentor: Fitsilis Fotis ([fitsilisf](https://github.com/fitsilisf))
-  * Google Summer of Code 2019 Participant: Papantonakis Panagiotis ([PanagiotisP](https://github.com/PanagiotisP))
+
+## Demo
+Instructions on how to install and operate the applicatoin can be found at the relative [wiki page](https://github.com/eellak/gsoc2019-text-extraction/wiki/Installation-and-Operation).
+
+The performance of the processing is good enough, although there are many changes that can be done to improve it. Below is an example of calculating all of the currently supported indices on 24 files of 10MB total size (RAM peaked at ~1800 MB).
+
+## Future Work
+The application at the current state can be considered to be in alpha version. As such, it is expected to have many bugs and many areas for improvement. Some future enhancements that can be done are the following:
+
+ 1. Adopt Typescript
+ 2. Improve performance
+ 3. Add more indices
+ 4. Add workspaces
+ 5. Improve appearance
+ 
+ A full list of planned features and future work can be found [here](https://github.com/eellak/gsoc2019-text-extraction/wiki/Future-Work).
+
+## Contributors
+ * Mentor: Leventis Sotiris ([sotirisleventis](https://github.com/sotirisleventis))
+ * Mentor: Mikros George ([gmikros](https://github.com/gmikros))
+ * Mentor: Fitsilis Fotis ([fitsilisf](https://github.com/fitsilisf))
+ * Google Summer of Code 2019 Participant: Papantonakis Panagiotis ([PanagiotisP](https://github.com/PanagiotisP))
   
