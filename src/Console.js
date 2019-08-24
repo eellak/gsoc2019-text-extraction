@@ -1,9 +1,7 @@
-import React, { Component } from 'react';
-import Typography from '@material-ui/core/Typography';
-import { withStyles } from '@material-ui/styles';
-import Button from '@material-ui/core/Button';
-import Paper from '@material-ui/core/Paper';
 import { consoleHeight } from './Main';
+import React, { Component } from 'react';
+import { withStyles } from '@material-ui/styles';
+import { Typography, Paper } from '@material-ui/core';
 
 const styles = theme => ({
 

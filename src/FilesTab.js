@@ -1,18 +1,6 @@
 import React, { Component } from 'react';
-import Typography from '@material-ui/core/Typography';
-import clsx from 'clsx';
 import { withStyles } from '@material-ui/styles';
-import Button from '@material-ui/core/Button';
-import IconButton from '@material-ui/core/IconButton';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import TableSortLabel from '@material-ui/core/TableSortLabel';
-import Checkbox from '@material-ui/core/Checkbox';
-import Paper from '@material-ui/core/Paper';
-import Container from '@material-ui/core/Container';
+import { IconButton, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, Checkbox, Paper, Container } from '@material-ui/core';
 
 const styles = theme => ({
     root: {
@@ -32,9 +20,10 @@ const styles = theme => ({
     }
 });
 
-/* FilesTab is a stateless component, which renders
-* the tab responsible for file selection
-*/
+/**
+ * FilesTab is an, almost, stateless component, which renders
+ * the tab responsible for file selection
+ */
 class FilesTab extends Component {
     constructor(props) {
         super(props);
@@ -45,14 +34,17 @@ class FilesTab extends Component {
         this.getBook();
     }
 
+    /**
+     * Method for book fetching
+     */
     getBook = (order = { order: this.props.order }) => {
         this.props.ipc.send("get-book", order);
     };
 
-    /* addFilesDialog:
-    * This function opens an electron dialog in order to select input files.
-    * The selected files are then stored at the state of the Main component.
-    */
+    /**
+     * This function opens an electron dialog in order to select input files.
+     * The selected files are then stored at the state of the Main component.
+     */
     addFilesDialog = () => {
         if (this.props.isDev) {
             this.props.logMessage('Open dialog for file selection', 'info');
@@ -116,6 +108,9 @@ class FilesTab extends Component {
             });
     };
 
+    /**
+     * Method to select all files
+     */
     handleToggleAll = () => {
         if (this.props.selectedFilesPaths.length === this.props.files.length) {
             if (this.props.isDev) {
@@ -130,6 +125,9 @@ class FilesTab extends Component {
         }
     };
 
+    /**
+     * Method to select one
+     */
     handleToggle = (value) => {
         const currentIndex = this.props.selectedFilesPaths.indexOf(value);
         const newChecked = [...this.props.selectedFilesPaths];
@@ -149,6 +147,10 @@ class FilesTab extends Component {
         this.props.setDistantState({ selectedFilesPaths: newChecked });
     };
 
+    /**
+     * Method that stores table by columns. It does so by doing a database 
+     * query with the correct order 
+     */
     sortByColumn = (field, columnId) => {
         let newOrder = {};
         if (this.props.order.columnId === columnId) {
@@ -173,14 +175,32 @@ class FilesTab extends Component {
         this.getBook({ order: newOrder });
     }
 
+    /**
+     * Delete book method
+     */
+
+    deleteBook = (event, bookObj) => {
+        event.stopPropagation();
+        // Send sync message in order to avoid sync errors when fetching books
+        this.props.ipc.sendSync('delete-book', {
+            path: bookObj.path
+        })
+        this.getBook();
+        if (this.props.isDev) {
+            this.props.logMessage(`Delete ${bookObj.path}`, 'info');
+        }
+        let selectedFilesPaths = Object.assign([], this.props.selectedFilesPaths);
+        if (selectedFilesPaths.indexOf(bookObj.path) !== -1) {
+            selectedFilesPaths.splice(selectedFilesPaths.indexOf(bookObj.path), 1);
+        }
+        this.props.setDistantState({ selectedFilesPaths: selectedFilesPaths });
+    }
     render() {
         let columnId = 0;
         const classes = this.props.classes;
         return (
             <Container maxWidth='md' classes={{root: classes.container}}>
-                {/* <Typography variant="h5" align="center">Select one or more files to be processed</Typography> */}
                     {<Paper className={classes.root}>
-                    {/* <Table padding='checkbox'> */}
                     <Table>
                             <TableHead>
                                 <TableRow>
@@ -225,22 +245,7 @@ class FilesTab extends Component {
                                                 <Checkbox
                                                     checked={this.props.selectedFilesPaths.indexOf(fileObj.path) !== -1} />
                                                 <IconButton
-                                                    onClick={(event) => {
-                                                        event.stopPropagation();
-                                                        // Send sync message in order to avoid sync errors when fetching books
-                                                        this.props.ipc.sendSync('delete-book', {
-                                                            path: fileObj.path
-                                                        })
-                                                        this.getBook();
-                                                        if (this.props.isDev) {
-                                                            this.props.logMessage(`Delete ${fileObj.path}`, 'info');
-                                                        }
-                                                        let selectedFilesPaths = Object.assign([], this.props.selectedFilesPaths);
-                                                        if (selectedFilesPaths.indexOf(fileObj.path) !== -1) {
-                                                            selectedFilesPaths.splice(selectedFilesPaths.indexOf(fileObj.path), 1);
-                                                        }
-                                                        this.props.setDistantState({ selectedFilesPaths: selectedFilesPaths });
-                                                    }}
+                                                    onClick={(event) => this.deleteBook(event, fileObj)}
                                                     className={classes.button}>
                                                     <i className="material-icons">delete</i>
                                                 </IconButton>

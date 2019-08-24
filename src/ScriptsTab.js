@@ -1,17 +1,17 @@
-import React, { Component } from 'react';
-import { withStyles } from '@material-ui/styles';
 import BuiltinScriptOptions from './Built-in/BuiltinScriptOptions';
 import CustomScriptOptions from './Built-in/custom/CustomScriptOptions';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
+import React, { Component } from 'react';
+import { withStyles } from '@material-ui/styles';
+import { Tabs, Tab } from '@material-ui/core/';
 
 const styles = theme => ({
     container: {
         height: '100%'
     }
 })
-/* ScriptsTab is a component, which renders a script selection tab.
-*/
+/**
+ * ScriptsTab is a component, which renders a script selection tab.
+ */
 class ScriptsTab extends Component {
     constructor(props) {
         super(props);
@@ -19,7 +19,9 @@ class ScriptsTab extends Component {
             tabIndex: 0
         }
     }
-    // Change view tab according to user's selection
+    /**
+     * Change view tab according to user's selection
+     */
     changeTab = (tabIndex) => {
         this.setState({ tabIndex: Number(tabIndex) })
     };
@@ -57,7 +59,6 @@ class ScriptsTab extends Component {
         const classes = this.props.classes;
         return (
             <div className={classes.container}>
-                {/* <Typography variant="subtitle1" align="center">Select processing script</Typography> */}
                 <Tabs value={this.state.tabIndex} textColor="secondary" onChange={(event, tabIndex) => this.changeTab(tabIndex)}>
                     {this.props.indices.map(obj => <Tab key={obj.indexTypeDisplayName} label={obj.indexTypeDisplayName} />)}
                     <Tab label="Custom Script" />

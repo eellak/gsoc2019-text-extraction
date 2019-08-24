@@ -1,13 +1,6 @@
 import React, { Component } from 'react';
-import clsx from 'clsx';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import Checkbox from '@material-ui/core/Checkbox';
-import Paper from '@material-ui/core/Paper';
-import ListSubheader from '@material-ui/core/ListSubheader';
-import Container from '@material-ui/core/Container';
 import { withStyles } from '@material-ui/styles';
+import { List, ListItem, ListItemText, Checkbox, Paper, ListSubheader, Container } from '@material-ui/core';
 
 
 const styles = theme => ({

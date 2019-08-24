@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import clsx from 'clsx';
 import { withStyles } from '@material-ui/styles';
 import Typography from '@material-ui/core/Typography';
-import { Paper, Container, IconButton, Checkbox, ExpansionPanel, ExpansionPanelSummary, ExpansionPanelDetails, TextField, Input, DialogActions, Button, Dialog, DialogTitle, DialogContent, FormControl, InputLabel, Select, MenuItem, InputBase } from '@material-ui/core';
+import { Paper, Container, IconButton, Checkbox, ExpansionPanel, ExpansionPanelSummary, ExpansionPanelDetails, TextField, Input, DialogActions, Button, Dialog, DialogTitle, DialogContent, FormControl, InputLabel, Select, MenuItem } from '@material-ui/core'; 
+import clsx from 'clsx';
 
 const styles = theme => ({
   paper: {

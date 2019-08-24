@@ -1,21 +1,8 @@
 import React, { Component } from 'react';
-import clsx from 'clsx';
 import { withStyles } from '@material-ui/styles';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import TableSortLabel from '@material-ui/core/TableSortLabel';
-import Paper from '@material-ui/core/Paper';
-import Popper from '@material-ui/core/Popper';
-import ClickAwayListener from '@material-ui/core/ClickAwayListener';
-import ButtonGroup from '@material-ui/core/ButtonGroup';
-import Button from '@material-ui/core/Button';
-import MenuList from '@material-ui/core/MenuList';
-import MenuItem from '@material-ui/core/MenuItem';
-import { Snackbar, SnackbarContent, Container, Checkbox, Typography, Tabs, Tab, ListItem, ListItemText, IconButton } from '@material-ui/core';
+import { Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, Paper, Popper, ClickAwayListener, ButtonGroup, Button, MenuList, MenuItem, Snackbar, SnackbarContent, Container, Checkbox, Typography, Tabs, Tab, ListItem, ListItemText, IconButton } from '@material-ui/core';
 import { List, AutoSizer } from 'react-virtualized'
+import clsx from 'clsx';
 
 const styles = theme => ({
     listRow: {
@@ -101,12 +88,11 @@ class ResultsTab extends Component {
         this.setResults();
     }
 
-    // pass by value
-    // TODO : find better way?
     componentDidUpdate(prevProps) {
         if (prevProps.resultList !== this.props.resultList) {
             this.setState({snackbarOpen: true})
             this.setResults();
+            // pass by value
             this.props.setDistantState({ selectedResultRows: [...Array(this.props.resultList.length).keys()] });
         }
     }
