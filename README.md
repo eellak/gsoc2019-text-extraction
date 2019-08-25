@@ -31,7 +31,7 @@ The timeline of the development must comply with the official GSoC [timeline](ht
 Instructions on how to install and operate the application can be found at the relevant [wiki page](https://github.com/eellak/gsoc2019-text-extraction/wiki/Installation-and-Operation).
 
 The performance of the processing is good enough, although there are many changes that can be done to improve it. Below is an example of calculating all of the currently supported indices on 24 files of 10MB total size (RAM peaked at ~1800 MB).
-![performance](https://docs.google.com/document/d/e/2PACX-1vT6XpTlUSwaE7zCrp8saKWNKGZRkplNfPEttanEmXkO03y_gZoGf0ThOs5474HJ5j9Kq8oj-LNATNeE/pub)
+![performance](https://github.com/eellak/gsoc2019-text-extraction/blob/master/doc_images/performance.png "Performance demonstration")
 ## Future Work
 The application at the current state can be considered to be in alpha version. As such, it is expected to have many bugs and many areas for improvement. Some future enhancements that can be done are the following:
 
