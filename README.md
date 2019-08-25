@@ -27,9 +27,19 @@ The timeline of the development must comply with the official GSoC [timeline](ht
   * Add export and visualization options.
   * Test the application with real users and adapt to the feedback
 
-## Demo
+## Execution
 Instructions on how to install and operate the application can be found at the relevant [wiki page](https://github.com/eellak/gsoc2019-text-extraction/wiki/Installation-and-Operation).
 
+To run the application in development mode, firstly install the necessary npm package, by executing
+
+```npm install```
+ at the project's directory. Then run with
+
+```npm run electron-dev```
+
+This will run reactJS on port 3000, but instead of opening it in a browser, an electron window will open, hosting is.
+
+## Demo
 The performance of the processing is good enough, although there are many changes that can be done to improve it. Below is an example of calculating all of the currently supported indices on 24 files of 10MB total size (RAM peaked at ~1800 MB).
 ![performance](https://github.com/eellak/gsoc2019-text-extraction/blob/master/doc_images/performance.png "Performance demonstration")
 ## Future Work
