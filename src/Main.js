@@ -279,6 +279,13 @@ class Main extends Component {
       }
     });
 
+    if (this.props.isDev) {
+      // Debug message
+      process.stderr.on("data", data => {
+        console.log(`${data}`);
+      });
+    }
+
     // Call callback on exit (to resolve promise)
     process.on("exit", code => {
       if (code !== 0) {
